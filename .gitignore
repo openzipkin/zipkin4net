@@ -1,0 +1,12 @@
+*.nupkg
+*.suo
+*.user
+*.DotSettings
+bin/
+obj/
+packages/
+_ReSharper.*/
+
+.cbs/
+cbs.log
+logs/
