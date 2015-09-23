@@ -10,6 +10,7 @@
     <RootNamespace>Criteo.Profiling.Tracing</RootNamespace>
     <AssemblyName>Criteo.Profiling.Tracing</AssemblyName>
     <FileAlignment>512</FileAlignment>
+    <EnableThrift>true</EnableThrift>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -37,6 +38,10 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
+    <Reference Include="Thrift, Version=0.9.1.3, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>$(SolutionDir)\packages\Thrift.0.9.1.3\lib\net35\Thrift.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Annotations.cs" />
@@ -63,11 +68,26 @@
     <Compile Include="Tracers\ConsoleTracer.cs" />
     <Compile Include="Tracers\SamplerTracer.cs" />
     <Compile Include="Tracers\VoidTracer.cs" />
+    <Compile Include="Tracers\Zipkin\BinaryAnnotation.cs" />
+    <Compile Include="Tracers\Zipkin\IZipkinSender.cs" />
+    <Compile Include="Tracers\Zipkin\Span.cs" />
+    <Compile Include="Tracers\Zipkin\ZipkinAnnotation.cs" />
+    <Compile Include="Tracers\Zipkin\ZipkinAnnotationVisitor.cs" />
+    <Compile Include="Tracers\Zipkin\ZipkinTracer.cs" />
     <Compile Include="Utils\RandomUtils.cs" />
+    <Compile Include="Tracers\Zipkin\obj\gen_zipkinCore.thrift\Criteo\Profiling\Tracing\Tracers\Zipkin\Thrift\Annotation.cs" />
+    <Compile Include="Tracers\Zipkin\obj\gen_zipkinCore.thrift\Criteo\Profiling\Tracing\Tracers\Zipkin\Thrift\AnnotationType.cs" />
+    <Compile Include="Tracers\Zipkin\obj\gen_zipkinCore.thrift\Criteo\Profiling\Tracing\Tracers\Zipkin\Thrift\BinaryAnnotation.cs" />
+    <Compile Include="Tracers\Zipkin\obj\gen_zipkinCore.thrift\Criteo\Profiling\Tracing\Tracers\Zipkin\Thrift\Endpoint.cs" />
+    <Compile Include="Tracers\Zipkin\obj\gen_zipkinCore.thrift\Criteo\Profiling\Tracing\Tracers\Zipkin\Thrift\Span.cs" />
+    <Compile Include="Tracers\Zipkin\obj\gen_zipkinCore.thrift\Criteo\Profiling\Tracing\Tracers\Zipkin\Thrift\zipkinCore.Constants.cs" />
     <Compile Include="Utils\IpUtils.cs" />
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Service References\" />
+  </ItemGroup>
+  <ItemGroup>
+    <CompileThrift Include="Tracers\Zipkin\zipkinCore.thrift" />
   </ItemGroup>
   <Import Project="$(SolutionDir)\.cbs\moab.targets" Condition="Exists('$(SolutionDir)\.cbs\moab.targets')" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
