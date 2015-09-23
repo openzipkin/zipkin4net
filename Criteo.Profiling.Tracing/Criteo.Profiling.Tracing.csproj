@@ -59,6 +59,10 @@
     <Compile Include="Record.cs" />
     <Compile Include="Trace.cs" />
     <Compile Include="Tracer.cs" />
+    <Compile Include="Tracers\InMemoryTracer.cs" />
+    <Compile Include="Tracers\ConsoleTracer.cs" />
+    <Compile Include="Tracers\SamplerTracer.cs" />
+    <Compile Include="Tracers\VoidTracer.cs" />
     <Compile Include="Utils\RandomUtils.cs" />
     <Compile Include="Utils\IpUtils.cs" />
   </ItemGroup>
