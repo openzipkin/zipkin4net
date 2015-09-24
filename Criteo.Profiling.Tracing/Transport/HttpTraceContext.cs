@@ -36,8 +36,9 @@ namespace Criteo.Profiling.Tracing.Transport
                     trace = Trace.CreateFromId(id);
                     return true;
                 }
-                catch (Exception _)
+                catch (Exception ex)
                 {
+                    Trace.Logger.LogWarning("Couldn't parse trace context from HTTP headers. Trace is ignored. Message:" + ex.Message);
                 }
             }
 

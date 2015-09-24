@@ -20,14 +20,15 @@ namespace Criteo.Profiling.Tracing
 
         private static string defaultServiceName = "Unknown Service";
 
+        private static ILogger logger = new VoidLogger();
+
         /// <summary>
         /// Basic logger to record events. By default NO-OP logger.
         /// </summary>
-        private static ILogger logger = new VoidLogger();
-
-        public static void SetLogger(ILogger l)
+        public static ILogger Logger
         {
-            logger = l;
+            get { return logger; }
+            set { logger = value; }
         }
 
         /// <summary>
@@ -114,7 +115,7 @@ namespace Criteo.Profiling.Tracing
                 catch (Exception ex)
                 {
                     // No exception coming for traces should disrupt the main application as tracing is optional.
-                    logger.LogWarning("An error occured while recording the annotation. Msg: " + ex.Message);
+                    Logger.LogWarning("An error occured while recording the annotation. Msg: " + ex.Message);
                 }
             }
         }
