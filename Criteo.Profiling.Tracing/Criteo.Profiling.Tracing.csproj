@@ -74,6 +74,7 @@
     <Compile Include="Tracers\Zipkin\ZipkinAnnotation.cs" />
     <Compile Include="Tracers\Zipkin\ZipkinAnnotationVisitor.cs" />
     <Compile Include="Tracers\Zipkin\ZipkinTracer.cs" />
+    <Compile Include="Transport\HttpTraceContext.cs" />
     <Compile Include="Utils\RandomUtils.cs" />
     <Compile Include="Tracers\Zipkin\obj\gen_zipkinCore.thrift\Criteo\Profiling\Tracing\Tracers\Zipkin\Thrift\Annotation.cs" />
     <Compile Include="Tracers\Zipkin\obj\gen_zipkinCore.thrift\Criteo\Profiling\Tracing\Tracers\Zipkin\Thrift\AnnotationType.cs" />

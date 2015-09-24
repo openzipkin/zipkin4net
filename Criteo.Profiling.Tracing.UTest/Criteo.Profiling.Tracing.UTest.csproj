@@ -57,6 +57,7 @@
     <Compile Include="Tracers\Zipkin\T_Span.cs" />
     <Compile Include="Tracers\Zipkin\T_ZipkinAnnotation.cs" />
     <Compile Include="Tracers\Zipkin\T_ZipkinAnnotationVisitor.cs" />
+    <Compile Include="Transport\T_HttpTraceContext.cs" />
     <Compile Include="Tracers\Zipkin\T_ZipkinTracer.cs" />
     <Compile Include="T_Annotations.cs" />
     <Compile Include="T_Flags.cs" />
