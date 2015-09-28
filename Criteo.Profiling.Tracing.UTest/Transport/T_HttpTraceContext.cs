@@ -9,6 +9,17 @@ namespace Criteo.Profiling.Tracing.UTest.Transport
     {
 
         [Test]
+        public void FailsToGetTraceFromRequestWithoutContext()
+        {
+            var headers = new NameValueCollection();
+            headers["Some-HTTP-header"] = "value";
+
+            Trace receivedTrace;
+            Assert.False(HttpTraceContext.TryGet(headers, out receivedTrace));
+            Assert.IsNull(receivedTrace);
+        }
+
+        [Test]
         public void SerializedTraceIsEqualToOriginal()
         {
             var originalTrace = Trace.Create();
@@ -49,7 +60,6 @@ namespace Criteo.Profiling.Tracing.UTest.Transport
         [Test]
         public void HeadersAreCorrectlySet()
         {
-
             var traceId = new SpanId(1, 0, 250, Flags.Empty().SetSampled());
             var trace = Trace.CreateFromId(traceId);
 
@@ -134,7 +144,6 @@ namespace Criteo.Profiling.Tracing.UTest.Transport
         [Test]
         public void LongIdEncodingIsCorrect()
         {
-
             const long notEncodedLong = 170;
             const string expectedEncodedLong = "00000000000000AA";
 

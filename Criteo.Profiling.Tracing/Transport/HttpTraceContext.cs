@@ -6,6 +6,10 @@ namespace Criteo.Profiling.Tracing.Transport
 {
     public class HttpTraceContext
     {
+        /// <summary>
+        /// See https://twitter.github.io/zipkin/Instrumenting.html#communicating-trace-information
+        /// for the description of the HTTP Headers used
+        /// </summary>
         public const string TraceId = "X-B3-TraceId";
         public const string SpanId = "X-B3-SpanId";
         public const string ParentSpanId = "X-B3-ParentSpanId";
