@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Globalization;
 
@@ -16,41 +17,80 @@ namespace Criteo.Profiling.Tracing.Transport
         public const string Sampled = "X-B3-Sampled"; // Will be replaced by Flags in the future releases of Finagle
         public const string Flags = "X-B3-Flags";
 
-        public static bool TryGet(NameValueCollection headers, out Trace trace)
+        public static bool TryGet(IDictionary<string, string> headers, out Trace trace)
         {
-            var encodedTraceId = headers[TraceId];
-            var encodedSpanId = headers[SpanId];
-            var encodedParentSpanId = headers[ParentSpanId];
+            string encodedTraceId, encodedSpanId, encodedParentSpanId;
 
-            if (!String.IsNullOrWhiteSpace(encodedTraceId) && !String.IsNullOrWhiteSpace(encodedSpanId) &&
-                !String.IsNullOrWhiteSpace(encodedParentSpanId))
+            if (headers.TryGetValue(TraceId, out encodedTraceId)
+                && headers.TryGetValue(SpanId, out encodedSpanId)
+                && headers.TryGetValue(ParentSpanId, out encodedParentSpanId))
             {
-                try
-                {
-                    var traceId = DecodeHexString(encodedTraceId);
-                    var spanId = DecodeHexString(encodedSpanId);
-                    var parentSpanId = DecodeHexString(encodedParentSpanId);
-                    var sampled = ParseSampledHeader(headers[Sampled]);
-                    var flags = ParseFlagsHeader(headers[Flags]);
-
-                    if (sampled != null)
-                        flags = sampled.Value ? flags.SetSampled() : flags.SetNotSampled();
-
-                    var id = new SpanId(traceId, parentSpanId, spanId, flags);
-                    trace = Trace.CreateFromId(id);
-                    return true;
-                }
-                catch (Exception ex)
-                {
-                    Trace.Logger.LogWarning("Couldn't parse trace context from HTTP headers. Trace is ignored. Message:" + ex.Message);
-                }
+                string flagsStr, sampledStr;
+                headers.TryGetValue(Flags, out flagsStr);
+                headers.TryGetValue(Sampled, out sampledStr);
+                return TryParseTrace(encodedTraceId, encodedSpanId, encodedParentSpanId, sampledStr, flagsStr, out trace);
             }
 
             trace = default(Trace);
             return false;
         }
 
+        public static bool TryGet(NameValueCollection headers, out Trace trace)
+        {
+            return TryParseTrace(headers[TraceId], headers[SpanId], headers[ParentSpanId], headers[Sampled], headers[Flags], out trace);
+        }
+
+        internal static bool TryParseTrace(string encodedTraceId, string encodedSpanId, string encodedParentSpanId, string sampledStr, string flagsStr, out Trace trace)
+        {
+            if (String.IsNullOrWhiteSpace(encodedTraceId)
+                || String.IsNullOrWhiteSpace(encodedSpanId)
+                || String.IsNullOrWhiteSpace(encodedParentSpanId))
+            {
+                trace = default(Trace);
+                return false;
+            }
+
+            try
+            {
+                var traceId = DecodeHexString(encodedTraceId);
+                var spanId = DecodeHexString(encodedSpanId);
+                var parentSpanId = DecodeHexString(encodedParentSpanId);
+                var flags = ParseFlagsHeader(flagsStr);
+                var sampled = ParseSampledHeader(sampledStr);
+
+                if (sampled != null)
+                    flags = sampled.Value ? flags.SetSampled() : flags.SetNotSampled();
+
+                var id = new SpanId(traceId, parentSpanId, spanId, flags);
+                trace = Trace.CreateFromId(id);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Trace.Logger.LogWarning("Couldn't parse trace context. Trace is ignored. Message:" + ex.Message);
+            }
+
+            trace = default(Trace);
+            return false;
+        }
+
+        // Duplicate code... Don't know any way to avoid this
         public static void Set(NameValueCollection headers, Trace trace)
+        {
+            var traceId = trace.CurrentId;
+
+            headers[TraceId] = EncodeLongToHexString(traceId.TraceId);
+            headers[SpanId] = EncodeLongToHexString(traceId.Id);
+            headers[ParentSpanId] = EncodeLongToHexString(traceId.ParentSpanId);
+            headers[Flags] = traceId.Flags.ToLong().ToString(CultureInfo.InvariantCulture);
+
+            // Add "Sampled" header for compatibility with Finagle
+            if (traceId.Flags.IsSamplingKnown())
+                headers[Sampled] = traceId.Flags.IsSampled() ? "1" : "0";
+        }
+
+        // Duplicate code... Don't know any way to avoid this
+        public static void Set(IDictionary<string, string> headers, Trace trace)
         {
             var traceId = trace.CurrentId;
 

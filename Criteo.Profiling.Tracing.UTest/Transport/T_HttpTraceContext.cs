@@ -1,4 +1,5 @@
-﻿using System.Collections.Specialized;
+﻿using System.Collections.Generic;
+using System.Collections.Specialized;
 using Criteo.Profiling.Tracing.Transport;
 using NUnit.Framework;
 
@@ -9,13 +10,30 @@ namespace Criteo.Profiling.Tracing.UTest.Transport
     {
 
         [Test]
-        public void FailsToGetTraceFromRequestWithoutContext()
+        [TestCase("", "", "", "", "")]
+        [TestCase(null, null, null, null, null)]
+        [TestCase("0000000000000001", null, null, null, null)]
+        [TestCase("0000000000000001", "", null, null, null)]
+        [TestCase("0000000000000001", "0000000000000000", null, null, null)]
+        [TestCase("0000000000000001", "0000000000000000", "", null, null)]
+        public void FailsToParseTraceFromNullOrEmpty(string encodedTraceId, string encodedSpanId, string encodedParentSpanId, string sampledStr, string flagsStr)
         {
-            var headers = new NameValueCollection();
-            headers["Some-HTTP-header"] = "value";
-
             Trace receivedTrace;
-            Assert.False(HttpTraceContext.TryGet(headers, out receivedTrace));
+            Assert.False(HttpTraceContext.TryParseTrace(encodedTraceId, encodedSpanId, encodedParentSpanId, sampledStr, flagsStr, out receivedTrace));
+            Assert.IsNull(receivedTrace);
+        }
+
+        [Test]
+        public void FailsToGetTraceFromEmptyHeaders()
+        {
+            Trace receivedTrace;
+
+            // NameValueCollection
+            Assert.False(HttpTraceContext.TryGet(new NameValueCollection(), out receivedTrace));
+            Assert.IsNull(receivedTrace);
+
+            // IDictionnary
+            Assert.False(HttpTraceContext.TryGet(new Dictionary<string, string>(), out receivedTrace));
             Assert.IsNull(receivedTrace);
         }
 
@@ -24,41 +42,47 @@ namespace Criteo.Profiling.Tracing.UTest.Transport
         {
             var originalTrace = Trace.Create();
 
-            var headers = new NameValueCollection();
+            var headersNvc = new NameValueCollection();
+            var headersDict = new Dictionary<string, string>();
 
-            HttpTraceContext.Set(headers, originalTrace);
+            HttpTraceContext.Set(headersNvc, originalTrace);
+            HttpTraceContext.Set(headersDict, originalTrace);
 
-            Trace receivedTrace;
-            Assert.True(HttpTraceContext.TryGet(headers, out receivedTrace));
+            Trace receivedTraceNvc;
+            Assert.True(HttpTraceContext.TryGet(headersNvc, out receivedTraceNvc));
+            Assert.AreEqual(originalTrace, receivedTraceNvc);
 
-            Assert.AreEqual(originalTrace, receivedTrace);
+            Trace receivedTraceDict;
+            Assert.True(HttpTraceContext.TryGet(headersDict, out receivedTraceDict));
+            Assert.AreEqual(originalTrace, receivedTraceDict);
         }
 
         [Test]
         public void DeserializedTraceIsEqualToOriginal()
         {
-            var headers = new NameValueCollection();
-            headers[HttpTraceContext.TraceId] = "0000000000000001";
-            headers[HttpTraceContext.ParentSpanId] = "0000000000000000";
-            headers[HttpTraceContext.SpanId] = "00000000000000FA";
-            headers[HttpTraceContext.Flags] = "0";
+            const string encodedTraceId = "0000000000000001";
+            const string encodedSpanId = "0000000000000000";
+            const string encodedParentSpanId = "00000000000000FA";
+            const string flagsStr = "0";
+            const string sampledStr = null;
+
 
             Trace receivedTrace;
-            Assert.True(HttpTraceContext.TryGet(headers, out receivedTrace));
+            Assert.True(HttpTraceContext.TryParseTrace(encodedTraceId, encodedSpanId, encodedParentSpanId, sampledStr, flagsStr, out receivedTrace));
 
             var recreatedHeaders = new NameValueCollection();
             HttpTraceContext.Set(recreatedHeaders, receivedTrace);
 
-            Assert.AreEqual(headers.Count, recreatedHeaders.Count);
+            Assert.AreEqual(4, recreatedHeaders.Count);
 
-            Assert.AreEqual(headers[HttpTraceContext.TraceId], recreatedHeaders[HttpTraceContext.TraceId]);
-            Assert.AreEqual(headers[HttpTraceContext.ParentSpanId], recreatedHeaders[HttpTraceContext.ParentSpanId]);
-            Assert.AreEqual(headers[HttpTraceContext.SpanId], recreatedHeaders[HttpTraceContext.SpanId]);
-            Assert.AreEqual(headers[HttpTraceContext.Flags], recreatedHeaders[HttpTraceContext.Flags]);
+            Assert.AreEqual(encodedTraceId, recreatedHeaders[HttpTraceContext.TraceId]);
+            Assert.AreEqual(encodedParentSpanId, recreatedHeaders[HttpTraceContext.ParentSpanId]);
+            Assert.AreEqual(encodedSpanId, recreatedHeaders[HttpTraceContext.SpanId]);
+            Assert.AreEqual(flagsStr, recreatedHeaders[HttpTraceContext.Flags]);
         }
 
         [Test]
-        public void HeadersAreCorrectlySet()
+        public void HeadersAreCorrectlySetNvc()
         {
             var traceId = new SpanId(1, 0, 250, Flags.Empty().SetSampled());
             var trace = Trace.CreateFromId(traceId);
@@ -77,15 +101,29 @@ namespace Criteo.Profiling.Tracing.UTest.Transport
         }
 
         [Test]
-        public void GetWithoutFlagsIsCorrectlyCreated()
+        public void HeadersAreCorrectlySetDict()
         {
-            var headers = new NameValueCollection();
-            headers[HttpTraceContext.TraceId] = "0000000000000001";
-            headers[HttpTraceContext.ParentSpanId] = "0000000000000000";
-            headers[HttpTraceContext.SpanId] = "00000000000000FA";
+            var traceId = new SpanId(1, 0, 250, Flags.Empty().SetSampled());
+            var trace = Trace.CreateFromId(traceId);
 
+            var headers = new Dictionary<string, string>();
+
+            HttpTraceContext.Set(headers, trace);
+
+            Assert.AreEqual(5, headers.Count);
+
+            Assert.AreEqual("0000000000000001", headers[HttpTraceContext.TraceId]);
+            Assert.AreEqual("0000000000000000", headers[HttpTraceContext.ParentSpanId]);
+            Assert.AreEqual("00000000000000FA", headers[HttpTraceContext.SpanId]);
+            Assert.AreEqual("6", headers[HttpTraceContext.Flags]);
+            Assert.AreEqual("1", headers[HttpTraceContext.Sampled]);
+        }
+
+        [Test]
+        public void ParseTraceWithoutFlags()
+        {
             Trace trace;
-            Assert.True(HttpTraceContext.TryGet(headers, out trace));
+            Assert.True(HttpTraceContext.TryParseTrace(encodedTraceId: "0000000000000001", encodedSpanId: "00000000000000FA", encodedParentSpanId: "0000000000000000", sampledStr: null, flagsStr: null, trace: out trace));
 
             Assert.AreEqual(1, trace.CurrentId.TraceId);
             Assert.AreEqual(0, trace.CurrentId.ParentSpanId);
@@ -93,52 +131,18 @@ namespace Criteo.Profiling.Tracing.UTest.Transport
             Assert.AreEqual(Flags.Empty(), trace.CurrentId.Flags);
         }
 
-        [Test]
+        [TestCase(null, null, null)]
+        [TestCase("0000000000000001", null, null)]
+        [TestCase(null, "00000000000000FA", null)]
+        [TestCase(null, null, "0000000000000000")]
+        [TestCase(null, "00000000000000FA", "0000000000000000")]
+        [TestCase("0000000000000001", "00000000000000FA", null)]
+        [TestCase("0000000000000001", null, "0000000000000000")]
         [Description("A missing required trace header should prevent the trace to be created (required headers are traceId, spanId and parentSpanId)")]
-        public void GetWithoutRequiredHeadersShouldFail()
+        public void ParseWithoutRequiredHeadersShouldFail(string encodedTraceId, string encodedSpanId, string encodedParentSpanId)
         {
-            var headers = new NameValueCollection();
-            headers[HttpTraceContext.Flags] = "0";
-            headers[HttpTraceContext.Sampled] = "1";
-
             Trace trace;
-            Assert.False(HttpTraceContext.TryGet(headers, out trace));
-
-            headers[HttpTraceContext.TraceId] = "0000000000000001";
-            headers[HttpTraceContext.SpanId] = null;
-            headers[HttpTraceContext.ParentSpanId] = null;
-
-            Assert.False(HttpTraceContext.TryGet(headers, out trace));
-
-            headers[HttpTraceContext.TraceId] = null;
-            headers[HttpTraceContext.SpanId] = "00000000000000FA";
-            headers[HttpTraceContext.ParentSpanId] = null;
-
-            Assert.False(HttpTraceContext.TryGet(headers, out trace));
-
-            headers[HttpTraceContext.TraceId] = null;
-            headers[HttpTraceContext.SpanId] = null;
-            headers[HttpTraceContext.ParentSpanId] = "0000000000000000";
-
-            Assert.False(HttpTraceContext.TryGet(headers, out trace));
-
-            headers[HttpTraceContext.TraceId] = null;
-            headers[HttpTraceContext.SpanId] = "00000000000000FA";
-            headers[HttpTraceContext.ParentSpanId] = "0000000000000000";
-
-            Assert.False(HttpTraceContext.TryGet(headers, out trace));
-
-            headers[HttpTraceContext.TraceId] = "0000000000000001";
-            headers[HttpTraceContext.SpanId] = "00000000000000FA";
-            headers[HttpTraceContext.ParentSpanId] = null;
-
-            Assert.False(HttpTraceContext.TryGet(headers, out trace));
-
-            headers[HttpTraceContext.TraceId] = "0000000000000001";
-            headers[HttpTraceContext.SpanId] = null;
-            headers[HttpTraceContext.ParentSpanId] = "0000000000000000";
-
-            Assert.False(HttpTraceContext.TryGet(headers, out trace));
+            Assert.False(HttpTraceContext.TryParseTrace(encodedTraceId, encodedSpanId, encodedParentSpanId, sampledStr: "1", flagsStr: "0", trace: out trace));
         }
 
         [Test]
