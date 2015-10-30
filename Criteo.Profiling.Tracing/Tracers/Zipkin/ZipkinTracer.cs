@@ -27,7 +27,7 @@ namespace Criteo.Profiling.Tracing.Tracers.Zipkin
         /// Time-to-live expressed in seconds.
         /// Spans which are not completed by this time are automatically flushed.
         /// </summary>
-        internal const int TimeToLive = 120;
+        internal const int TimeToLive = 10;
 
         public ZipkinTracer(IZipkinSender sender)
         {

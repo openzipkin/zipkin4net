@@ -68,8 +68,8 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
 
             zipkinTracer.Record(record);
 
-            // futureTime = now + (ttl - 10)
-            var futureTime = now.AddSeconds(ZipkinTracer.TimeToLive - 10); // of course test will fail if TTL is set lower than 10 seconds
+            // futureTime = now + (ttl - 4)
+            var futureTime = now.AddSeconds(ZipkinTracer.TimeToLive - 4); // of course test will fail if TTL is set lower than 4 seconds
 
             zipkinTracer.FlushOldSpans(futureTime); // shouldn't do anything since we haven't reached span ttl yet
 
@@ -79,9 +79,9 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
             var newerRecord = new Record(newerSpanId, futureTime, Annotations.ServerRecv(), 0);
             zipkinTracer.Record(newerRecord); // creates a second span
 
-            futureTime = futureTime.AddSeconds(15); // = now + (ttl + 5)
+            futureTime = futureTime.AddSeconds(5); // = now + (ttl - 4) + 5 = now + ttl + 1
 
-            zipkinTracer.FlushOldSpans(futureTime); // should flush only the first span since we are 5 seconds past its TTL
+            zipkinTracer.FlushOldSpans(futureTime); // should flush only the first span since we are 1 second past its TTL but 5 seconds before the second span TTL
 
             mockedSender.Verify(sender => sender.Send(It.IsAny<byte[]>()), Times.Once());
 
