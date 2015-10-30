@@ -28,10 +28,10 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers
             var servRecv = Annotations.ServerRecv();
             var servSend = Annotations.ServerSend();
 
-            trace.Record(rpcAnn);
-            trace.Record(servAnn);
-            trace.Record(servRecv);
-            trace.Record(servSend);
+            trace.Record(rpcAnn).Wait();
+            trace.Record(servAnn).Wait();
+            trace.Record(servRecv).Wait();
+            trace.Record(servSend).Wait();
 
             var records = memoryTracer.Records.ToList();
             var annotations = records.Select(record => record.Annotation).ToList();

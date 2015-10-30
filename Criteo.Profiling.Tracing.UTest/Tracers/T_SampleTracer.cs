@@ -55,7 +55,7 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers
 
             var trace = Trace.CreateFromId(new SpanId(1, 0, 1, Flags.Empty().SetSampled()));
 
-            trace.Record(Annotations.ClientRecv());
+            trace.Record(Annotations.ClientRecv()).Wait();
 
             mockTracer.Verify(tracer => tracer.Record(It.IsAny<Record>()), Times.Once());
         }
@@ -71,7 +71,7 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers
 
             var trace = Trace.CreateFromId(new SpanId(1, 0, 1, Flags.Empty().SetNotSampled()));
 
-            trace.Record(Annotations.ClientRecv());
+            trace.Record(Annotations.ClientRecv()).Wait();
 
             mockTracer.Verify(tracer => tracer.Record(It.IsAny<Record>()), Times.Never());
         }

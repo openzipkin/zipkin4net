@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Net;
+using System.Threading.Tasks;
 using Criteo.Profiling.Tracing.Annotation;
 using Criteo.Profiling.Tracing.Logger;
 using Criteo.Profiling.Tracing.Utils;
@@ -73,6 +73,22 @@ namespace Criteo.Profiling.Tracing
             return new Trace(spanId);
         }
 
+        private static void PushToTracers(Record record)
+        {
+            foreach (var tracer in Tracer.Tracers)
+            {
+                try
+                {
+                    tracer.Record(record);
+                }
+                catch (Exception ex)
+                {
+                    // No exception coming for traces should disrupt the main application as tracing is optional.
+                    Logger.LogWarning("An error occured while recording the annotation. Msg: " + ex.Message);
+                }
+            }
+        }
+
         private Trace()
         {
             CurrentId = NextId();
@@ -100,32 +116,13 @@ namespace Criteo.Profiling.Tracing
             return new Trace(NextId());
         }
 
-        public void Record(IAnnotation annotation)
+        public Task Record(IAnnotation annotation)
         {
-            if (!TracingEnabled) return;
+            if (!TracingEnabled) return Task.FromResult(0);
 
-            var utcNow = DateTime.UtcNow;
+            var record = new Record(CurrentId, DateTime.UtcNow, annotation, 0);
 
-            foreach (var tracer in Tracer.Tracers)
-            {
-                try
-                {
-                    tracer.Record(new Record(CurrentId, utcNow, annotation, 0));
-                }
-                catch (Exception ex)
-                {
-                    // No exception coming for traces should disrupt the main application as tracing is optional.
-                    Logger.LogWarning("An error occured while recording the annotation. Msg: " + ex.Message);
-                }
-            }
-        }
-
-        public void Record(IEnumerable<IAnnotation> annotations)
-        {
-            foreach (var annotation in annotations)
-            {
-                Record(annotation);
-            }
+            return Task.Run(() => PushToTracers(record));
         }
 
         public bool Equals(Trace other)
