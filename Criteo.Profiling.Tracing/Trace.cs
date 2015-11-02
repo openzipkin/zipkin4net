@@ -22,6 +22,8 @@ namespace Criteo.Profiling.Tracing
 
         private static ILogger logger = new VoidLogger();
 
+        private static bool _tracingEnabled = false;
+
         /// <summary>
         /// Basic logger to record events. By default NO-OP logger.
         /// </summary>
@@ -52,7 +54,15 @@ namespace Criteo.Profiling.Tracing
         /// <summary>
         /// Globally set the state of the tracing. Annotations are ignored when set to false.
         /// </summary>
-        public static bool TracingEnabled { get; set; }
+        public static bool TracingEnabled
+        {
+            get { return _tracingEnabled; }
+            set
+            {
+                _tracingEnabled = value;
+                logger.LogInformation(string.Format("Tracing is {0}", _tracingEnabled ? "enabled" : "disabled"));
+            }
+        }
 
         /// <summary>
         /// Starts a new trace with a random id, no parent and empty flags.
@@ -118,7 +128,7 @@ namespace Criteo.Profiling.Tracing
 
         public Task Record(IAnnotation annotation)
         {
-            if (!TracingEnabled) return Task.FromResult(0);
+            if (!_tracingEnabled) return Task.FromResult(0);
 
             var record = new Record(CurrentId, DateTime.UtcNow, annotation);
 
