@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Net;
+using System.Threading;
 using System.Threading.Tasks;
 using Criteo.Profiling.Tracing.Annotation;
 using Criteo.Profiling.Tracing.Logger;
@@ -19,6 +20,7 @@ namespace Criteo.Profiling.Tracing
         private static IPEndPoint defaultEndPoint = new IPEndPoint(IpUtils.GetLocalIpAddress() ?? IPAddress.Loopback, 0);
 
         private static string defaultServiceName = "Unknown Service";
+        private static float _samplingRate = 0f;
 
         private static ILogger logger = new VoidLogger();
 
@@ -62,6 +64,26 @@ namespace Criteo.Profiling.Tracing
                 _tracingEnabled = value;
                 logger.LogInformation(string.Format("Tracing is {0}", _tracingEnabled ? "enabled" : "disabled"));
             }
+        }
+
+        /// <summary>
+        // Sampling of the tracing. Between 0.0 (not tracing) and 1.0 (full tracing). Default 0.0
+        /// </summary>
+        public static float SamplingRate
+        {
+            get { return _samplingRate; }
+            set
+            {
+                if (!IsValidSamplingRate(value))
+                    throw new ArgumentOutOfRangeException("value", "Sample rate should be between 0.0 and 1.0");
+
+                Interlocked.Exchange(ref _samplingRate, value);
+            }
+        }
+
+        private static bool IsValidSamplingRate(float rate)
+        {
+            return 0.0f <= rate && rate <= 1.0f;
         }
 
         /// <summary>
