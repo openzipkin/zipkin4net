@@ -96,13 +96,13 @@ namespace Criteo.Profiling.Tracing
 
         private Trace(SpanId spanId)
         {
-            CurrentId = new SpanId(spanId.TraceId, spanId.ParentSpanId, spanId.Id, spanId.Flags.Copy());
+            CurrentId = new SpanId(spanId.TraceId, spanId.ParentSpanId, spanId.Id, spanId.Flags);
         }
 
         private SpanId NextId()
         {
             var spanId = RandomUtils.NextLong();
-            return (CurrentId == null) ? new SpanId(RandomUtils.NextLong(), 0, spanId, flags: null) : new SpanId(CurrentId.TraceId, CurrentId.Id, spanId, CurrentId.Flags.Copy());
+            return (CurrentId == null) ? new SpanId(RandomUtils.NextLong(), 0, spanId, Flags.Empty()) : new SpanId(CurrentId.TraceId, CurrentId.Id, spanId, CurrentId.Flags);
         }
 
         /// <summary>

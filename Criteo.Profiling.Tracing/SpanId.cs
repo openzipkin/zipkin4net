@@ -16,12 +16,12 @@ namespace Criteo.Profiling.Tracing
         /// </summary>
         public Flags Flags { get; private set; }
 
-        public SpanId(long traceId, long parentSpanId, long id, Flags flags = null)
+        public SpanId(long traceId, long parentSpanId, long id, Flags flags)
         {
             this.TraceId = traceId;
             this.ParentSpanId = parentSpanId;
             this.Id = id;
-            this.Flags = flags ?? Flags.Empty();
+            this.Flags = flags;
         }
 
         public bool Equals(SpanId other)

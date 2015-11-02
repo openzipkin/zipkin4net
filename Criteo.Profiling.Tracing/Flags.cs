@@ -7,7 +7,7 @@ namespace Criteo.Profiling.Tracing
     /// Represents flags that can be passed along in request headers.
     /// C# version of Finagle Flags class (com.twitter.finagle.tracing.Flags).
     /// </summary>
-    public sealed class Flags : IEquatable<Flags>
+    public struct Flags
     {
         private const long DebugMask = 1L << 0;
         private const long SamplingSetMask = 1L << 1;
@@ -26,11 +26,6 @@ namespace Criteo.Profiling.Tracing
         }
 
         public static Flags FromLong(long value)
-        {
-            return new Flags(value);
-        }
-
-        public Flags Copy()
         {
             return new Flags(value);
         }
@@ -78,26 +73,6 @@ namespace Criteo.Profiling.Tracing
         public long ToLong()
         {
             return value;
-        }
-
-        public bool Equals(Flags other)
-        {
-            if (ReferenceEquals(null, other)) return false;
-            if (ReferenceEquals(this, other)) return true;
-            return value == other.value;
-        }
-
-        public override bool Equals(object obj)
-        {
-            if (ReferenceEquals(null, obj)) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            var flagsObj = obj as Flags;
-            return flagsObj != null && Equals(flagsObj);
-        }
-
-        public override int GetHashCode()
-        {
-            return (this.value).GetHashCode();
         }
     }
 }
