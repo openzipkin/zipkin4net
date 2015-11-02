@@ -10,14 +10,12 @@ namespace Criteo.Profiling.Tracing
         private readonly SpanId spanId;
         private readonly DateTime timestamp;
         private readonly IAnnotation annotation;
-        private readonly long duration;
 
-        public Record(SpanId spanId, DateTime timestamp, IAnnotation annotation, long duration)
+        public Record(SpanId spanId, DateTime timestamp, IAnnotation annotation)
         {
             this.spanId = spanId;
             this.timestamp = timestamp;
             this.annotation = annotation;
-            this.duration = duration;
         }
 
         public DateTime Timestamp
@@ -33,11 +31,6 @@ namespace Criteo.Profiling.Tracing
         public SpanId SpanId
         {
             get { return spanId; }
-        }
-
-        public long Duration
-        {
-            get { return duration; }
         }
 
         public override string ToString()

@@ -120,7 +120,7 @@ namespace Criteo.Profiling.Tracing
         {
             if (!TracingEnabled) return Task.FromResult(0);
 
-            var record = new Record(CurrentId, DateTime.UtcNow, annotation, 0);
+            var record = new Record(CurrentId, DateTime.UtcNow, annotation);
 
             return Task.Run(() => PushToTracers(record));
         }

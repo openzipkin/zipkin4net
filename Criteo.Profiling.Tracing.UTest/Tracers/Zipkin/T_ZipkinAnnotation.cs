@@ -25,7 +25,7 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
         {
             var now = DateTime.UtcNow;
             const string value = "anything";
-            var ann = new ZipkinAnnotation(now, value, 0);
+            var ann = new ZipkinAnnotation(now, value);
 
             var thriftAnn = ann.ToThrift();
 
@@ -35,38 +35,5 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
             Assert.IsNull(thriftAnn.Host);
             Assert.IsNull(thriftAnn.Duration);
         }
-
-        [Test]
-        public void ThriftConversionWithDurationIsCorrect()
-        {
-            var now = DateTime.UtcNow;
-            const string value = "anything";
-
-            var ann = new ZipkinAnnotation(now, value, 10250);
-            var thriftAnn = ann.ToThrift();
-
-            Assert.NotNull(thriftAnn);
-            Assert.AreEqual(ZipkinAnnotation.ToUnixTimestamp(now), thriftAnn.Timestamp);
-            Assert.AreEqual(value, thriftAnn.Value);
-            Assert.IsNull(thriftAnn.Host);
-            Assert.AreEqual(10250, thriftAnn.Duration);
-        }
-
-        [Test]
-        public void ThriftConversionWithDurationOverflowIsCorrect()
-        {
-            var now = DateTime.UtcNow;
-            const string value = "anything";
-
-            var ann = new ZipkinAnnotation(now, value, int.MaxValue + 250L);
-            var thriftAnn = ann.ToThrift();
-
-            Assert.NotNull(thriftAnn);
-            Assert.AreEqual(ZipkinAnnotation.ToUnixTimestamp(now), thriftAnn.Timestamp);
-            Assert.AreEqual(value, thriftAnn.Value);
-            Assert.IsNull(thriftAnn.Host);
-            Assert.AreEqual(int.MaxValue, thriftAnn.Duration);
-        }
-
     }
 }

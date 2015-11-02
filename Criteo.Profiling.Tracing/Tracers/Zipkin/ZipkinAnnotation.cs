@@ -6,18 +6,12 @@ namespace Criteo.Profiling.Tracing.Tracers.Zipkin
     {
         private readonly DateTime timestamp;
 
-        /// <summary>
-        /// Duration of the event in microseconds.
-        /// </summary>
-        private readonly long duration;
-
         public string Value { get; private set; }
 
-        public ZipkinAnnotation(DateTime timestamp, string value, long duration)
+        public ZipkinAnnotation(DateTime timestamp, string value)
         {
             this.timestamp = timestamp;
             this.Value = value;
-            this.duration = duration;
         }
 
         public Thrift.Annotation ToThrift()
@@ -27,10 +21,6 @@ namespace Criteo.Profiling.Tracing.Tracers.Zipkin
                 Timestamp = ToUnixTimestamp(this.timestamp),
                 Value = this.Value
             };
-
-            if (duration > 0){
-                thriftAnn.Duration = (duration > int.MaxValue) ? int.MaxValue : (int)duration;
-            }
 
             return thriftAnn;
         }

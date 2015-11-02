@@ -93,7 +93,7 @@ namespace Criteo.Profiling.Tracing.Tracers.Zipkin
         {
             spanMap.Where(pair => utcNow.Subtract(pair.Value.Started).TotalSeconds > TimeToLive).AsParallel().ForAll(pair =>
             {
-                if (!pair.Value.Complete) pair.Value.AddAnnotation(new ZipkinAnnotation(DateTime.UtcNow, "flush.timeout", 0));
+                if (!pair.Value.Complete) pair.Value.AddAnnotation(new ZipkinAnnotation(DateTime.UtcNow, "flush.timeout"));
                 RemoveThenLogSpan(pair.Key);
             });
         }

@@ -1,4 +1,5 @@
 ﻿using System;
+using Criteo.Profiling.Tracing.Annotation;
 using Criteo.Profiling.Tracing.Tracers.Zipkin;
 using Moq;
 using NUnit.Framework;
@@ -29,12 +30,10 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
             var mockedSender = new Mock<IZipkinSender>();
             var zipkinTracer = new ZipkinTracer(mockedSender.Object);
 
-            Tracer.Register(zipkinTracer);
-
             var trace = Trace.Create();
 
-            trace.Record(Annotations.ClientSend());
-            trace.Record(Annotations.ClientRecv());
+            Record(zipkinTracer, trace, Annotations.ClientSend());
+            Record(zipkinTracer, trace, Annotations.ClientRecv());
 
             mockedSender.Verify(sender => sender.Send(It.IsAny<byte[]>()), Times.Once());
         }
@@ -45,12 +44,10 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
             var mockedSender = new Mock<IZipkinSender>();
             var zipkinTracer = new ZipkinTracer(mockedSender.Object);
 
-            Tracer.Register(zipkinTracer);
-
             var trace = Trace.Create();
 
-            trace.Record(Annotations.ServerRecv());
-            trace.Record(Annotations.ServerSend());
+            Record(zipkinTracer, trace, Annotations.ServerRecv());
+            Record(zipkinTracer, trace, Annotations.ServerSend());
 
             mockedSender.Verify(sender => sender.Send(It.IsAny<byte[]>()), Times.Once());
         }
@@ -63,8 +60,8 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
 
             var now = DateTime.UtcNow;
 
-            var firstSpanId = new SpanId(traceId: 1, parentSpanId: 0, id: 4874542152, flags: null);
-            var record = new Record(firstSpanId, now, Annotations.ServerRecv(), 0);
+            var firstSpanId = new SpanId(traceId: 1, parentSpanId: 0, id: 4874542152, flags: Flags.Empty());
+            var record = new Record(firstSpanId, now, Annotations.ServerRecv());
 
             zipkinTracer.Record(record);
 
@@ -75,8 +72,8 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
 
             mockedSender.Verify(sender => sender.Send(It.IsAny<byte[]>()), Times.Never());
 
-            var newerSpanId = new SpanId(traceId: 2, parentSpanId: 0, id: 9988415021, flags: null);
-            var newerRecord = new Record(newerSpanId, futureTime, Annotations.ServerRecv(), 0);
+            var newerSpanId = new SpanId(traceId: 2, parentSpanId: 0, id: 9988415021, flags: Flags.Empty());
+            var newerRecord = new Record(newerSpanId, futureTime, Annotations.ServerRecv());
             zipkinTracer.Record(newerRecord); // creates a second span
 
             futureTime = futureTime.AddSeconds(5); // = now + (ttl - 4) + 5 = now + ttl + 1
@@ -86,10 +83,16 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
             mockedSender.Verify(sender => sender.Send(It.IsAny<byte[]>()), Times.Once());
 
             // "ServerSend" should make the second span "complete" hence the second span should be sent immediately
-            var newerComplementaryRecord = new Record(newerSpanId, futureTime, Annotations.ServerSend(), 0);
+            var newerComplementaryRecord = new Record(newerSpanId, futureTime, Annotations.ServerSend());
             zipkinTracer.Record(newerComplementaryRecord);
 
             mockedSender.Verify(sender => sender.Send(It.IsAny<byte[]>()), Times.Exactly(2));
+        }
+
+        private static void Record(ITracer tracer, Trace trace, IAnnotation annotation)
+        {
+            var recordClientSend = new Record(trace.CurrentId, DateTime.UtcNow, annotation);
+            tracer.Record(recordClientSend);
         }
 
     }

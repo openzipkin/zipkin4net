@@ -20,21 +20,21 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
             var spanClientRecv = new Span(traceId, started);
             Assert.False(spanClientRecv.Complete);
 
-            spanClientRecv.AddAnnotation(new ZipkinAnnotation(DateTime.UtcNow, zipkinCoreConstants.CLIENT_RECV, 0));
+            spanClientRecv.AddAnnotation(new ZipkinAnnotation(DateTime.UtcNow, zipkinCoreConstants.CLIENT_RECV));
             Assert.True(spanClientRecv.Complete);
 
             var spanServSend = new Span(traceId, started);
             Assert.False(spanServSend.Complete);
 
-            spanServSend.AddAnnotation(new ZipkinAnnotation(DateTime.UtcNow, zipkinCoreConstants.SERVER_SEND, 0));
+            spanServSend.AddAnnotation(new ZipkinAnnotation(DateTime.UtcNow, zipkinCoreConstants.SERVER_SEND));
             Assert.True(spanServSend.Complete);
 
 
             var spanOtherAnn = new Span(traceId, started);
             Assert.False(spanOtherAnn.Complete);
 
-            spanServSend.AddAnnotation(new ZipkinAnnotation(DateTime.UtcNow, zipkinCoreConstants.SERVER_RECV, 0));
-            spanServSend.AddAnnotation(new ZipkinAnnotation(DateTime.UtcNow, zipkinCoreConstants.CLIENT_SEND, 0));
+            spanServSend.AddAnnotation(new ZipkinAnnotation(DateTime.UtcNow, zipkinCoreConstants.SERVER_RECV));
+            spanServSend.AddAnnotation(new ZipkinAnnotation(DateTime.UtcNow, zipkinCoreConstants.CLIENT_SEND));
             Assert.False(spanOtherAnn.Complete);
         }
 
@@ -52,8 +52,8 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
             var span = new Span(traceId, started) { Endpoint = new IPEndPoint(hostIp, hostPort), ServiceName = serviceName, Name = methodName };
 
             var zipkinAnnDateTime = DateTime.UtcNow;
-            span.AddAnnotation(new ZipkinAnnotation(zipkinAnnDateTime, zipkinCoreConstants.CLIENT_SEND, 0));
-            span.AddAnnotation(new ZipkinAnnotation(zipkinAnnDateTime, zipkinCoreConstants.CLIENT_RECV, 0));
+            span.AddAnnotation(new ZipkinAnnotation(zipkinAnnDateTime, zipkinCoreConstants.CLIENT_SEND));
+            span.AddAnnotation(new ZipkinAnnotation(zipkinAnnDateTime, zipkinCoreConstants.CLIENT_RECV));
 
             const string binAnnKey = "http.uri";
             var binAnnVal = new byte[] { 0x00 };
@@ -104,8 +104,8 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
             var started = DateTime.UtcNow;
             var span = new Span(traceId, started);
 
-            span.AddAnnotation(new ZipkinAnnotation(DateTime.UtcNow, zipkinCoreConstants.CLIENT_SEND, 0));
-            span.AddAnnotation(new ZipkinAnnotation(DateTime.UtcNow, zipkinCoreConstants.CLIENT_RECV, 0));
+            span.AddAnnotation(new ZipkinAnnotation(DateTime.UtcNow, zipkinCoreConstants.CLIENT_SEND));
+            span.AddAnnotation(new ZipkinAnnotation(DateTime.UtcNow, zipkinCoreConstants.CLIENT_RECV));
 
             var thriftSpan = span.ToThrift();
 
@@ -132,8 +132,8 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
 
             var span = new Span(traceId, started) { Endpoint = new IPEndPoint(IPAddress.Loopback, hostPort), ServiceName = serviceName };
 
-            span.AddAnnotation(new ZipkinAnnotation(DateTime.UtcNow, zipkinCoreConstants.CLIENT_SEND, 0));
-            span.AddAnnotation(new ZipkinAnnotation(DateTime.UtcNow, zipkinCoreConstants.CLIENT_RECV, 0));
+            span.AddAnnotation(new ZipkinAnnotation(DateTime.UtcNow, zipkinCoreConstants.CLIENT_SEND));
+            span.AddAnnotation(new ZipkinAnnotation(DateTime.UtcNow, zipkinCoreConstants.CLIENT_RECV));
 
             var thriftSpan = span.ToThrift();
 
