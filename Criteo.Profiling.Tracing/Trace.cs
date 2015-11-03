@@ -203,7 +203,8 @@ namespace Criteo.Profiling.Tracing
         public static Task Record(this Trace trace, IAnnotation annotation)
         {
             if (trace != null && Trace.TracingEnabled)
-                trace.RecordAnnotation(annotation);
+                return trace.RecordAnnotation(annotation);
+
             return Task.FromResult(0);
         }
     }
