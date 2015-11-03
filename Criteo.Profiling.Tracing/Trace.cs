@@ -162,12 +162,9 @@ namespace Criteo.Profiling.Tracing
             return new SpanId(CurrentId.TraceId, CurrentId.Id, spanId, CurrentId.Flags);
         }
 
-        public Task Record(IAnnotation annotation)
+        internal Task RecordAnnotation(IAnnotation annotation)
         {
-            if (!_tracingEnabled) return Task.FromResult(0);
-
             var record = new Record(CurrentId, DateTime.UtcNow, annotation);
-
             return Task.Run(() => PushToTracers(record));
         }
 
@@ -195,6 +192,19 @@ namespace Criteo.Profiling.Tracing
         {
             return String.Format("Trace [{0}]", CurrentId);
         }
+    }
 
+    /**
+     * Traces are sampled for performance management. Therefore trace can be null
+     * and you probably don't want to check for nullity every time in your code.
+     */
+    public static class TraceExtensions
+    {
+        public static Task Record(this Trace trace, IAnnotation annotation)
+        {
+            if (trace != null && Trace.TracingEnabled)
+                trace.RecordAnnotation(annotation);
+            return Task.FromResult(0);
+        }
     }
 }
