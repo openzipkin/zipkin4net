@@ -20,8 +20,8 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers
         {
             var memoryTracer = new InMemoryTracer();
             Tracer.Register(memoryTracer);
-
-            var trace = Trace.Create();
+            Trace.SamplingRate = 1f;
+            var trace = Trace.CreateIfSampled();
 
             var rpcAnn = Annotations.Rpc("GET RPC");
             var servAnn = Annotations.ServiceName("MyCriteoService");

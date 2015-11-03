@@ -11,6 +11,7 @@ namespace Criteo.Profiling.Tracing.UTest
         {
             Tracer.Clear();
             Trace.TracingEnabled = true;
+            Trace.SamplingRate = 1f;
         }
 
         [Test]
@@ -20,8 +21,7 @@ namespace Criteo.Profiling.Tracing.UTest
             Tracer.Register(mockTracer.Object);
 
             Trace.TracingEnabled = true;
-
-            var trace = Trace.Create();
+            var trace = Trace.CreateIfSampled();
             trace.Record(Annotations.ServerSend()).Wait();
 
             mockTracer.Verify(tracer => tracer.Record(It.IsAny<Record>()), Times.Once());
@@ -34,8 +34,7 @@ namespace Criteo.Profiling.Tracing.UTest
             Tracer.Register(mockTracer.Object);
 
             Trace.TracingEnabled = false;
-
-            var trace = Trace.Create();
+            var trace = Trace.CreateIfSampled();
             trace.Record(Annotations.ServerSend()).Wait();
 
             mockTracer.Verify(tracer => tracer.Record(It.IsAny<Record>()), Times.Never());
@@ -44,7 +43,7 @@ namespace Criteo.Profiling.Tracing.UTest
         [Test]
         public void ChildTraceIsCorrectlyCreated()
         {
-            var parent = Trace.Create();
+            var parent = Trace.CreateIfSampled();
             var child = parent.Child();
 
             // Should share the same global id
@@ -66,7 +65,7 @@ namespace Criteo.Profiling.Tracing.UTest
             var mockTracer = new Mock<ITracer>();
             Tracer.Register(mockTracer.Object);
 
-            var trace = Trace.Create();
+            var trace = Trace.CreateIfSampled();
 
             var clientRcv = Annotations.ClientRecv();
 

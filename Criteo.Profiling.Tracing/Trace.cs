@@ -14,6 +14,8 @@ namespace Criteo.Profiling.Tracing
     /// </summary>
     public sealed class Trace : IEquatable<Trace>
     {
+        // Avoid that every machines sample the same traceId subset
+        private static readonly long Salt = RandomUtils.NextLong();
 
         internal SpanId CurrentId { get; private set; }
 
@@ -90,9 +92,15 @@ namespace Criteo.Profiling.Tracing
         /// Starts a new trace with a random id, no parent and empty flags.
         /// </summary>
         /// <returns></returns>
-        public static Trace Create()
+        public static Trace CreateIfSampled()
         {
-            return new Trace();
+            var traceId = RandomUtils.NextLong();
+            return RandomSample(traceId) ? new Trace(traceId) : null;
+        }
+
+        private static bool RandomSample(long id)
+        {
+            return Math.Abs(id ^ Salt) % 10000 < (SamplingRate * 10000);
         }
 
         /// <summary>
@@ -121,9 +129,9 @@ namespace Criteo.Profiling.Tracing
             }
         }
 
-        private Trace()
+        private Trace(long traceId)
         {
-            CurrentId = NextId();
+            CurrentId = CreateRootSpanId(traceId);
         }
 
         private Trace(SpanId spanId)
@@ -131,10 +139,10 @@ namespace Criteo.Profiling.Tracing
             CurrentId = new SpanId(spanId.TraceId, spanId.ParentSpanId, spanId.Id, spanId.Flags);
         }
 
-        private SpanId NextId()
+        private static SpanId CreateRootSpanId(long traceId)
         {
             var spanId = RandomUtils.NextLong();
-            return (CurrentId == null) ? new SpanId(RandomUtils.NextLong(), 0, spanId, Flags.Empty()) : new SpanId(CurrentId.TraceId, CurrentId.Id, spanId, CurrentId.Flags);
+            return new SpanId(traceId, 0, spanId, Flags.Empty());
         }
 
         /// <summary>
@@ -145,7 +153,13 @@ namespace Criteo.Profiling.Tracing
         /// <returns></returns>
         public Trace Child()
         {
-            return new Trace(NextId());
+            return new Trace(CreateChildSpanId());
+        }
+
+        private SpanId CreateChildSpanId()
+        {
+            var spanId = RandomUtils.NextLong();
+            return new SpanId(CurrentId.TraceId, CurrentId.Id, spanId, CurrentId.Flags);
         }
 
         public Task Record(IAnnotation annotation)

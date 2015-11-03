@@ -14,6 +14,7 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
         public void EnableAndClearTracers()
         {
             Trace.TracingEnabled = true;
+            Trace.SamplingRate = 1f;
             Tracer.Clear();
         }
 
@@ -30,7 +31,7 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
             var mockedSender = new Mock<IZipkinSender>();
             var zipkinTracer = new ZipkinTracer(mockedSender.Object);
 
-            var trace = Trace.Create();
+            var trace = Trace.CreateIfSampled();
 
             Record(zipkinTracer, trace, Annotations.ClientSend());
             Record(zipkinTracer, trace, Annotations.ClientRecv());
@@ -44,7 +45,7 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
             var mockedSender = new Mock<IZipkinSender>();
             var zipkinTracer = new ZipkinTracer(mockedSender.Object);
 
-            var trace = Trace.Create();
+            var trace = Trace.CreateIfSampled();
 
             Record(zipkinTracer, trace, Annotations.ServerRecv());
             Record(zipkinTracer, trace, Annotations.ServerSend());
