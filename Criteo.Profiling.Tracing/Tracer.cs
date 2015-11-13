@@ -18,7 +18,7 @@ namespace Criteo.Profiling.Tracing
         }
 
         /// <summary>
-        /// Adds a new tracer. Subsequent trace records will be forwarded to the tracer.
+        /// Adds a new tracer. Subsequent annotation records will be forwarded to the tracer.
         /// </summary>
         /// <param name="tracer"></param>
         public static void Register(ITracer tracer)
@@ -28,9 +28,8 @@ namespace Criteo.Profiling.Tracing
 
         /// <summary>
         /// Clears the registered tracers. This is not thread-safe.
-        /// Should be used for debugging and testing purposes.
         /// </summary>
-        internal static void Clear()
+        public static void Clear()
         {
             tracers.Clear();
         }
