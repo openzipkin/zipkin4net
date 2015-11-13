@@ -10,7 +10,7 @@ namespace Criteo.Profiling.Tracing
         /// <summary>
         /// Global list of registred tracers.
         /// </summary>
-        private static readonly ICollection<ITracer> tracers = new List<ITracer>();
+        private static ICollection<ITracer> tracers = new List<ITracer>();
 
         internal static ICollection<ITracer> Tracers
         {
@@ -23,15 +23,15 @@ namespace Criteo.Profiling.Tracing
         /// <param name="tracer"></param>
         public static void Register(ITracer tracer)
         {
-            Tracers.Add(tracer);
+            tracers.Add(tracer);
         }
 
         /// <summary>
-        /// Clears the registered tracers. This is not thread-safe.
+        /// Clears the registered tracers.
         /// </summary>
         public static void Clear()
         {
-            tracers.Clear();
+            tracers = new List<ITracer>();
         }
 
     }
