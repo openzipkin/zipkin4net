@@ -41,7 +41,6 @@ namespace Criteo.Profiling.Tracing.UTest.Transport
         public void SerializedTraceIsEqualToOriginal()
         {
             Trace.SamplingRate = 1f;
-            Trace.TracingEnabled = true;
             var originalTrace = Trace.CreateIfSampled();
 
             var headersNvc = new NameValueCollection();

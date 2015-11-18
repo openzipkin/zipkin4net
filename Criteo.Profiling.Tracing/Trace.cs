@@ -27,7 +27,7 @@ namespace Criteo.Profiling.Tracing
         private static ILogger _logger = new VoidLogger();
 
         private static IRecordDispatcher _dispatcher = new VoidDispatcher();
-        private static int _status = (int)Status.Disabled;
+        private static int _status = (int)Status.Stopped;
 
         /// <summary>
         /// Basic logger to record events. By default NO-OP logger.
@@ -57,36 +57,47 @@ namespace Criteo.Profiling.Tracing
         }
 
         /// <summary>
-        /// Globally set the state of the tracing. Records are ignored when set to false.
-        /// Records are flushed when tracing is going from enabled to disabled.
+        /// Returns true if tracing is currently running and forwarding records to the registered tracers.
         /// </summary>
-        public static bool TracingEnabled
+        /// <returns></returns>
+        public static bool TracingRunning
         {
-            get { return _status == (int)Status.Enabled; }
-            set
+            get { return _status == (int)Status.Started; }
+        }
+
+        /// <summary>
+        /// Start tracing, records will be forwarded to the registered tracers.
+        /// </summary>
+        /// <returns></returns>
+        public static bool Start()
+        {
+            if (Interlocked.CompareExchange(ref _status, (int)Status.Started, (int)Status.Stopped) ==
+                      (int)Status.Stopped)
             {
-                if (value) // try to enable tracing
-                {
-                    if (Interlocked.CompareExchange(ref _status, (int)Status.Enabled, (int)Status.Disabled) ==
-                        (int)Status.Disabled)
-                    {
-                        _dispatcher.Stop();
-                        _dispatcher = new InOrderAsyncDispatcher(PushToTracers);
-                    }
-                }
-                else
-                {
-                    if (Interlocked.CompareExchange(ref _status, (int)Status.Disabled, (int)Status.Enabled) ==
-                       (int)Status.Enabled)
-                    {
-                        _dispatcher.Stop();
-                        _dispatcher = new VoidDispatcher();
-                    }
-                }
-
-
-                _logger.LogInformation(string.Format("Tracing is {0}", (_status == (int)Status.Enabled) ? "enabled" : "disabled"));
+                _dispatcher = new InOrderAsyncDispatcher(PushToTracers);
+                _logger.LogInformation("Tracing dispatcher service started");
+                return true;
             }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Stop tracing, records will be ignored.
+        /// </summary>
+        /// <returns></returns>
+        public static bool Stop()
+        {
+            if (Interlocked.CompareExchange(ref _status, (int)Status.Stopped, (int)Status.Started) ==
+                   (int)Status.Started)
+            {
+                _dispatcher.Stop(); // InOrderAsyncDispatcher
+                _dispatcher = new VoidDispatcher();
+                _logger.LogInformation("Tracing dispatcher service stopped");
+                return true;
+            }
+
+            return false;
         }
 
         /// <summary>
@@ -134,22 +145,6 @@ namespace Criteo.Profiling.Tracing
             return new Trace(spanId);
         }
 
-        private static void PushToTracers(Record record)
-        {
-            foreach (var tracer in Tracer.Tracers)
-            {
-                try
-                {
-                    tracer.Record(record);
-                }
-                catch (Exception ex)
-                {
-                    // No exception coming for traces should disrupt the main application as tracing is optional.
-                    Logger.LogWarning("An error occured while recording the annotation. Msg: " + ex.Message);
-                }
-            }
-        }
-
         private Trace(long traceId)
         {
             CurrentId = CreateRootSpanId(traceId);
@@ -189,6 +184,22 @@ namespace Criteo.Profiling.Tracing
             _dispatcher.Dispatch(record);
         }
 
+        private static void PushToTracers(Record record)
+        {
+            foreach (var tracer in Tracer.Tracers)
+            {
+                try
+                {
+                    tracer.Record(record);
+                }
+                catch (Exception ex)
+                {
+                    // No exception coming for traces should disrupt the main application as tracing is optional.
+                    Logger.LogWarning("An error occured while recording the annotation. Msg: " + ex.Message);
+                }
+            }
+        }
+
         public bool Equals(Trace other)
         {
             if (ReferenceEquals(null, other)) return false;
@@ -216,8 +227,8 @@ namespace Criteo.Profiling.Tracing
 
         private enum Status
         {
-            Enabled,
-            Disabled
+            Started,
+            Stopped
         }
     }
 
@@ -229,7 +240,7 @@ namespace Criteo.Profiling.Tracing
     {
         public static void Record(this Trace trace, IAnnotation annotation)
         {
-            if (trace != null && Trace.TracingEnabled)
+            if (trace != null)
             {
                 trace.RecordAnnotation(annotation);
             }
