@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using Criteo.Profiling.Tracing.Tracers;
 using NUnit.Framework;
 
@@ -8,32 +9,29 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers
     class T_InMemoryTracer
     {
 
-        [SetUp]
-        public void EnableAndClearTracers()
-        {
-            Trace.TracingEnabled = true;
-            Tracer.Clear();
-        }
-
         [Test]
         public void AnnotationsAreCorrectlyRecorded()
         {
             var memoryTracer = new InMemoryTracer();
-            Tracer.Register(memoryTracer);
-            Trace.SamplingRate = 1f;
-            var trace = Trace.CreateIfSampled();
+
+            var spanId = new SpanId(1, 0, 1, Flags.Empty());
 
             var rpcAnn = Annotations.Rpc("GET RPC");
+            var recordRpc = new Record(spanId, DateTime.UtcNow, rpcAnn);
+
             var servAnn = Annotations.ServiceName("MyCriteoService");
+            var recordServName = new Record(spanId, DateTime.UtcNow, servAnn);
+
             var servRecv = Annotations.ServerRecv();
+            var recordServR = new Record(spanId, DateTime.UtcNow, servRecv);
+
             var servSend = Annotations.ServerSend();
+            var recordServS = new Record(spanId, DateTime.UtcNow, servSend);
 
-            trace.Record(rpcAnn);
-            trace.Record(servAnn);
-            trace.Record(servRecv);
-            trace.Record(servSend);
-
-            Trace.TracingEnabled = false; // force flush to tracers
+            memoryTracer.Record(recordRpc);
+            memoryTracer.Record(recordServName);
+            memoryTracer.Record(recordServR);
+            memoryTracer.Record(recordServS);
 
             var records = memoryTracer.Records.ToList();
             var annotations = records.Select(record => record.Annotation).ToList();
@@ -45,5 +43,6 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers
             Assert.True(annotations.Contains(servRecv));
             Assert.True(annotations.Contains(servSend));
         }
+
     }
 }

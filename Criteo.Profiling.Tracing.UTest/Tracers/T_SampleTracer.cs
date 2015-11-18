@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics;
 using Criteo.Profiling.Tracing.Tracers;
 using Moq;
 using NUnit.Framework;
@@ -9,14 +8,6 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers
     [TestFixture]
     class T_SampleTracer
     {
-
-        [SetUp]
-        public void SetUp()
-        {
-            Trace.TracingEnabled = true;
-            Tracer.Clear();
-        }
-
         [Test]
         [ExpectedException(typeof(ArgumentOutOfRangeException))]
         public void ConstructorShouldThrowWithNegativeSamplingRate()
@@ -39,45 +30,36 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers
             var mockTracer = new Mock<ITracer>();
             var sampleTracer = new SamplerTracer(underlyingTracer: mockTracer.Object, sampleRate: 1.0f);
 
-
             Assert.Throws<ArgumentOutOfRangeException>(() => sampleTracer.SampleRate = 2);
             Assert.Throws<ArgumentOutOfRangeException>(() => sampleTracer.SampleRate = -2);
         }
 
-
         [Test]
         public void FlagSampledTrueShouldAlwaysTrace()
         {
-            var mockTracer = new Mock<ITracer>();
-            var sampleTracer = new SamplerTracer(underlyingTracer: mockTracer.Object, sampleRate: 0f);
+            var underlyingTracer = new Mock<ITracer>();
+            var sampleTracer = new SamplerTracer(underlyingTracer.Object, sampleRate: 0f);
 
-            Tracer.Register(sampleTracer);
+            var spanId = new SpanId(1, 0, 1, Flags.Empty().SetSampled());
+            var record = new Record(spanId, DateTime.UtcNow, Annotations.ClientRecv());
 
-            var trace = Trace.CreateFromId(new SpanId(1, 0, 1, Flags.Empty().SetSampled()));
+            sampleTracer.Record(record);
 
-            trace.Record(Annotations.ClientRecv());
-
-            Trace.TracingEnabled = false; // force flush to tracers
-
-            mockTracer.Verify(tracer => tracer.Record(It.IsAny<Record>()), Times.Once());
+            underlyingTracer.Verify(tracer => tracer.Record(It.IsAny<Record>()), Times.Once());
         }
 
         [Test]
         public void FlagSampledFalseShouldNeverTrace()
         {
-            var mockTracer = new Mock<ITracer>();
+            var underlyingTracer = new Mock<ITracer>();
+            var sampleTracer = new SamplerTracer(underlyingTracer.Object, sampleRate: 1f);
 
-            var sampleTracer = new SamplerTracer(underlyingTracer: mockTracer.Object, sampleRate: 1f);
+            var spanId = new SpanId(1, 0, 1, Flags.Empty().SetNotSampled());
+            var record = new Record(spanId, DateTime.UtcNow, Annotations.ClientRecv());
 
-            Tracer.Register(sampleTracer);
+            sampleTracer.Record(record);
 
-            var trace = Trace.CreateFromId(new SpanId(1, 0, 1, Flags.Empty().SetNotSampled()));
-
-            trace.Record(Annotations.ClientRecv());
-
-            Trace.TracingEnabled = false; // force flush to tracers
-
-            mockTracer.Verify(tracer => tracer.Record(It.IsAny<Record>()), Times.Never());
+            underlyingTracer.Verify(tracer => tracer.Record(It.IsAny<Record>()), Times.Never());
         }
 
     }
