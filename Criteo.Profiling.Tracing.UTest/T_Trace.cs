@@ -22,7 +22,9 @@ namespace Criteo.Profiling.Tracing.UTest
 
             Trace.TracingEnabled = true;
             var trace = Trace.CreateIfSampled();
-            trace.Record(Annotations.ServerSend()).Wait();
+            trace.Record(Annotations.ServerSend());
+
+            Trace.TracingEnabled = false; // force flush to tracers
 
             mockTracer.Verify(tracer => tracer.Record(It.IsAny<Record>()), Times.Once());
         }
@@ -35,7 +37,9 @@ namespace Criteo.Profiling.Tracing.UTest
 
             Trace.TracingEnabled = false;
             var trace = Trace.CreateIfSampled();
-            trace.Record(Annotations.ServerSend()).Wait();
+            trace.Record(Annotations.ServerSend());
+
+            Trace.TracingEnabled = false; // force flush to tracers
 
             mockTracer.Verify(tracer => tracer.Record(It.IsAny<Record>()), Times.Never());
         }
@@ -69,7 +73,9 @@ namespace Criteo.Profiling.Tracing.UTest
 
             var clientRcv = Annotations.ClientRecv();
 
-            trace.Record(clientRcv).Wait();
+            trace.Record(clientRcv);
+
+            Trace.TracingEnabled = false; // force flush to tracers
 
             mockTracer.Verify(t => t.Record(It.Is<Record>(r => r.Annotation == clientRcv && r.SpanId.Equals(trace.CurrentId))), Times.Once());
         }

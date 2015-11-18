@@ -51,6 +51,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Dispatchers\T_AsyncDispatcher.cs" />
     <Compile Include="Tracers\T_InMemoryTracer.cs" />
     <Compile Include="Tracers\T_SampleTracer.cs" />
     <Compile Include="Tracers\Zipkin\T_BinaryAnnotation.cs" />
