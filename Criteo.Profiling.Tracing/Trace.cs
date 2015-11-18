@@ -4,6 +4,7 @@ using System.Threading;
 using Criteo.Profiling.Tracing.Annotation;
 using Criteo.Profiling.Tracing.Dispatcher;
 using Criteo.Profiling.Tracing.Logger;
+using Criteo.Profiling.Tracing.Sampling;
 using Criteo.Profiling.Tracing.Utils;
 
 namespace Criteo.Profiling.Tracing
@@ -14,15 +15,13 @@ namespace Criteo.Profiling.Tracing
     /// </summary>
     public sealed class Trace : IEquatable<Trace>
     {
-        // Avoid that every machines sample the same traceId subset
-        private static readonly long Salt = RandomUtils.NextLong();
 
         internal SpanId CurrentId { get; private set; }
 
         private static IPEndPoint _defaultEndPoint = new IPEndPoint(IpUtils.GetLocalIpAddress() ?? IPAddress.Loopback, 0);
         private static string _defaultServiceName = "Unknown Service";
 
-        private static float _samplingRate = 0f;
+        private static readonly ISampler _sampler = new DefaultSampler(samplingRate: 0f);
 
         private static ILogger _logger = new VoidLogger();
 
@@ -105,19 +104,8 @@ namespace Criteo.Profiling.Tracing
         /// </summary>
         public static float SamplingRate
         {
-            get { return _samplingRate; }
-            set
-            {
-                if (!IsValidSamplingRate(value))
-                    throw new ArgumentOutOfRangeException("value", "Sample rate should be between 0.0 and 1.0");
-
-                Interlocked.Exchange(ref _samplingRate, value);
-            }
-        }
-
-        private static bool IsValidSamplingRate(float rate)
-        {
-            return 0.0f <= rate && rate <= 1.0f;
+            get { return _sampler.SamplingRate; }
+            set { _sampler.SamplingRate = value; }
         }
 
         /// <summary>
@@ -127,12 +115,7 @@ namespace Criteo.Profiling.Tracing
         public static Trace CreateIfSampled()
         {
             var traceId = RandomUtils.NextLong();
-            return RandomSample(traceId) ? new Trace(traceId) : null;
-        }
-
-        private static bool RandomSample(long id)
-        {
-            return Math.Abs(id ^ Salt) % 10000 < (SamplingRate * 10000);
+            return _sampler.Sample(traceId) ? new Trace(traceId) : null;
         }
 
         /// <summary>

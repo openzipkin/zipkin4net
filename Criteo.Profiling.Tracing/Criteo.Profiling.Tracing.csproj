@@ -65,6 +65,8 @@
     <Compile Include="Flags.cs" />
     <Compile Include="ILogger.cs" />
     <Compile Include="Logger\VoidLogger.cs" />
+    <Compile Include="Sampling\DefaultSampler.cs" />
+    <Compile Include="Sampling\ISampler.cs" />
     <Compile Include="SpanId.cs" />
     <Compile Include="ITracer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
