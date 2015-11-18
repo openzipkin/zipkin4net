@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Net;
 using System.Threading;
-using System.Threading.Tasks;
 using Criteo.Profiling.Tracing.Annotation;
+using Criteo.Profiling.Tracing.Dispatcher;
 using Criteo.Profiling.Tracing.Logger;
 using Criteo.Profiling.Tracing.Utils;
 
@@ -19,22 +19,23 @@ namespace Criteo.Profiling.Tracing
 
         internal SpanId CurrentId { get; private set; }
 
-        private static IPEndPoint defaultEndPoint = new IPEndPoint(IpUtils.GetLocalIpAddress() ?? IPAddress.Loopback, 0);
+        private static IPEndPoint _defaultEndPoint = new IPEndPoint(IpUtils.GetLocalIpAddress() ?? IPAddress.Loopback, 0);
+        private static string _defaultServiceName = "Unknown Service";
 
-        private static string defaultServiceName = "Unknown Service";
         private static float _samplingRate = 0f;
 
-        private static ILogger logger = new VoidLogger();
+        private static ILogger _logger = new VoidLogger();
 
-        private static bool _tracingEnabled = false;
+        private static IRecordDispatcher _dispatcher = new VoidDispatcher();
+        private static int _status = (int)Status.Disabled;
 
         /// <summary>
         /// Basic logger to record events. By default NO-OP logger.
         /// </summary>
         public static ILogger Logger
         {
-            get { return logger; }
-            set { logger = value; }
+            get { return _logger; }
+            set { _logger = value; }
         }
 
         /// <summary>
@@ -42,8 +43,8 @@ namespace Criteo.Profiling.Tracing
         /// </summary>
         public static IPEndPoint DefaultEndPoint
         {
-            get { return defaultEndPoint; }
-            set { defaultEndPoint = value; }
+            get { return _defaultEndPoint; }
+            set { _defaultEndPoint = value; }
         }
 
         /// <summary>
@@ -51,20 +52,40 @@ namespace Criteo.Profiling.Tracing
         /// </summary>
         public static string DefaultServiceName
         {
-            get { return defaultServiceName; }
-            set { defaultServiceName = value; }
+            get { return _defaultServiceName; }
+            set { _defaultServiceName = value; }
         }
 
         /// <summary>
-        /// Globally set the state of the tracing. Annotations are ignored when set to false.
+        /// Globally set the state of the tracing. Records are ignored when set to false.
+        /// Records are flushed when tracing is going from enabled to disabled.
         /// </summary>
         public static bool TracingEnabled
         {
-            get { return _tracingEnabled; }
+            get { return _status == (int)Status.Enabled; }
             set
             {
-                _tracingEnabled = value;
-                logger.LogInformation(string.Format("Tracing is {0}", _tracingEnabled ? "enabled" : "disabled"));
+                if (value) // try to enable tracing
+                {
+                    if (Interlocked.CompareExchange(ref _status, (int)Status.Enabled, (int)Status.Disabled) ==
+                        (int)Status.Disabled)
+                    {
+                        _dispatcher.Stop();
+                        _dispatcher = new InOrderAsyncDispatcher(PushToTracers);
+                    }
+                }
+                else
+                {
+                    if (Interlocked.CompareExchange(ref _status, (int)Status.Disabled, (int)Status.Enabled) ==
+                       (int)Status.Enabled)
+                    {
+                        _dispatcher.Stop();
+                        _dispatcher = new VoidDispatcher();
+                    }
+                }
+
+
+                _logger.LogInformation(string.Format("Tracing is {0}", (_status == (int)Status.Enabled) ? "enabled" : "disabled"));
             }
         }
 
@@ -162,10 +183,10 @@ namespace Criteo.Profiling.Tracing
             return new SpanId(CurrentId.TraceId, CurrentId.Id, spanId, CurrentId.Flags);
         }
 
-        internal Task RecordAnnotation(IAnnotation annotation)
+        internal void RecordAnnotation(IAnnotation annotation)
         {
             var record = new Record(CurrentId, DateTime.UtcNow, annotation);
-            return Task.Run(() => PushToTracers(record));
+            _dispatcher.Dispatch(record);
         }
 
         public bool Equals(Trace other)
@@ -192,6 +213,12 @@ namespace Criteo.Profiling.Tracing
         {
             return String.Format("Trace [{0}]", CurrentId);
         }
+
+        private enum Status
+        {
+            Enabled,
+            Disabled
+        }
     }
 
     /**
@@ -200,12 +227,14 @@ namespace Criteo.Profiling.Tracing
      */
     public static class TraceExtensions
     {
-        public static Task Record(this Trace trace, IAnnotation annotation)
+        public static void Record(this Trace trace, IAnnotation annotation)
         {
             if (trace != null && Trace.TracingEnabled)
-                return trace.RecordAnnotation(annotation);
-
-            return Task.FromResult(0);
+            {
+                trace.RecordAnnotation(annotation);
+            }
         }
     }
+
+
 }
