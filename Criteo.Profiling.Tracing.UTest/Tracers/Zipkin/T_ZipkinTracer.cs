@@ -11,11 +11,9 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
     {
 
         [SetUp]
-        public void EnableAndClearTracers()
+        public void Setup()
         {
-            Trace.TracingEnabled = true;
             Trace.SamplingRate = 1f;
-            Tracer.Clear();
         }
 
         [Test]

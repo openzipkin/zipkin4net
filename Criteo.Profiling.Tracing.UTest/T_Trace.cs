@@ -6,42 +6,49 @@ namespace Criteo.Profiling.Tracing.UTest
     [TestFixture]
     class T_Trace
     {
+
+        private Mock<ITracer> _mockTracer;
+
         [SetUp]
         public void SetUp()
         {
             Tracer.Clear();
-            Trace.TracingEnabled = true;
+            Trace.Start();
             Trace.SamplingRate = 1f;
+
+            _mockTracer = new Mock<ITracer>();
+            Tracer.Register(_mockTracer.Object);
+        }
+
+        [TearDown]
+        public void TearDown()
+        {
+            Trace.Stop();
+            Tracer.Clear();
         }
 
         [Test]
-        public void TracerRecordShouldBeCalledIfTracingIsEnabled()
+        public void TracerRecordShouldBeCalledIfTracingIsStarted()
         {
-            var mockTracer = new Mock<ITracer>();
-            Tracer.Register(mockTracer.Object);
-
-            Trace.TracingEnabled = true;
             var trace = Trace.CreateIfSampled();
+
+            Assert.IsTrue(Trace.TracingRunning);
             trace.Record(Annotations.ServerSend());
+            Trace.Stop();
 
-            Trace.TracingEnabled = false; // force flush to tracers
-
-            mockTracer.Verify(tracer => tracer.Record(It.IsAny<Record>()), Times.Once());
+            _mockTracer.Verify(tracer => tracer.Record(It.IsAny<Record>()), Times.Once());
         }
 
         [Test]
-        public void TracerRecordShouldntBeCalledIfTracingIsDisabled()
+        public void RecordsShouldntBeSentToTracersIfTracingIsStopped()
         {
-            var mockTracer = new Mock<ITracer>();
-            Tracer.Register(mockTracer.Object);
-
-            Trace.TracingEnabled = false;
             var trace = Trace.CreateIfSampled();
+
+            Trace.Stop();
+            Assert.IsFalse(Trace.TracingRunning);
             trace.Record(Annotations.ServerSend());
 
-            Trace.TracingEnabled = false; // force flush to tracers
-
-            mockTracer.Verify(tracer => tracer.Record(It.IsAny<Record>()), Times.Never());
+            _mockTracer.Verify(tracer => tracer.Record(It.IsAny<Record>()), Times.Never());
         }
 
         [Test]
@@ -66,18 +73,14 @@ namespace Criteo.Profiling.Tracing.UTest
         [Test]
         public void TraceCreatesCorrectRecord()
         {
-            var mockTracer = new Mock<ITracer>();
-            Tracer.Register(mockTracer.Object);
-
             var trace = Trace.CreateIfSampled();
 
             var clientRcv = Annotations.ClientRecv();
-
             trace.Record(clientRcv);
 
-            Trace.TracingEnabled = false; // force flush to tracers
+            Trace.Stop();
 
-            mockTracer.Verify(t => t.Record(It.Is<Record>(r => r.Annotation == clientRcv && r.SpanId.Equals(trace.CurrentId))), Times.Once());
+            _mockTracer.Verify(t => t.Record(It.Is<Record>(r => r.Annotation == clientRcv && r.SpanId.Equals(trace.CurrentId))), Times.Once());
         }
 
     }
