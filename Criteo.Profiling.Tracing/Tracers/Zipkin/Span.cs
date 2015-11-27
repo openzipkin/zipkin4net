@@ -43,6 +43,8 @@ namespace Criteo.Profiling.Tracing.Tracers.Zipkin
         /// </summary>
         public DateTime Started { get; private set; }
 
+        internal const string DefaultRpcMethod = "Unknown";
+
         public Span(SpanId spanId, DateTime started)
         {
             this.Annotations = new List<ZipkinAnnotation>();
@@ -79,7 +81,7 @@ namespace Criteo.Profiling.Tracing.Tracers.Zipkin
                 Id = SpanId.Id,
                 Parent_id = SpanId.ParentSpanId,
                 Trace_id = SpanId.TraceId,
-                Name = Name,
+                Name = Name ?? DefaultRpcMethod,
                 Debug = false
             };
 

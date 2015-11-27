@@ -4,6 +4,7 @@ using Criteo.Profiling.Tracing.Tracers.Zipkin;
 using Criteo.Profiling.Tracing.Tracers.Zipkin.Thrift;
 using NUnit.Framework;
 using Span = Criteo.Profiling.Tracing.Tracers.Zipkin.Span;
+using ThriftSpan = Criteo.Profiling.Tracing.Tracers.Zipkin.Thrift.Span;
 
 namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
 {
@@ -41,19 +42,16 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
         [Test]
         public void SpanCorrectlyConvertedToThrift()
         {
-
             var hostIp = IPAddress.Loopback;
             const int hostPort = 1234;
             const string serviceName = "myCriteoService";
             const string methodName = "GET";
 
             var traceId = new SpanId(1, 0, 2, Flags.Empty());
-            var started = DateTime.UtcNow;
-            var span = new Span(traceId, started) { Endpoint = new IPEndPoint(hostIp, hostPort), ServiceName = serviceName, Name = methodName };
+            var span = new Span(traceId, DateTime.UtcNow) { Endpoint = new IPEndPoint(hostIp, hostPort), ServiceName = serviceName, Name = methodName };
 
             var zipkinAnnDateTime = DateTime.UtcNow;
-            span.AddAnnotation(new ZipkinAnnotation(zipkinAnnDateTime, zipkinCoreConstants.CLIENT_SEND));
-            span.AddAnnotation(new ZipkinAnnotation(zipkinAnnDateTime, zipkinCoreConstants.CLIENT_RECV));
+            AddClientSendReceiveAnnotations(span, zipkinAnnDateTime);
 
             const string binAnnKey = "http.uri";
             var binAnnVal = new byte[] { 0x00 };
@@ -83,7 +81,6 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
                 Assert.AreEqual(expectedHost, ann.Host);
                 Assert.IsNull(ann.Duration);
                 Assert.AreEqual(ZipkinAnnotation.ToUnixTimestamp(zipkinAnnDateTime), ann.Timestamp);
-
             });
 
             Assert.AreEqual(1, thriftSpan.Binary_annotations.Count);
@@ -98,26 +95,30 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
         }
 
         [Test]
+        [Description("Span should never be sent without required fields such as Name, ServiceName, Ipv4 or Port")]
         public void DefaultsValuesAreUsedIfNothingSpecified()
         {
             var traceId = new SpanId(1, 0, 2, Flags.Empty());
-            var started = DateTime.UtcNow;
-            var span = new Span(traceId, started);
-
-            span.AddAnnotation(new ZipkinAnnotation(DateTime.UtcNow, zipkinCoreConstants.CLIENT_SEND));
-            span.AddAnnotation(new ZipkinAnnotation(DateTime.UtcNow, zipkinCoreConstants.CLIENT_RECV));
+            var span = new Span(traceId, DateTime.UtcNow);
+            AddClientSendReceiveAnnotations(span);
 
             var thriftSpan = span.ToThrift();
+            AssertSpanHasRequiredFields(thriftSpan);
 
-            Assert.NotNull(thriftSpan);
+            const string defaultName = Span.DefaultRpcMethod;
+            var defaultServiceName = Trace.DefaultServiceName;
+            var defaultIpv4 = Span.IpToInt(Trace.DefaultEndPoint.Address);
+            var defaultPort = Trace.DefaultEndPoint.Port;
+
             Assert.AreEqual(2, thriftSpan.Annotations.Count);
-
             thriftSpan.Annotations.ForEach(ann =>
             {
-                Assert.AreEqual(Trace.DefaultServiceName, ann.Host.Service_name);
-                Assert.AreEqual(Span.IpToInt(Trace.DefaultEndPoint.Address), ann.Host.Ipv4);
-                Assert.AreEqual(Trace.DefaultEndPoint.Port, ann.Host.Port);
+                Assert.AreEqual(defaultServiceName, ann.Host.Service_name);
+                Assert.AreEqual(defaultIpv4, ann.Host.Ipv4);
+                Assert.AreEqual(defaultPort, ann.Host.Port);
             });
+
+            Assert.AreEqual(defaultName, thriftSpan.Name);
         }
 
         [Test]
@@ -129,13 +130,13 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
             // Make sure we choose something different thant the default values
             var serviceName = Trace.DefaultServiceName + "_notDefault";
             var hostPort = Trace.DefaultEndPoint.Port + 1;
+            const string name = "myRPCmethod";
 
-            var span = new Span(traceId, started) { Endpoint = new IPEndPoint(IPAddress.Loopback, hostPort), ServiceName = serviceName };
-
-            span.AddAnnotation(new ZipkinAnnotation(DateTime.UtcNow, zipkinCoreConstants.CLIENT_SEND));
-            span.AddAnnotation(new ZipkinAnnotation(DateTime.UtcNow, zipkinCoreConstants.CLIENT_RECV));
+            var span = new Span(traceId, started) { Endpoint = new IPEndPoint(IPAddress.Loopback, hostPort), ServiceName = serviceName, Name = name };
+            AddClientSendReceiveAnnotations(span);
 
             var thriftSpan = span.ToThrift();
+            AssertSpanHasRequiredFields(thriftSpan);
 
             Assert.NotNull(thriftSpan);
             Assert.AreEqual(2, thriftSpan.Annotations.Count);
@@ -146,6 +147,8 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
                 Assert.AreEqual(Span.IpToInt(IPAddress.Loopback), annotation.Host.Ipv4);
                 Assert.AreEqual(hostPort, annotation.Host.Port);
             });
+
+            Assert.AreEqual(name, thriftSpan.Name);
         }
 
         [Test]
@@ -161,6 +164,48 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
             Assert.AreEqual(expectedIp, ipInt);
         }
 
+        private static void AddClientSendReceiveAnnotations(Span span)
+        {
+            AddClientSendReceiveAnnotations(span, DateTime.UtcNow);
+        }
+
+        private static void AddClientSendReceiveAnnotations(Span span, DateTime dateTime)
+        {
+            span.AddAnnotation(new ZipkinAnnotation(dateTime, zipkinCoreConstants.CLIENT_SEND));
+            span.AddAnnotation(new ZipkinAnnotation(dateTime, zipkinCoreConstants.CLIENT_RECV));
+        }
+
+        private static void AssertSpanHasRequiredFields(ThriftSpan thriftSpan)
+        {
+            Assert.IsNotNull(thriftSpan.Id);
+            Assert.IsNotNull(thriftSpan.Parent_id);
+            Assert.IsNotNull(thriftSpan.Trace_id);
+            Assert.IsNotNullOrEmpty(thriftSpan.Name);
+
+            thriftSpan.Annotations.ForEach(annotation =>
+            {
+                Assert.IsNotNullOrEmpty(annotation.Host.Service_name);
+                Assert.IsNotNull(annotation.Host.Ipv4);
+                Assert.IsNotNull(annotation.Host.Port);
+
+                Assert.IsNotNull(annotation.Timestamp);
+                Assert.That(annotation.Timestamp, Is.GreaterThan(0));
+                Assert.IsNotNullOrEmpty(annotation.Value);
+            });
+
+            if (thriftSpan.Binary_annotations != null)
+            {
+                thriftSpan.Binary_annotations.ForEach(annotation =>
+                {
+                    Assert.IsNotNullOrEmpty(annotation.Host.Service_name);
+                    Assert.IsNotNull(annotation.Host.Ipv4);
+                    Assert.IsNotNull(annotation.Host.Port);
+
+                    Assert.IsNotNull(annotation.Annotation_type);
+                    Assert.IsNotNull(annotation.Value);
+                });
+            }
+        }
 
     }
 }
