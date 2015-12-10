@@ -69,7 +69,7 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
             };
 
             Assert.AreEqual(1, thriftSpan.Trace_id);
-            Assert.AreEqual(0, thriftSpan.Parent_id);
+            Assert.IsNull(thriftSpan.Parent_id); // Root span has no parent
             Assert.AreEqual(2, thriftSpan.Id);
             Assert.AreEqual(false, thriftSpan.Debug);
             Assert.AreEqual(methodName, thriftSpan.Name);
@@ -178,7 +178,6 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
         private static void AssertSpanHasRequiredFields(ThriftSpan thriftSpan)
         {
             Assert.IsNotNull(thriftSpan.Id);
-            Assert.IsNotNull(thriftSpan.Parent_id);
             Assert.IsNotNull(thriftSpan.Trace_id);
             Assert.IsNotNullOrEmpty(thriftSpan.Name);
 
