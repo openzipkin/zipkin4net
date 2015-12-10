@@ -79,11 +79,15 @@ namespace Criteo.Profiling.Tracing.Tracers.Zipkin
             var thriftSpan = new Thrift.Span()
             {
                 Id = SpanId.Id,
-                Parent_id = SpanId.ParentSpanId,
                 Trace_id = SpanId.TraceId,
                 Name = Name ?? DefaultRpcMethod,
                 Debug = false
             };
+
+            if (SpanId.ParentSpanId != 0)
+            {
+                thriftSpan.Parent_id = SpanId.ParentSpanId;
+            }
 
             // Use default value if no information were recorded
             if (Endpoint == null) Endpoint = Trace.DefaultEndPoint;
