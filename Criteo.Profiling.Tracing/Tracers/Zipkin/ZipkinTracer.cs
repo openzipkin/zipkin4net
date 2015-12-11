@@ -91,11 +91,17 @@ namespace Criteo.Profiling.Tracing.Tracers.Zipkin
         /// <param name="utcNow"></param>
         internal void FlushOldSpans(DateTime utcNow)
         {
-            spanMap.Where(pair => utcNow.Subtract(pair.Value.Started).TotalSeconds > TimeToLive).AsParallel().ForAll(pair =>
+            var outlivedSpans = spanMap.Where(pair => utcNow.Subtract(pair.Value.Started).TotalSeconds > TimeToLive);
+
+            foreach (var oldSpanEntry in outlivedSpans)
             {
-                if (!pair.Value.Complete) pair.Value.AddAnnotation(new ZipkinAnnotation(DateTime.UtcNow, "flush.timeout"));
-                RemoveThenLogSpan(pair.Key);
-            });
+                if (!oldSpanEntry.Value.Complete)
+                {
+                    oldSpanEntry.Value.AddAnnotation(new ZipkinAnnotation(DateTime.UtcNow, "flush.timeout"));
+                }
+                RemoveThenLogSpan(oldSpanEntry.Key);
+            }
+
         }
 
     }
