@@ -11,13 +11,15 @@ namespace Criteo.Profiling.Tracing.Utils
     /// </summary>
     internal static class RandomUtils
     {
-        private static int seed = Environment.TickCount;
+        private static int _seed = Guid.NewGuid().GetHashCode();
 
-        private static readonly ThreadLocal<Random> rand = new ThreadLocal<Random>(() => new Random(Interlocked.Increment(ref seed)));
+        private static readonly ThreadLocal<Random> LocalRandom = new ThreadLocal<Random>(() => new Random(Interlocked.Increment(ref _seed)));
 
         public static long NextLong()
         {
-            return (long)((rand.Value.NextDouble() * 2.0 - 1.0) * long.MaxValue);
+            var buffer = new byte[8];
+            LocalRandom.Value.NextBytes(buffer);
+            return BitConverter.ToInt64(buffer, 0);
         }
 
     }
