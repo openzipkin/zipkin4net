@@ -19,7 +19,7 @@ namespace Criteo.Profiling.Tracing
         internal SpanId CurrentId { get; private set; }
 
         private static IPEndPoint _defaultEndPoint = new IPEndPoint(IpUtils.GetLocalIpAddress() ?? IPAddress.Loopback, 0);
-        private static string _defaultServiceName = "Unknown Service";
+        private static string _defaultServiceName = "UnknownService";
 
         private static readonly ISampler _sampler = new DefaultSampler(samplingRate: 0f);
 
@@ -48,6 +48,7 @@ namespace Criteo.Profiling.Tracing
 
         /// <summary>
         /// Default service/application name if none was recorded using an annotation.
+        /// Avoid spaces as they are not correctly handled by zipkin-web-service (at least up to v1.19.1)
         /// </summary>
         public static string DefaultServiceName
         {

@@ -43,7 +43,7 @@ namespace Criteo.Profiling.Tracing.Tracers.Zipkin
         /// </summary>
         public DateTime Started { get; private set; }
 
-        internal const string DefaultRpcMethod = "Unknown";
+        internal const string DefaultRpcMethod = "UnknownRpc";
 
         public Span(SpanId spanId, DateTime started)
         {
