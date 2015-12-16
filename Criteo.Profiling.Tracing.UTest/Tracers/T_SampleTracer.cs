@@ -1,4 +1,5 @@
 ﻿using System;
+using Criteo.Profiling.Tracing.Sampling;
 using Criteo.Profiling.Tracing.Tracers;
 using Moq;
 using NUnit.Framework;
@@ -8,58 +9,58 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers
     [TestFixture]
     class T_SampleTracer
     {
-        [Test]
-        [ExpectedException(typeof(ArgumentOutOfRangeException))]
-        public void ConstructorShouldThrowWithNegativeSamplingRate()
+
+        private Mock<ISampler> _mockSampler;
+        private Mock<ITracer> _mockUnderlyingTracer;
+
+        [SetUp]
+        public void SetUp()
         {
-            var mockTracer = new Mock<ITracer>();
-            var sampleTracer = new SamplerTracer(underlyingTracer: mockTracer.Object, sampleRate: -0.1f);
+            _mockUnderlyingTracer = new Mock<ITracer>();
+            _mockSampler = new Mock<ISampler>();
         }
 
         [Test]
-        [ExpectedException(typeof(ArgumentOutOfRangeException))]
-        public void ConstructorShouldThrowWithSuperiorToOneSamplingRate()
+        public void FlagSampledShouldByPassSamplingAndForward()
         {
-            var mockTracer = new Mock<ITracer>();
-            var sampleTracer = new SamplerTracer(underlyingTracer: mockTracer.Object, sampleRate: 1.1f);
+            var sampleTracer = new SamplerTracer(_mockUnderlyingTracer.Object, _mockSampler.Object);
+
+            RecordTrace(sampleTracer, Flags.Empty().SetSampled());
+
+            _mockSampler.Verify(sampler1 => sampler1.Sample(It.IsAny<long>()), Times.Never());
+            _mockUnderlyingTracer.Verify(tracer => tracer.Record(It.IsAny<Record>()), Times.Once());
         }
 
         [Test]
-        public void SamplingRateSetterShouldThrow()
+        public void FlagNotSampledShouldByPassSamplingAndNotForward()
         {
-            var mockTracer = new Mock<ITracer>();
-            var sampleTracer = new SamplerTracer(underlyingTracer: mockTracer.Object, sampleRate: 1.0f);
+            var sampleTracer = new SamplerTracer(_mockUnderlyingTracer.Object, _mockSampler.Object);
 
-            Assert.Throws<ArgumentOutOfRangeException>(() => sampleTracer.SampleRate = 2);
-            Assert.Throws<ArgumentOutOfRangeException>(() => sampleTracer.SampleRate = -2);
+            RecordTrace(sampleTracer, Flags.Empty().SetNotSampled());
+
+            _mockSampler.Verify(sampler1 => sampler1.Sample(It.IsAny<long>()), Times.Never());
+            _mockUnderlyingTracer.Verify(tracer => tracer.Record(It.IsAny<Record>()), Times.Never());
         }
 
-        [Test]
-        public void FlagSampledTrueShouldAlwaysTrace()
+        [TestCase(true)]
+        public void FlagUnsetShouldRelyOnSampling(bool sampled)
         {
-            var underlyingTracer = new Mock<ITracer>();
-            var sampleTracer = new SamplerTracer(underlyingTracer.Object, sampleRate: 0f);
+            var sampleTracer = new SamplerTracer(_mockUnderlyingTracer.Object, _mockSampler.Object);
 
-            var spanId = new SpanId(1, 0, 1, Flags.Empty().SetSampled());
+            _mockSampler.Setup(sampler => sampler.Sample(It.IsAny<long>())).Returns(sampled);
+
+            RecordTrace(sampleTracer, Flags.Empty());
+
+            _mockSampler.Verify(sampler1 => sampler1.Sample(It.IsAny<long>()), Times.Once());
+            _mockUnderlyingTracer.Verify(tracer => tracer.Record(It.IsAny<Record>()), sampled ? Times.Once() : Times.Never());
+        }
+
+        private static void RecordTrace(ITracer tracer, Flags flags)
+        {
+            var spanId = new SpanId(1, 0, 1, flags);
             var record = new Record(spanId, DateTime.UtcNow, Annotations.ClientRecv());
 
-            sampleTracer.Record(record);
-
-            underlyingTracer.Verify(tracer => tracer.Record(It.IsAny<Record>()), Times.Once());
-        }
-
-        [Test]
-        public void FlagSampledFalseShouldNeverTrace()
-        {
-            var underlyingTracer = new Mock<ITracer>();
-            var sampleTracer = new SamplerTracer(underlyingTracer.Object, sampleRate: 1f);
-
-            var spanId = new SpanId(1, 0, 1, Flags.Empty().SetNotSampled());
-            var record = new Record(spanId, DateTime.UtcNow, Annotations.ClientRecv());
-
-            sampleTracer.Record(record);
-
-            underlyingTracer.Verify(tracer => tracer.Record(It.IsAny<Record>()), Times.Never());
+            tracer.Record(record);
         }
 
     }
