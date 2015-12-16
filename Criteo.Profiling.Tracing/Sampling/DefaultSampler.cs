@@ -1,18 +1,18 @@
 ﻿using System;
 using System.Threading;
-using Criteo.Profiling.Tracing.Utils;
 
 namespace Criteo.Profiling.Tracing.Sampling
 {
     internal class DefaultSampler : ISampler
     {
         // Avoid that every machines sample the same traceId subset
-        private static readonly long Salt = RandomUtils.NextLong();
+        private readonly long _salt;
 
         private float _samplingRate;
 
-        public DefaultSampler(float samplingRate = 0f)
+        public DefaultSampler(long salt, float samplingRate = 0f)
         {
+            _salt = salt;
             SamplingRate = samplingRate;
         }
 
@@ -30,7 +30,7 @@ namespace Criteo.Profiling.Tracing.Sampling
 
         public bool Sample(long traceId)
         {
-            return Math.Abs(traceId ^ Salt) % 10000 < (_samplingRate * 10000);
+            return Math.Abs(traceId ^ _salt) % 10000 < (_samplingRate * 10000);
         }
 
         private static bool IsValidSamplingRate(float rate)

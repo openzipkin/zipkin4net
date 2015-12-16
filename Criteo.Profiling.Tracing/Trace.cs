@@ -21,7 +21,7 @@ namespace Criteo.Profiling.Tracing
         private static IPEndPoint _defaultEndPoint = new IPEndPoint(IpUtils.GetLocalIpAddress() ?? IPAddress.Loopback, 0);
         private static string _defaultServiceName = "UnknownService";
 
-        private static readonly ISampler _sampler = new DefaultSampler(samplingRate: 0f);
+        private static readonly ISampler Sampler = new DefaultSampler(salt: RandomUtils.NextLong(), samplingRate: 0f);
 
         private static ILogger _logger = new VoidLogger();
 
@@ -105,8 +105,8 @@ namespace Criteo.Profiling.Tracing
         /// </summary>
         public static float SamplingRate
         {
-            get { return _sampler.SamplingRate; }
-            set { _sampler.SamplingRate = value; }
+            get { return Sampler.SamplingRate; }
+            set { Sampler.SamplingRate = value; }
         }
 
         /// <summary>
@@ -116,7 +116,7 @@ namespace Criteo.Profiling.Tracing
         public static Trace CreateIfSampled()
         {
             var traceId = RandomUtils.NextLong();
-            return _sampler.Sample(traceId) ? new Trace(traceId) : null;
+            return Sampler.Sample(traceId) ? new Trace(traceId) : null;
         }
 
         /// <summary>
