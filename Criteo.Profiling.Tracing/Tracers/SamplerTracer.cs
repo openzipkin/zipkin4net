@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading;
+﻿using Criteo.Profiling.Tracing.Sampling;
 using Criteo.Profiling.Tracing.Utils;
 
 namespace Criteo.Profiling.Tracing.Tracers
@@ -10,36 +9,33 @@ namespace Criteo.Profiling.Tracing.Tracers
     /// </summary>
     public class SamplerTracer : ITracer
     {
-        // Avoid that every machines sample the same traceId subset
-        private static readonly long salt = RandomUtils.NextLong();
 
-        private float sampleRate;
-        private readonly ITracer underlyingTracer;
+        private readonly ISampler _sampler;
+        private readonly ITracer _underlyingTracer;
 
-        public float SampleRate
+        public float SamplingRate
         {
-            get { return sampleRate; }
-
-            set
-            {
-                if (!IsValidSamplingRate(value))
-                    throw new ArgumentOutOfRangeException("value", "Sample rate should be between 0.0 and 1.0");
-
-                Interlocked.Exchange(ref sampleRate, value);
-            }
+            get { return _sampler.SamplingRate; }
+            set { _sampler.SamplingRate = value; }
         }
 
-        public SamplerTracer(ITracer underlyingTracer, float sampleRate = 0.001f)
+        public SamplerTracer(ITracer underlyingTracer)
+            : this(underlyingTracer, new DefaultSampler(RandomUtils.NextLong()))
         {
-            this.underlyingTracer = underlyingTracer;
-            this.SampleRate = sampleRate;
+
+        }
+
+        internal SamplerTracer(ITracer underlyingTracer, ISampler sampler)
+        {
+            _underlyingTracer = underlyingTracer;
+            _sampler = sampler;
         }
 
         public void Record(Record record)
         {
             if (Sample(record.SpanId))
             {
-                underlyingTracer.Record(record);
+                _underlyingTracer.Record(record);
             }
         }
 
@@ -57,18 +53,8 @@ namespace Criteo.Profiling.Tracing.Tracers
             }
             else
             {
-                return RandomSample(spanId.TraceId);
+                return _sampler.Sample(spanId.TraceId);
             }
-        }
-
-        private bool RandomSample(long traceId)
-        {
-            return Math.Abs(traceId ^ salt) % 10000 < (SampleRate * 10000);
-        }
-
-        private static bool IsValidSamplingRate(float rate)
-        {
-            return 0.0f <= rate && rate <= 1.0f;
         }
 
     }
