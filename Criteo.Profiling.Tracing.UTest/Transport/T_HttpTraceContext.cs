@@ -9,22 +9,11 @@ namespace Criteo.Profiling.Tracing.UTest.Transport
     class T_HttpTraceContext
     {
 
-        [Test]
-        [TestCase("", "", "", "", "")]
-        [TestCase(null, null, null, null, null)]
-        [TestCase("0000000000000001", null, null, null, null)]
-        [TestCase("0000000000000001", "", null, null, null)]
-        [TestCase("0000000000000001", "0000000000000000", null, null, null)]
-        [TestCase("0000000000000001", "0000000000000000", "", null, null)]
-        public void FailsToParseTraceFromNullOrEmpty(string encodedTraceId, string encodedSpanId, string encodedParentSpanId, string sampledStr, string flagsStr)
-        {
-            Trace receivedTrace;
-            Assert.False(HttpTraceContext.TryParseTrace(encodedTraceId, encodedSpanId, encodedParentSpanId, sampledStr, flagsStr, out receivedTrace));
-            Assert.IsNull(receivedTrace);
-        }
+        #region TryGet/TryParse Context
 
         [Test]
-        public void FailsToGetTraceFromEmptyHeaders()
+        [Description("Required headers are traceId and spanId")]
+        public void TryGetFailsWithoutRequiredHeaders()
         {
             Trace receivedTrace;
 
@@ -35,46 +24,120 @@ namespace Criteo.Profiling.Tracing.UTest.Transport
             // IDictionnary
             Assert.False(HttpTraceContext.TryGet(new Dictionary<string, string>(), out receivedTrace));
             Assert.IsNull(receivedTrace);
+
+            Assert.False(HttpTraceContext.TryGet(new Dictionary<string, string> { { HttpTraceContext.TraceId, "0000000000000001" } }, out receivedTrace));
+            Assert.IsNull(receivedTrace);
+
+            Assert.False(HttpTraceContext.TryGet(new Dictionary<string, string> { { HttpTraceContext.SpanId, "0000000000000001" } }, out receivedTrace));
+            Assert.IsNull(receivedTrace);
         }
 
-        [Test]
-        public void SerializedTraceIsEqualToOriginal()
+        [TestCase(null, null)]
+        [TestCase("", "")]
+        [TestCase("0000000000000001", null)]
+        [TestCase("0000000000000001", "")]
+        [TestCase(null, "00000000000000FA")]
+        [TestCase("", "00000000000000FA")]
+        [Description("Required headers are traceId and spanId")]
+        public void TryParseFailsWithoutRequiredHeaders(string encodedTraceId, string encodedSpanId)
         {
-            Trace.SamplingRate = 1f;
-            var originalTrace = Trace.CreateIfSampled();
+            Trace trace;
+            Assert.False(HttpTraceContext.TryParseTrace(encodedTraceId, encodedSpanId, encodedParentSpanId: "0000000000000000", sampledStr: "1", flagsStr: "0", trace: out trace));
+        }
+
+
+        [TestCase("0000000000000000")]
+        [TestCase(null)]
+        public void ShouldParseTraceWithoutFlags(string encodedParentSpanId)
+        {
+            Trace trace;
+            Assert.True(HttpTraceContext.TryParseTrace(encodedTraceId: "0000000000000001", encodedSpanId: "00000000000000FA", encodedParentSpanId: encodedParentSpanId, sampledStr: null, flagsStr: null, trace: out trace));
+
+            Assert.AreEqual(1, trace.CurrentId.TraceId);
+            Assert.AreEqual(250, trace.CurrentId.Id);
+            Assert.AreEqual(Flags.Empty(), trace.CurrentId.Flags);
+
+            var expectedParentSpanId = (encodedParentSpanId == null) ? (long?)null : 0L;
+            Assert.AreEqual(expectedParentSpanId, trace.CurrentId.ParentSpanId);
+        }
+
+        #endregion
+
+        #region Set Context
+
+        [TestCase("0000000000000001", 0L, "0000000000000000", "00000000000000FA", true, "6", "1", 5)]
+        [TestCase("0000000000000001", 0L, "0000000000000000", "00000000000000FA", false, "0", null, 4)]
+        [TestCase("0000000000000001", null, null, "00000000000000FA", true, "6", "1", 4)]
+        public void HeadersAreCorrectlySet(string expectedTraceId, long? parentSpanId, string expectedParentSpanId, string expectedSpanId, bool setSampled, string expectedFlags, string expectedSampled, int expectedCount)
+        {
+            var spanId = new SpanId(1, parentSpanId, 250, setSampled ? Flags.Empty().SetSampled() : Flags.Empty());
+            var trace = Trace.CreateFromId(spanId);
 
             var headersNvc = new NameValueCollection();
+            HttpTraceContext.Set(headersNvc, trace);
+            CheckHeaders(headersNvc, expectedTraceId, expectedParentSpanId, expectedSpanId, expectedFlags, expectedSampled, expectedCount);
+
             var headersDict = new Dictionary<string, string>();
-
-            HttpTraceContext.Set(headersNvc, originalTrace);
-            HttpTraceContext.Set(headersDict, originalTrace);
-
-            Trace receivedTraceNvc;
-            Assert.True(HttpTraceContext.TryGet(headersNvc, out receivedTraceNvc));
-            Assert.AreEqual(originalTrace, receivedTraceNvc);
-
-            Trace receivedTraceDict;
-            Assert.True(HttpTraceContext.TryGet(headersDict, out receivedTraceDict));
-            Assert.AreEqual(originalTrace, receivedTraceDict);
+            HttpTraceContext.Set(headersDict, trace);
+            CheckHeaders(headersDict, expectedTraceId, expectedParentSpanId, expectedSpanId, expectedFlags, expectedSampled, expectedCount);
         }
 
-        [Test]
-        public void DeserializedTraceIsEqualToOriginal()
+        private static void CheckHeaders(IReadOnlyDictionary<string, string> headers, string traceId, string parentSpanId, string spanId, string flags, string sampled, int count)
         {
-            const string encodedTraceId = "0000000000000001";
-            const string encodedSpanId = "0000000000000000";
-            const string encodedParentSpanId = "00000000000000FA";
-            const string flagsStr = "0";
-            const string sampledStr = null;
+            Assert.AreEqual(count, headers.Count);
 
+            // Required fields
+            Assert.AreEqual(traceId, headers[HttpTraceContext.TraceId]);
+            Assert.AreEqual(spanId, headers[HttpTraceContext.SpanId]);
+            Assert.AreEqual(flags, headers[HttpTraceContext.Flags]);
 
-            Trace receivedTrace;
-            Assert.True(HttpTraceContext.TryParseTrace(encodedTraceId, encodedSpanId, encodedParentSpanId, sampledStr, flagsStr, out receivedTrace));
+            // Optional fields
+            if (parentSpanId != null)
+            {
+                Assert.AreEqual(parentSpanId, headers[HttpTraceContext.ParentSpanId]);
+            }
+            else
+            {
+                Assert.False(headers.ContainsKey(HttpTraceContext.ParentSpanId));
+            }
+
+            if (sampled != null)
+            {
+                Assert.AreEqual(sampled, headers[HttpTraceContext.Sampled]);
+            }
+            else
+            {
+                Assert.False(headers.ContainsKey(HttpTraceContext.Sampled));
+            }
+        }
+
+        private static void CheckHeaders(NameValueCollection headers, string traceId, string parentSpanId, string spanId, string flags, string sampled, int count)
+        {
+            Assert.AreEqual(count, headers.Count);
+
+            Assert.AreEqual(traceId, headers[HttpTraceContext.TraceId]);
+            Assert.AreEqual(parentSpanId, headers[HttpTraceContext.ParentSpanId]);
+            Assert.AreEqual(spanId, headers[HttpTraceContext.SpanId]);
+            Assert.AreEqual(flags, headers[HttpTraceContext.Flags]);
+            Assert.AreEqual(sampled, headers[HttpTraceContext.Sampled]);
+        }
+
+        #endregion
+
+        #region Get/Set inversions
+
+        [TestCase("0000000000000001", "0000000000000000", "00000000000000FA", "0", null, 4)]
+        [TestCase("0000000000000001", "0000000000000000", "00000000000000FA", "0", "", 4)]
+        [TestCase("0000000000000001", "0000000000000000", null, "0", null, 3)]
+        public void GetTraceThenSetHeadersEqualsOriginal(string encodedTraceId, string encodedSpanId, string encodedParentSpanId, string flagsStr, string sampledStr, int expectedHeadersCount)
+        {
+            Trace parsedTrace;
+            Assert.True(HttpTraceContext.TryParseTrace(encodedTraceId, encodedSpanId, encodedParentSpanId, sampledStr, flagsStr, out parsedTrace));
 
             var recreatedHeaders = new NameValueCollection();
-            HttpTraceContext.Set(recreatedHeaders, receivedTrace);
+            HttpTraceContext.Set(recreatedHeaders, parsedTrace);
 
-            Assert.AreEqual(4, recreatedHeaders.Count);
+            Assert.AreEqual(expectedHeadersCount, recreatedHeaders.Count);
 
             Assert.AreEqual(encodedTraceId, recreatedHeaders[HttpTraceContext.TraceId]);
             Assert.AreEqual(encodedParentSpanId, recreatedHeaders[HttpTraceContext.ParentSpanId]);
@@ -82,69 +145,45 @@ namespace Criteo.Profiling.Tracing.UTest.Transport
             Assert.AreEqual(flagsStr, recreatedHeaders[HttpTraceContext.Flags]);
         }
 
-        [Test]
-        public void HeadersAreCorrectlySetNvc()
+        [TestCase(null)]
+        [TestCase(9845431L)]
+        public void SetHeadersThenGetTraceEqualsOriginal(long? parentSpanId)
         {
-            var traceId = new SpanId(1, 0, 250, Flags.Empty().SetSampled());
-            var trace = Trace.CreateFromId(traceId);
-
-            var headers = new NameValueCollection();
-
-            HttpTraceContext.Set(headers, trace);
-
-            Assert.AreEqual(5, headers.Count);
-
-            Assert.AreEqual("0000000000000001", headers[HttpTraceContext.TraceId]);
-            Assert.AreEqual("0000000000000000", headers[HttpTraceContext.ParentSpanId]);
-            Assert.AreEqual("00000000000000FA", headers[HttpTraceContext.SpanId]);
-            Assert.AreEqual("6", headers[HttpTraceContext.Flags]);
-            Assert.AreEqual("1", headers[HttpTraceContext.Sampled]);
+            CheckSetHeadersThenGetTrace_Dict(parentSpanId);
+            CheckSetHeadersThenGetTrace_NVC(parentSpanId);
         }
 
-        [Test]
-        public void HeadersAreCorrectlySetDict()
+        private static void CheckSetHeadersThenGetTrace_Dict(long? parentSpanId)
         {
-            var traceId = new SpanId(1, 0, 250, Flags.Empty().SetSampled());
-            var trace = Trace.CreateFromId(traceId);
+            var spanId = new SpanId(1, parentSpanId, 250, Flags.Empty());
+            var originalTrace = Trace.CreateFromId(spanId);
 
             var headers = new Dictionary<string, string>();
+            HttpTraceContext.Set(headers, originalTrace);
 
-            HttpTraceContext.Set(headers, trace);
+            Trace deserializedTrace;
+            Assert.True(HttpTraceContext.TryGet(headers, out deserializedTrace));
 
-            Assert.AreEqual(5, headers.Count);
-
-            Assert.AreEqual("0000000000000001", headers[HttpTraceContext.TraceId]);
-            Assert.AreEqual("0000000000000000", headers[HttpTraceContext.ParentSpanId]);
-            Assert.AreEqual("00000000000000FA", headers[HttpTraceContext.SpanId]);
-            Assert.AreEqual("6", headers[HttpTraceContext.Flags]);
-            Assert.AreEqual("1", headers[HttpTraceContext.Sampled]);
+            Assert.AreEqual(originalTrace, deserializedTrace);
         }
 
-        [Test]
-        public void ParseTraceWithoutFlags()
+        private static void CheckSetHeadersThenGetTrace_NVC(long? parentSpanId)
         {
-            Trace trace;
-            Assert.True(HttpTraceContext.TryParseTrace(encodedTraceId: "0000000000000001", encodedSpanId: "00000000000000FA", encodedParentSpanId: "0000000000000000", sampledStr: null, flagsStr: null, trace: out trace));
+            var spanId = new SpanId(1, parentSpanId, 250, Flags.Empty());
+            var originalTrace = Trace.CreateFromId(spanId);
 
-            Assert.AreEqual(1, trace.CurrentId.TraceId);
-            Assert.AreEqual(0, trace.CurrentId.ParentSpanId);
-            Assert.AreEqual(250, trace.CurrentId.Id);
-            Assert.AreEqual(Flags.Empty(), trace.CurrentId.Flags);
+            var headers = new NameValueCollection();
+            HttpTraceContext.Set(headers, originalTrace);
+
+            Trace deserializedTrace;
+            Assert.True(HttpTraceContext.TryGet(headers, out deserializedTrace));
+
+            Assert.AreEqual(originalTrace, deserializedTrace);
         }
 
-        [TestCase(null, null, null)]
-        [TestCase("0000000000000001", null, null)]
-        [TestCase(null, "00000000000000FA", null)]
-        [TestCase(null, null, "0000000000000000")]
-        [TestCase(null, "00000000000000FA", "0000000000000000")]
-        [TestCase("0000000000000001", "00000000000000FA", null)]
-        [TestCase("0000000000000001", null, "0000000000000000")]
-        [Description("A missing required trace header should prevent the trace to be created (required headers are traceId, spanId and parentSpanId)")]
-        public void ParseWithoutRequiredHeadersShouldFail(string encodedTraceId, string encodedSpanId, string encodedParentSpanId)
-        {
-            Trace trace;
-            Assert.False(HttpTraceContext.TryParseTrace(encodedTraceId, encodedSpanId, encodedParentSpanId, sampledStr: "1", flagsStr: "0", trace: out trace));
-        }
+        #endregion
+
+        #region Id Encoding
 
         [Test]
         public void LongIdEncodingIsCorrect()
@@ -184,6 +223,8 @@ namespace Criteo.Profiling.Tracing.UTest.Transport
 
             Assert.AreEqual(encodedInput, reEncodedInput);
         }
+
+        #endregion
 
     }
 }

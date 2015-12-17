@@ -39,6 +39,14 @@ namespace Criteo.Profiling.Tracing.Tracers.Zipkin
         public bool Complete { get; private set; }
 
         /// <summary>
+        /// True if this span doesn't have a parent.
+        /// </summary>
+        public bool IsRoot
+        {
+            get { return !SpanId.ParentSpanId.HasValue; }
+        }
+
+        /// <summary>
         /// DateTime of the span creation. It is currently only use for flushing old spans.
         /// </summary>
         public DateTime Started { get; private set; }
@@ -84,7 +92,7 @@ namespace Criteo.Profiling.Tracing.Tracers.Zipkin
                 Debug = false
             };
 
-            if (SpanId.ParentSpanId != 0)
+            if (!IsRoot)
             {
                 thriftSpan.Parent_id = SpanId.ParentSpanId;
             }

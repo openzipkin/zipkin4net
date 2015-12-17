@@ -40,16 +40,17 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
             Assert.False(spanOtherAnn.Complete);
         }
 
-        [Test]
-        public void SpanCorrectlyConvertedToThrift()
+        [TestCase(null)]
+        [TestCase(123456L)]
+        public void SpanCorrectlyConvertedToThrift(long? parentSpanId)
         {
             var hostIp = IPAddress.Loopback;
             const int hostPort = 1234;
             const string serviceName = "myCriteoService";
             const string methodName = "GET";
 
-            var traceId = new SpanId(1, 0, 2, Flags.Empty());
-            var span = new Span(traceId, DateTime.UtcNow) { Endpoint = new IPEndPoint(hostIp, hostPort), ServiceName = serviceName, Name = methodName };
+            var spanId = new SpanId(1, parentSpanId, 2, Flags.Empty());
+            var span = new Span(spanId, DateTime.UtcNow) { Endpoint = new IPEndPoint(hostIp, hostPort), ServiceName = serviceName, Name = methodName };
 
             var zipkinAnnDateTime = DateTime.UtcNow;
             AddClientSendReceiveAnnotations(span, zipkinAnnDateTime);
@@ -70,8 +71,17 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
             };
 
             Assert.AreEqual(1, thriftSpan.Trace_id);
-            Assert.IsNull(thriftSpan.Parent_id); // Root span has no parent
             Assert.AreEqual(2, thriftSpan.Id);
+
+            if (span.IsRoot)
+            {
+                Assert.IsNull(thriftSpan.Parent_id); // root span has no parent
+            }
+            else
+            {
+                Assert.AreEqual(parentSpanId, thriftSpan.Parent_id);
+            }
+
             Assert.AreEqual(false, thriftSpan.Debug);
             Assert.AreEqual(methodName, thriftSpan.Name);
 
@@ -163,6 +173,16 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
             var ipInt = Span.IpToInt(ipAddr);
 
             Assert.AreEqual(expectedIp, ipInt);
+        }
+
+        [TestCase(null)]
+        [TestCase(123456L)]
+        public void RootSpanPropertyIsCorrect(long? parentSpanId)
+        {
+            var spanId = new SpanId(1, parentSpanId, 1, Flags.Empty());
+            var span = new Span(spanId, DateTime.UtcNow);
+
+            Assert.AreEqual(parentSpanId == null, span.IsRoot);
         }
 
         private static void AddClientSendReceiveAnnotations(Span span)
