@@ -74,7 +74,7 @@ namespace Criteo.Profiling.Tracing
             if (Interlocked.CompareExchange(ref _status, (int)Status.Started, (int)Status.Stopped) ==
                       (int)Status.Stopped)
             {
-                _dispatcher = new InOrderAsyncDispatcher(PushToTracers);
+                _dispatcher = new InOrderAsyncDispatcher(Tracer.Push);
                 _logger.LogInformation("Tracing dispatcher service started");
                 return true;
             }
@@ -166,22 +166,6 @@ namespace Criteo.Profiling.Tracing
         {
             var record = new Record(CurrentId, DateTime.UtcNow, annotation);
             _dispatcher.Dispatch(record);
-        }
-
-        private static void PushToTracers(Record record)
-        {
-            foreach (var tracer in Tracer.Tracers)
-            {
-                try
-                {
-                    tracer.Record(record);
-                }
-                catch (Exception ex)
-                {
-                    // No exception coming for traces should disrupt the main application as tracing is optional.
-                    Logger.LogWarning("An error occured while recording the annotation. Msg: " + ex.Message);
-                }
-            }
         }
 
         public bool Equals(Trace other)
