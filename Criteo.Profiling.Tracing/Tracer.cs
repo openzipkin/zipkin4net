@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Criteo.Profiling.Tracing
 {
@@ -10,11 +11,11 @@ namespace Criteo.Profiling.Tracing
         /// <summary>
         /// Global list of registred tracers.
         /// </summary>
-        private static ICollection<ITracer> tracers = new List<ITracer>();
+        private static ICollection<ITracer> _tracers = new List<ITracer>();
 
         internal static ICollection<ITracer> Tracers
         {
-            get { return tracers; }
+            get { return _tracers; }
         }
 
         /// <summary>
@@ -23,7 +24,7 @@ namespace Criteo.Profiling.Tracing
         /// <param name="tracer"></param>
         public static void Register(ITracer tracer)
         {
-            tracers.Add(tracer);
+            _tracers.Add(tracer);
         }
 
         /// <summary>
@@ -31,7 +32,27 @@ namespace Criteo.Profiling.Tracing
         /// </summary>
         public static void Clear()
         {
-            tracers = new List<ITracer>();
+            _tracers = new List<ITracer>();
+        }
+
+        /// <summary>
+        /// Send a record to all the registered tracers
+        /// </summary>
+        /// <param name="record"></param>
+        internal static void Push(Record record)
+        {
+            foreach (var tracer in _tracers)
+            {
+                try
+                {
+                    tracer.Record(record);
+                }
+                catch (Exception ex)
+                {
+                    // No exception coming for traces should disrupt the main application as tracing is optional.
+                    Trace.Logger.LogWarning("An error occured while recording the annotation. Msg: " + ex.Message);
+                }
+            }
         }
 
     }
