@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using System.Net;
-using System.Text;
 using Criteo.Profiling.Tracing.Annotation;
 using Criteo.Profiling.Tracing.Tracers.Zipkin;
 using Criteo.Profiling.Tracing.Tracers.Zipkin.Thrift;
@@ -57,13 +56,19 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
             Assert.AreEqual(ipEndpoint, span.Endpoint);
         }
 
-        [Test]
-        public void BinaryAnnotationCorrectlyAdded()
+        [TestCase("string", new byte[] { 0x73, 0x74, 0x72, 0x69, 0x6E, 0x67 }, AnnotationType.STRING)]
+        [TestCase(true, new byte[] { 0x1 }, AnnotationType.BOOL)]
+        [TestCase(Int16.MaxValue, new byte[] { 0xFF, 0x7F }, AnnotationType.I16)]
+        [TestCase(Int32.MaxValue, new byte[] { 0xFF, 0xFF, 0xFF, 0x7F }, AnnotationType.I32)]
+        [TestCase(Int64.MaxValue, new byte[] { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x7F }, AnnotationType.I64)]
+        [TestCase(new byte[] { 0x93 }, new byte[] { 0x93 }, AnnotationType.BYTES)]
+        [TestCase(9.3d, new byte[] { 0x9A, 0x99, 0x99, 0x99, 0x99, 0x99, 0x22, 0x40 }, AnnotationType.DOUBLE)]
+        public void BinaryAnnotationCorrectlyAdded(object value, byte[] expectedBytes, AnnotationType expectedType)
         {
             var traceId = new SpanId(1, 0, 2, Flags.Empty());
             var span = new Span(traceId, started: DateTime.UtcNow);
 
-            var record = new Record(traceId, DateTime.UtcNow, Annotations.Binary("magicKey", "string object"));
+            var record = new Record(traceId, DateTime.UtcNow, Annotations.Binary("magicKey", value));
             var visitor = new ZipkinAnnotationVisitor(record, span);
 
             Assert.AreEqual(0, span.Annotations.Count);
@@ -77,8 +82,8 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
             var binAnn = span.BinaryAnnotations.First(_ => true);
 
             Assert.AreEqual("magicKey", binAnn.Key);
-            Assert.AreEqual(Encoding.ASCII.GetBytes("string object"), binAnn.Value);
-            Assert.AreEqual(AnnotationType.STRING, binAnn.AnnotationType);
+            Assert.AreEqual(expectedBytes, binAnn.Value);
+            Assert.AreEqual(expectedType, binAnn.AnnotationType);
         }
 
 
