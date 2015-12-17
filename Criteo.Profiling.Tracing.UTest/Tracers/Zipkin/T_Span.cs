@@ -3,6 +3,7 @@ using System.Net;
 using Criteo.Profiling.Tracing.Tracers.Zipkin;
 using Criteo.Profiling.Tracing.Tracers.Zipkin.Thrift;
 using NUnit.Framework;
+using BinaryAnnotation = Criteo.Profiling.Tracing.Tracers.Zipkin.BinaryAnnotation;
 using Span = Criteo.Profiling.Tracing.Tracers.Zipkin.Span;
 using ThriftSpan = Criteo.Profiling.Tracing.Tracers.Zipkin.Thrift.Span;
 
@@ -15,23 +16,23 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
         [Description("Span should only be marked as complete when either ClientRecv or ServerSend are present.")]
         public void SpansAreLabeledAsCompleteWhenCrOrSs()
         {
-            var traceId = new SpanId(1, 0, 2, Flags.Empty());
+            var spanId = new SpanId(1, 0, 2, Flags.Empty());
             var started = DateTime.UtcNow;
 
-            var spanClientRecv = new Span(traceId, started);
+            var spanClientRecv = new Span(spanId, started);
             Assert.False(spanClientRecv.Complete);
 
             spanClientRecv.AddAnnotation(new ZipkinAnnotation(DateTime.UtcNow, zipkinCoreConstants.CLIENT_RECV));
             Assert.True(spanClientRecv.Complete);
 
-            var spanServSend = new Span(traceId, started);
+            var spanServSend = new Span(spanId, started);
             Assert.False(spanServSend.Complete);
 
             spanServSend.AddAnnotation(new ZipkinAnnotation(DateTime.UtcNow, zipkinCoreConstants.SERVER_SEND));
             Assert.True(spanServSend.Complete);
 
 
-            var spanOtherAnn = new Span(traceId, started);
+            var spanOtherAnn = new Span(spanId, started);
             Assert.False(spanOtherAnn.Complete);
 
             spanServSend.AddAnnotation(new ZipkinAnnotation(DateTime.UtcNow, zipkinCoreConstants.SERVER_RECV));
@@ -57,7 +58,7 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
             var binAnnVal = new byte[] { 0x00 };
             const AnnotationType binAnnType = AnnotationType.STRING;
 
-            span.AddBinaryAnnotation(new Tracing.Tracers.Zipkin.BinaryAnnotation(binAnnKey, binAnnVal, binAnnType));
+            span.AddBinaryAnnotation(new BinaryAnnotation(binAnnKey, binAnnVal, binAnnType));
 
             var thriftSpan = span.ToThrift();
 
@@ -98,8 +99,8 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
         [Description("Span should never be sent without required fields such as Name, ServiceName, Ipv4 or Port")]
         public void DefaultsValuesAreUsedIfNothingSpecified()
         {
-            var traceId = new SpanId(1, 0, 2, Flags.Empty());
-            var span = new Span(traceId, DateTime.UtcNow);
+            var spanId = new SpanId(1, 0, 2, Flags.Empty());
+            var span = new Span(spanId, DateTime.UtcNow);
             AddClientSendReceiveAnnotations(span);
 
             var thriftSpan = span.ToThrift();
@@ -124,7 +125,7 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
         [Test]
         public void DefaultsValuesAreNotUsedIfValuesSpecified()
         {
-            var traceId = new SpanId(1, 0, 2, Flags.Empty());
+            var spanId = new SpanId(1, 0, 2, Flags.Empty());
             var started = DateTime.UtcNow;
 
             // Make sure we choose something different thant the default values
@@ -132,7 +133,7 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
             var hostPort = Trace.DefaultEndPoint.Port + 1;
             const string name = "myRPCmethod";
 
-            var span = new Span(traceId, started) { Endpoint = new IPEndPoint(IPAddress.Loopback, hostPort), ServiceName = serviceName, Name = name };
+            var span = new Span(spanId, started) { Endpoint = new IPEndPoint(IPAddress.Loopback, hostPort), ServiceName = serviceName, Name = name };
             AddClientSendReceiveAnnotations(span);
 
             var thriftSpan = span.ToThrift();
