@@ -141,8 +141,7 @@ namespace Criteo.Profiling.Tracing
 
         private static SpanId CreateRootSpanId(long traceId)
         {
-            var spanId = RandomUtils.NextLong();
-            return new SpanId(traceId, 0, spanId, Flags.Empty());
+            return new SpanId(traceId: traceId, parentSpanId: null, id: RandomUtils.NextLong(), flags: Flags.Empty());
         }
 
         /// <summary>

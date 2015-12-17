@@ -19,15 +19,15 @@ namespace Criteo.Profiling.Tracing.Transport
 
         public static bool TryGet(IDictionary<string, string> headers, out Trace trace)
         {
-            string encodedTraceId, encodedSpanId, encodedParentSpanId;
+            string encodedTraceId, encodedSpanId;
 
             if (headers.TryGetValue(TraceId, out encodedTraceId)
-                && headers.TryGetValue(SpanId, out encodedSpanId)
-                && headers.TryGetValue(ParentSpanId, out encodedParentSpanId))
+                && headers.TryGetValue(SpanId, out encodedSpanId))
             {
-                string flagsStr, sampledStr;
+                string flagsStr, sampledStr, encodedParentSpanId;
                 headers.TryGetValue(Flags, out flagsStr);
                 headers.TryGetValue(Sampled, out sampledStr);
+                headers.TryGetValue(ParentSpanId, out encodedParentSpanId);
                 return TryParseTrace(encodedTraceId, encodedSpanId, encodedParentSpanId, sampledStr, flagsStr, out trace);
             }
 
@@ -43,8 +43,7 @@ namespace Criteo.Profiling.Tracing.Transport
         internal static bool TryParseTrace(string encodedTraceId, string encodedSpanId, string encodedParentSpanId, string sampledStr, string flagsStr, out Trace trace)
         {
             if (String.IsNullOrWhiteSpace(encodedTraceId)
-                || String.IsNullOrWhiteSpace(encodedSpanId)
-                || String.IsNullOrWhiteSpace(encodedParentSpanId))
+                || String.IsNullOrWhiteSpace(encodedSpanId))
             {
                 trace = default(Trace);
                 return false;
@@ -54,7 +53,7 @@ namespace Criteo.Profiling.Tracing.Transport
             {
                 var traceId = DecodeHexString(encodedTraceId);
                 var spanId = DecodeHexString(encodedSpanId);
-                var parentSpanId = DecodeHexString(encodedParentSpanId);
+                var parentSpanId = String.IsNullOrWhiteSpace(encodedParentSpanId) ? null : (long?)DecodeHexString(encodedParentSpanId);
                 var flags = ParseFlagsHeader(flagsStr);
                 var sampled = ParseSampledHeader(sampledStr);
 
@@ -81,12 +80,18 @@ namespace Criteo.Profiling.Tracing.Transport
 
             headers[TraceId] = EncodeLongToHexString(traceId.TraceId);
             headers[SpanId] = EncodeLongToHexString(traceId.Id);
-            headers[ParentSpanId] = EncodeLongToHexString(traceId.ParentSpanId);
+            if (traceId.ParentSpanId != null)
+            {
+                // Cannot be null in theory, the root span must have been created on request receive hence further RPC calls are necessary children
+                headers[ParentSpanId] = EncodeLongToHexString(traceId.ParentSpanId.Value);
+            }
             headers[Flags] = traceId.Flags.ToLong().ToString(CultureInfo.InvariantCulture);
 
             // Add "Sampled" header for compatibility with Finagle
             if (traceId.Flags.IsSamplingKnown())
+            {
                 headers[Sampled] = traceId.Flags.IsSampled() ? "1" : "0";
+            }
         }
 
         // Duplicate code... Don't know any way to avoid this
@@ -96,12 +101,18 @@ namespace Criteo.Profiling.Tracing.Transport
 
             headers[TraceId] = EncodeLongToHexString(traceId.TraceId);
             headers[SpanId] = EncodeLongToHexString(traceId.Id);
-            headers[ParentSpanId] = EncodeLongToHexString(traceId.ParentSpanId);
+            if (traceId.ParentSpanId != null)
+            {
+                // Cannot be null in theory, the root span must have been created on request receive hence further RPC calls are necessary children
+                headers[ParentSpanId] = EncodeLongToHexString(traceId.ParentSpanId.Value);
+            }
             headers[Flags] = traceId.Flags.ToLong().ToString(CultureInfo.InvariantCulture);
 
             // Add "Sampled" header for compatibility with Finagle
             if (traceId.Flags.IsSamplingKnown())
+            {
                 headers[Sampled] = traceId.Flags.IsSampled() ? "1" : "0";
+            }
         }
 
         internal static string EncodeLongToHexString(long value)

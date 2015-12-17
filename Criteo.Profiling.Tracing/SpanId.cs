@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 
 namespace Criteo.Profiling.Tracing
 {
@@ -7,7 +8,7 @@ namespace Criteo.Profiling.Tracing
     {
         public long TraceId { get; private set; }
 
-        public long ParentSpanId { get; private set; }
+        public long? ParentSpanId { get; private set; }
 
         public long Id { get; private set; }
 
@@ -16,7 +17,7 @@ namespace Criteo.Profiling.Tracing
         /// </summary>
         public Flags Flags { get; private set; }
 
-        public SpanId(long traceId, long parentSpanId, long id, Flags flags)
+        public SpanId(long traceId, long? parentSpanId, long id, Flags flags)
         {
             this.TraceId = traceId;
             this.ParentSpanId = parentSpanId;
@@ -44,7 +45,6 @@ namespace Criteo.Profiling.Tracing
             unchecked
             {
                 int hashCode = TraceId.GetHashCode();
-                hashCode = (hashCode * 397) ^ ParentSpanId.GetHashCode();
                 hashCode = (hashCode * 397) ^ Id.GetHashCode();
                 return hashCode;
             }
@@ -52,7 +52,7 @@ namespace Criteo.Profiling.Tracing
 
         public override string ToString()
         {
-            return String.Format("{0}.{1}<:{2}", TraceId, Id, ParentSpanId);
+            return String.Format("{0}.{1}<:{2}", TraceId, Id, (ParentSpanId.HasValue) ? ParentSpanId.Value.ToString(CultureInfo.InvariantCulture) : "_");
         }
 
     }
