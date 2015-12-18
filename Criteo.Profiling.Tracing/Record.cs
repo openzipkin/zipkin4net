@@ -7,30 +7,30 @@ namespace Criteo.Profiling.Tracing
     {
         private const string DatetimeFormat = "MMdd HH:mm:ss.fff";
 
-        private readonly SpanId spanId;
-        private readonly DateTime timestamp;
-        private readonly IAnnotation annotation;
+        private readonly SpanId _spanId;
+        private readonly DateTime _timestamp;
+        private readonly IAnnotation _annotation;
 
         public Record(SpanId spanId, DateTime timestamp, IAnnotation annotation)
         {
-            this.spanId = spanId;
-            this.timestamp = timestamp;
-            this.annotation = annotation;
+            _spanId = spanId;
+            _timestamp = timestamp;
+            _annotation = annotation;
         }
 
         public DateTime Timestamp
         {
-            get { return timestamp; }
+            get { return _timestamp; }
         }
 
         public IAnnotation Annotation
         {
-            get { return annotation; }
+            get { return _annotation; }
         }
 
         public SpanId SpanId
         {
-            get { return spanId; }
+            get { return _spanId; }
         }
 
         public override string ToString()
