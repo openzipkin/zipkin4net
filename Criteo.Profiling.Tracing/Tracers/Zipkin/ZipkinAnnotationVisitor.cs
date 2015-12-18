@@ -7,48 +7,48 @@ namespace Criteo.Profiling.Tracing.Tracers.Zipkin
 {
     internal class ZipkinAnnotationVisitor : IAnnotationVisitor
     {
-        private readonly Span span;
-        private readonly Record record;
+        private readonly Span _span;
+        private readonly Record _record;
 
         public ZipkinAnnotationVisitor(Record record, Span span)
         {
-            this.span = span;
-            this.record = record;
+            _span = span;
+            _record = record;
         }
 
         public void Visit(ClientRecv clientRecv)
         {
-            span.AddAnnotation(new ZipkinAnnotation(record.Timestamp, zipkinCoreConstants.CLIENT_RECV));
+            _span.AddAnnotation(new ZipkinAnnotation(_record.Timestamp, zipkinCoreConstants.CLIENT_RECV));
         }
 
         public void Visit(ClientSend clientSend)
         {
-            span.AddAnnotation(new ZipkinAnnotation(record.Timestamp, zipkinCoreConstants.CLIENT_SEND));
+            _span.AddAnnotation(new ZipkinAnnotation(_record.Timestamp, zipkinCoreConstants.CLIENT_SEND));
         }
 
         public void Visit(ServerRecv serverRecv)
         {
-            span.AddAnnotation(new ZipkinAnnotation(record.Timestamp, zipkinCoreConstants.SERVER_RECV));
+            _span.AddAnnotation(new ZipkinAnnotation(_record.Timestamp, zipkinCoreConstants.SERVER_RECV));
         }
 
         public void Visit(ServerSend serverSend)
         {
-            span.AddAnnotation(new ZipkinAnnotation(record.Timestamp, zipkinCoreConstants.SERVER_SEND));
+            _span.AddAnnotation(new ZipkinAnnotation(_record.Timestamp, zipkinCoreConstants.SERVER_SEND));
         }
 
         public void Visit(Rpc rpc)
         {
-            span.Name = rpc.Name;
+            _span.Name = rpc.Name;
         }
 
         public void Visit(ServiceName serviceName)
         {
-            span.ServiceName = serviceName.Service;
+            _span.ServiceName = serviceName.Service;
         }
 
         public void Visit(LocalAddr localAddr)
         {
-            span.Endpoint = localAddr.EndPoint;
+            _span.Endpoint = localAddr.EndPoint;
         }
 
         /// <summary>
@@ -132,7 +132,7 @@ namespace Criteo.Profiling.Tracing.Tracers.Zipkin
         private void AddBinaryBytes(Annotation.BinaryAnnotation binaryAnnotation, byte[] bytes)
         {
             var annotation = new BinaryAnnotation(binaryAnnotation.Key, bytes, AnnotationType.BYTES);
-            span.AddBinaryAnnotation(annotation);
+            _span.AddBinaryAnnotation(annotation);
         }
 
         private void AddBinaryDouble(Annotation.BinaryAnnotation binaryAnnotation, double value)
@@ -143,7 +143,7 @@ namespace Criteo.Profiling.Tracing.Tracers.Zipkin
 
         private void AddBinaryAnnotation(String key, byte[] value, AnnotationType type)
         {
-            span.AddBinaryAnnotation(new BinaryAnnotation(key, value, type));
+            _span.AddBinaryAnnotation(new BinaryAnnotation(key, value, type));
         }
 
     }

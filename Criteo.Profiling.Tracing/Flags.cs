@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Criteo.Profiling.Tracing
+﻿namespace Criteo.Profiling.Tracing
 {
 
     /// <summary>
@@ -13,11 +11,11 @@ namespace Criteo.Profiling.Tracing
         private const long SamplingSetMask = 1L << 1;
         private const long SampledMask = 1L << 2;
 
-        private readonly long value;
+        private readonly long _value;
 
         private Flags(long flags)
         {
-            this.value = flags;
+            _value = flags;
         }
 
         public static Flags Empty()
@@ -32,12 +30,12 @@ namespace Criteo.Profiling.Tracing
 
         public bool IsFlagSet(long mask)
         {
-            return (value & mask) == mask;
+            return (_value & mask) == mask;
         }
 
         public Flags SetFlag(long mask)
         {
-            return new Flags(value | mask);
+            return new Flags(_value | mask);
         }
 
         public bool IsDebug()
@@ -72,7 +70,7 @@ namespace Criteo.Profiling.Tracing
 
         public long ToLong()
         {
-            return value;
+            return _value;
         }
     }
 }

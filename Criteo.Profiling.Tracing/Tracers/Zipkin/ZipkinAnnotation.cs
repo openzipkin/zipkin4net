@@ -4,21 +4,21 @@ namespace Criteo.Profiling.Tracing.Tracers.Zipkin
 {
     internal class ZipkinAnnotation
     {
-        private readonly DateTime timestamp;
+        private readonly DateTime _timestamp;
 
-        public string Value { get; private set; }
+        internal string Value { get; private set; }
 
         public ZipkinAnnotation(DateTime timestamp, string value)
         {
-            this.timestamp = timestamp;
-            this.Value = value;
+            _timestamp = timestamp;
+            Value = value;
         }
 
         public Thrift.Annotation ToThrift()
         {
             var thriftAnn = new Thrift.Annotation()
             {
-                Timestamp = ToUnixTimestamp(this.timestamp),
+                Timestamp = ToUnixTimestamp(_timestamp),
                 Value = this.Value
             };
 
@@ -27,7 +27,7 @@ namespace Criteo.Profiling.Tracing.Tracers.Zipkin
 
         public override string ToString()
         {
-            return String.Format("ZipkinAnn: ts={0} val={1}", ToUnixTimestamp(timestamp), Value);
+            return String.Format("ZipkinAnn: ts={0} val={1}", ToUnixTimestamp(_timestamp), Value);
         }
 
         /// <summary>

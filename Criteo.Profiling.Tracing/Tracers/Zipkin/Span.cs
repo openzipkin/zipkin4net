@@ -55,11 +55,11 @@ namespace Criteo.Profiling.Tracing.Tracers.Zipkin
 
         public Span(SpanId spanId, DateTime started)
         {
-            this.Annotations = new List<ZipkinAnnotation>();
-            this.BinaryAnnotations = new List<BinaryAnnotation>();
-            this.Complete = false;
-            this.SpanId = spanId;
-            this.Started = started;
+            Annotations = new List<ZipkinAnnotation>();
+            BinaryAnnotations = new List<BinaryAnnotation>();
+            Complete = false;
+            SpanId = spanId;
+            Started = started;
         }
 
         public void AddAnnotation(ZipkinAnnotation annotation)

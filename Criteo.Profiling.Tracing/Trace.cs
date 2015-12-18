@@ -129,14 +129,14 @@ namespace Criteo.Profiling.Tracing
             return new Trace(spanId);
         }
 
-        private Trace(long traceId)
-        {
-            CurrentId = CreateRootSpanId(traceId);
-        }
-
         private Trace(SpanId spanId)
         {
             CurrentId = new SpanId(spanId.TraceId, spanId.ParentSpanId, spanId.Id, spanId.Flags);
+        }
+
+        private Trace(long traceId)
+        {
+            CurrentId = CreateRootSpanId(traceId);
         }
 
         private static SpanId CreateRootSpanId(long traceId)
@@ -157,8 +157,7 @@ namespace Criteo.Profiling.Tracing
 
         private SpanId CreateChildSpanId()
         {
-            var spanId = RandomUtils.NextLong();
-            return new SpanId(CurrentId.TraceId, CurrentId.Id, spanId, CurrentId.Flags);
+            return new SpanId(traceId: CurrentId.TraceId, parentSpanId: CurrentId.Id, id: RandomUtils.NextLong(), flags: CurrentId.Flags);
         }
 
         internal void RecordAnnotation(IAnnotation annotation)

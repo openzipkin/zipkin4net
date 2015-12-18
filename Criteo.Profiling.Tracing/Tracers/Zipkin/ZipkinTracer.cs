@@ -15,13 +15,13 @@ namespace Criteo.Profiling.Tracing.Tracers.Zipkin
     /// </summary>
     public class ZipkinTracer : ITracer
     {
-        private readonly ConcurrentDictionary<SpanId, Span> spanMap = new ConcurrentDictionary<SpanId, Span>();
-        private readonly IZipkinSender spanSender;
+        private readonly ConcurrentDictionary<SpanId, Span> _spanMap = new ConcurrentDictionary<SpanId, Span>();
+        private readonly IZipkinSender _spanSender;
 
         /// <summary>
         /// Flush old records when fired.
         /// </summary>
-        private readonly Timer flushTimer;
+        private readonly Timer _flushTimer;
 
         /// <summary>
         /// Time-to-live expressed in seconds.
@@ -32,13 +32,13 @@ namespace Criteo.Profiling.Tracing.Tracers.Zipkin
         public ZipkinTracer(IZipkinSender sender)
         {
             if (sender == null) throw new ArgumentNullException("sender", "You have to specify a non-null sender for Zipkin tracer.");
-            this.spanSender = sender;
-            this.flushTimer = new Timer(_ => FlushOldSpans(DateTime.UtcNow), null, TimeSpan.FromSeconds(TimeToLive), TimeSpan.FromSeconds(TimeToLive));
+            _spanSender = sender;
+            _flushTimer = new Timer(_ => FlushOldSpans(DateTime.UtcNow), null, TimeSpan.FromSeconds(TimeToLive), TimeSpan.FromSeconds(TimeToLive));
         }
 
         public void Record(Record record)
         {
-            var updatedSpan = spanMap.AddOrUpdate(record.SpanId,
+            var updatedSpan = _spanMap.AddOrUpdate(record.SpanId,
                 id => VisitAnnotation(record, new Span(record.SpanId, record.Timestamp)),
                 (id, span) => VisitAnnotation(record, span));
 
@@ -60,7 +60,7 @@ namespace Criteo.Profiling.Tracing.Tracers.Zipkin
         private void RemoveThenLogSpan(SpanId spanId)
         {
             Span spanToLog;
-            if (spanMap.TryRemove(spanId, out spanToLog))
+            if (_spanMap.TryRemove(spanId, out spanToLog))
             {
                 LogSpan(spanToLog);
             }
@@ -69,7 +69,7 @@ namespace Criteo.Profiling.Tracing.Tracers.Zipkin
         private void LogSpan(Span span)
         {
             var serializedSpan = ThriftSerialize(span);
-            spanSender.Send(serializedSpan);
+            _spanSender.Send(serializedSpan);
         }
 
         private static byte[] ThriftSerialize(Span span)
@@ -91,7 +91,7 @@ namespace Criteo.Profiling.Tracing.Tracers.Zipkin
         /// <param name="utcNow"></param>
         internal void FlushOldSpans(DateTime utcNow)
         {
-            var outlivedSpans = spanMap.Where(pair => utcNow.Subtract(pair.Value.Started).TotalSeconds > TimeToLive);
+            var outlivedSpans = _spanMap.Where(pair => utcNow.Subtract(pair.Value.Started).TotalSeconds > TimeToLive);
 
             foreach (var oldSpanEntry in outlivedSpans)
             {
