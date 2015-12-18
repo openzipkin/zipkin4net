@@ -58,7 +58,11 @@ namespace Criteo.Profiling.Tracing.Transport
                 var sampled = ParseSampledHeader(sampledStr);
 
                 if (sampled != null)
+                {
+                    flags = Tracing.Flags.Empty(); // "sampled" header overrides all flags
                     flags = sampled.Value ? flags.SetSampled() : flags.SetNotSampled();
+                }
+
 
                 var id = new SpanId(traceId, parentSpanId, spanId, flags);
                 trace = Trace.CreateFromId(id);
