@@ -226,5 +226,63 @@ namespace Criteo.Profiling.Tracing.UTest.Transport
 
         #endregion
 
+        #region "Flags & Sampled headers relationship"
+
+        [Test]
+        public void SampledHeaderFollowFlagsValueForCompatibility()
+        {
+            var headers = new Dictionary<string, string>();
+            var spanNoFlags = Trace.CreateFromId(new SpanId(1, 2, 250, Flags.Empty()));
+            HttpTraceContext.Set(headers, spanNoFlags);
+            Assert.False(headers.ContainsKey(HttpTraceContext.Sampled)); // no flags then no sampled header
+
+            headers = new Dictionary<string, string>();
+            var spanFlagNotSampled = Trace.CreateFromId(new SpanId(1, 2, 250, Flags.Empty().SetNotSampled()));
+            HttpTraceContext.Set(headers, spanFlagNotSampled);
+            Assert.AreEqual("0", headers[HttpTraceContext.Sampled]); // header sampled to false since flags set to not sampled
+
+            headers = new Dictionary<string, string>();
+            var spanFlagSampled = Trace.CreateFromId(new SpanId(1, 2, 250, Flags.Empty().SetSampled()));
+            HttpTraceContext.Set(headers, spanFlagSampled);
+            Assert.AreEqual("1", headers[HttpTraceContext.Sampled]); // header sampled to true since flags set to sampled
+        }
+
+        [TestCase(null, "0", false)]
+        [TestCase(null, "1", true)]
+        [TestCase("0", "1", true)]
+        [TestCase("2", "1", true)]
+        [TestCase("6", "1", true)]
+        [TestCase("0", "0", false)]
+        [TestCase("2", "0", false)]
+        [TestCase("6", "0", false)]
+        [TestCase("0", null, false)]
+        [TestCase("2", null, false)]
+        [TestCase("6", null, true)]
+        [Description("If present Sampled header value overrides Flags header")]
+        public void SampledHeaderIfPresentOverridesFlags(string flagsStr, string sampledStr, bool isSampledExpected)
+        {
+            Trace trace;
+
+            var headers = new Dictionary<string, string>
+            {
+                {HttpTraceContext.TraceId, "0000000000000001"},
+                {HttpTraceContext.ParentSpanId, "0000000000000000"},
+                {HttpTraceContext.SpanId, "00000000000000FA"},
+                {HttpTraceContext.Flags, flagsStr}
+            };
+
+            if (sampledStr != null)
+            {
+                headers[HttpTraceContext.Sampled] = sampledStr;
+            }
+
+            Assert.True(HttpTraceContext.TryGet(headers, out trace));
+
+            var flags = trace.CurrentId.Flags;
+            Assert.AreEqual(isSampledExpected, flags.IsSampled());
+        }
+
+        #endregion
+
     }
 }
