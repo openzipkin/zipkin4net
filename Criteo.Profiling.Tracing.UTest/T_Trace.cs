@@ -83,5 +83,12 @@ namespace Criteo.Profiling.Tracing.UTest
             _mockTracer.Verify(t => t.Record(It.Is<Record>(r => r.Annotation == clientRcv && r.SpanId.Equals(trace.CurrentId))), Times.Once());
         }
 
+        [Test]
+        public void CannotStartMultipleTimes()
+        {
+            Assert.True(Trace.TracingRunning, "Test setup failed?");
+            Assert.False(Trace.Start());
+        }
+
     }
 }

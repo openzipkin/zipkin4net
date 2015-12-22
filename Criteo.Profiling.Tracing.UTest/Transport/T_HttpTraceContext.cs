@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Collections.Specialized;
 using Criteo.Profiling.Tracing.Transport;
+using Moq;
 using NUnit.Framework;
 
 namespace Criteo.Profiling.Tracing.UTest.Transport
@@ -8,6 +9,15 @@ namespace Criteo.Profiling.Tracing.UTest.Transport
     [TestFixture]
     class T_HttpTraceContext
     {
+
+        private Mock<ILogger> _mockLogger;
+
+        [SetUp]
+        public void Setup()
+        {
+            _mockLogger = new Mock<ILogger>();
+            Trace.Logger = _mockLogger.Object;
+        }
 
         #region TryGet/TryParse Context
 
@@ -283,6 +293,16 @@ namespace Criteo.Profiling.Tracing.UTest.Transport
         }
 
         #endregion
+
+        [Test]
+        public void ParsingErrorAreLoggedAndDoesntThrow()
+        {
+            Trace trace;
+
+            Assert.False(HttpTraceContext.TryParseTrace("44FmalformedTraceId", "00000000000000FA", null, null, null, out trace));
+
+            _mockLogger.Verify(logger => logger.LogWarning(It.Is<string>(s => s.Contains("Couldn't parse trace context. Trace is ignored"))), Times.Once());
+        }
 
     }
 }
