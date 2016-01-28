@@ -101,6 +101,8 @@ namespace Criteo.Profiling.Tracing.Tracers.Zipkin
             if (Endpoint == null) Endpoint = Trace.DefaultEndPoint;
             if (String.IsNullOrWhiteSpace(ServiceName)) ServiceName = Trace.DefaultServiceName;
 
+            ServiceName = ServiceName.Replace(" ", "_"); // whitespaces cause issues with the query and ui
+
             var host = new Endpoint()
             {
                 Ipv4 = IpToInt(Endpoint.Address),
