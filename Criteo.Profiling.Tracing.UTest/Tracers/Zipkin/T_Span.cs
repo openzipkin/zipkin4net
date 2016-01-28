@@ -12,6 +12,7 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
     [TestFixture]
     class T_Span
     {
+
         [Test]
         [Description("Span should only be marked as complete when either ClientRecv or ServerSend are present.")]
         public void SpansAreLabeledAsCompleteWhenCrOrSs()
@@ -183,6 +184,18 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
             var span = new Span(spanId, DateTime.UtcNow);
 
             Assert.AreEqual(parentSpanId == null, span.IsRoot);
+        }
+
+        [Test]
+        public void WhiteSpacesAreRemovedFromServiceName()
+        {
+            var spanId = new SpanId(1, 0, 2, Flags.Empty());
+            var span = new Span(spanId, DateTime.UtcNow) { ServiceName = "my Criteo Service" };
+            AddClientSendReceiveAnnotations(span);
+
+            var thriftSpan = span.ToThrift();
+
+            Assert.AreEqual("my_Criteo_Service", thriftSpan.Annotations[0].Host.Service_name);
         }
 
         private static void AddClientSendReceiveAnnotations(Span span)
