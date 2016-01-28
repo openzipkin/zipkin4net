@@ -101,7 +101,7 @@ namespace Criteo.Profiling.Tracing
         }
 
         /// <summary>
-        // Sampling of the tracing. Between 0.0 (not tracing) and 1.0 (full tracing). Default 0.0
+        /// Sampling of the tracing. Between 0.0 (not tracing) and 1.0 (full tracing). Default 0.0
         /// </summary>
         public static float SamplingRate
         {
