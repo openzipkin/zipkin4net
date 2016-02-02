@@ -6,6 +6,8 @@ namespace Criteo.Profiling.Tracing.Tracers.Zipkin
     {
         private readonly DateTime _timestamp;
 
+        private static readonly DateTime Epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+
         internal string Value { get; private set; }
 
         public ZipkinAnnotation(DateTime timestamp, string value)
@@ -38,7 +40,7 @@ namespace Criteo.Profiling.Tracing.Tracers.Zipkin
         /// <returns></returns>
         internal static long ToUnixTimestamp(DateTime utcDateTime)
         {
-            return (long)((utcDateTime.Subtract(new DateTime(1970, 1, 1))).TotalMilliseconds) * 1000L;
+            return (long)(utcDateTime.Subtract(Epoch).TotalMilliseconds * 1000L);
         }
     }
 }
