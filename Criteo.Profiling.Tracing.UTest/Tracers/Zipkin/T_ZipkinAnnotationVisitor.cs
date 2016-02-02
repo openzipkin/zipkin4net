@@ -19,10 +19,7 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
             var spanId = new SpanId(1, 0, 2, Flags.Empty());
             var span = new Span(spanId, started: DateTime.UtcNow);
 
-            var record = new Record(spanId, DateTime.UtcNow, Annotations.Rpc("myRPCmethod"));
-            var visitor = new ZipkinAnnotationVisitor(record, span);
-
-            record.Annotation.Accept(visitor);
+            CreateAndVisitRecord(span, Annotations.Rpc("myRPCmethod"));
 
             Assert.AreEqual("myRPCmethod", span.Name);
         }
@@ -33,10 +30,7 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
             var spanId = new SpanId(1, 0, 2, Flags.Empty());
             var span = new Span(spanId, started: DateTime.UtcNow);
 
-            var record = new Record(spanId, DateTime.UtcNow, Annotations.ServiceName("myService"));
-            var visitor = new ZipkinAnnotationVisitor(record, span);
-
-            record.Annotation.Accept(visitor);
+            CreateAndVisitRecord(span, Annotations.ServiceName("myService"));
 
             Assert.AreEqual("myService", span.ServiceName);
         }
@@ -48,12 +42,30 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
             var span = new Span(spanId, started: DateTime.UtcNow);
 
             var ipEndpoint = new IPEndPoint(IPAddress.Loopback, 9987);
-            var record = new Record(spanId, DateTime.UtcNow, Annotations.LocalAddr(ipEndpoint));
+            CreateAndVisitRecord(span, Annotations.LocalAddr(ipEndpoint));
+
+            Assert.AreEqual(ipEndpoint, span.Endpoint);
+        }
+
+        [Test]
+        [Description("RPC, ServiceName and LocalAddr annotations override any previous recorded value.")]
+        public void LastAnnotationValueIsKeptIfMultipleRecord()
+        {
+            var spanId = new SpanId(1, 0, 2, Flags.Empty());
+            var span = new Span(spanId, started: DateTime.UtcNow);
+
+            CreateAndVisitRecord(span, Annotations.ServiceName("myService"));
+            CreateAndVisitRecord(span, Annotations.ServiceName("someOtherName"));
+
+            Assert.AreEqual("someOtherName", span.ServiceName);
+        }
+
+        private static void CreateAndVisitRecord(Span span, IAnnotation annotation)
+        {
+            var record = new Record(span.SpanId, DateTime.UtcNow, annotation);
             var visitor = new ZipkinAnnotationVisitor(record, span);
 
             record.Annotation.Accept(visitor);
-
-            Assert.AreEqual(ipEndpoint, span.Endpoint);
         }
 
         [TestCase("string", new byte[] { 0x73, 0x74, 0x72, 0x69, 0x6E, 0x67 }, AnnotationType.STRING)]
@@ -97,6 +109,7 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
 
             Assert.Throws<ArgumentException>(() => record.Annotation.Accept(visitor));
         }
+
 
 
         [Test]
