@@ -52,6 +52,7 @@
     <Compile Include="Annotation\BinaryAnnotation.cs" />
     <Compile Include="Annotation\ClientRecv.cs" />
     <Compile Include="Annotation\ClientSend.cs" />
+    <Compile Include="Annotation\Event.cs" />
     <Compile Include="Annotation\IAnnotation.cs" />
     <Compile Include="Annotation\IAnnotationVisitor.cs" />
     <Compile Include="Annotation\LocalAddr.cs" />

@@ -10,5 +10,6 @@
         void Visit(ServiceName serviceName);
         void Visit(LocalAddr localAddr);
         void Visit(BinaryAnnotation binaryAnnotation);
+        void Visit(Event ev);
     }
 }
