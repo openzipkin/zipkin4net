@@ -50,5 +50,10 @@ namespace Criteo.Profiling.Tracing
             return new BinaryAnnotation(key, value);
         }
 
+        public static IAnnotation Event(string name)
+        {
+            return new Event(name);
+        }
+
     }
 }

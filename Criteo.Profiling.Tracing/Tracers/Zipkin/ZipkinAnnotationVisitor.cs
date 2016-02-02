@@ -18,22 +18,32 @@ namespace Criteo.Profiling.Tracing.Tracers.Zipkin
 
         public void Visit(ClientRecv clientRecv)
         {
-            _span.AddAnnotation(new ZipkinAnnotation(_record.Timestamp, zipkinCoreConstants.CLIENT_RECV));
+            AddTimestampedAnnotation(zipkinCoreConstants.CLIENT_RECV);
         }
 
         public void Visit(ClientSend clientSend)
         {
-            _span.AddAnnotation(new ZipkinAnnotation(_record.Timestamp, zipkinCoreConstants.CLIENT_SEND));
+            AddTimestampedAnnotation(zipkinCoreConstants.CLIENT_SEND);
         }
 
         public void Visit(ServerRecv serverRecv)
         {
-            _span.AddAnnotation(new ZipkinAnnotation(_record.Timestamp, zipkinCoreConstants.SERVER_RECV));
+            AddTimestampedAnnotation(zipkinCoreConstants.SERVER_RECV);
         }
 
         public void Visit(ServerSend serverSend)
         {
-            _span.AddAnnotation(new ZipkinAnnotation(_record.Timestamp, zipkinCoreConstants.SERVER_SEND));
+            AddTimestampedAnnotation(zipkinCoreConstants.SERVER_SEND);
+        }
+
+        public void Visit(Event ev)
+        {
+            AddTimestampedAnnotation(ev.EventName);
+        }
+
+        private void AddTimestampedAnnotation(string value)
+        {
+            _span.AddAnnotation(new ZipkinAnnotation(_record.Timestamp, value));
         }
 
         public void Visit(Rpc rpc)

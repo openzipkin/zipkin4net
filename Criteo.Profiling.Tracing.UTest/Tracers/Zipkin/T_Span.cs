@@ -12,6 +12,7 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
     [TestFixture]
     class T_Span
     {
+        private const string SomeRandomAnnotation = "SomethingHappenedHere";
 
         [Test]
         [Description("Span should only be marked as complete when either ClientRecv or ServerSend are present.")]
@@ -55,6 +56,7 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
 
             var zipkinAnnDateTime = DateTime.UtcNow;
             AddClientSendReceiveAnnotations(span, zipkinAnnDateTime);
+            span.AddAnnotation(new ZipkinAnnotation(zipkinAnnDateTime, SomeRandomAnnotation));
 
             const string binAnnKey = "http.uri";
             var binAnnVal = new byte[] { 0x00 };
@@ -86,7 +88,7 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
             Assert.AreEqual(false, thriftSpan.Debug);
             Assert.AreEqual(methodName, thriftSpan.Name);
 
-            Assert.AreEqual(2, thriftSpan.Annotations.Count);
+            Assert.AreEqual(3, thriftSpan.Annotations.Count);
 
             thriftSpan.Annotations.ForEach(ann =>
             {
