@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using Criteo.Profiling.Tracing.Tracers.Zipkin.Thrift;
+using Thrift.Protocol;
+using Thrift.Transport;
 
 namespace Criteo.Profiling.Tracing.Tracers.Zipkin
 {
@@ -135,6 +138,20 @@ namespace Criteo.Profiling.Tracing.Tracers.Zipkin
             }
 
             return thriftSpan;
+        }
+
+        /// <summary>
+        /// Thrift serialize to memory stream
+        /// </summary>
+        /// <param name="stream"></param>
+        public void SerializeToMemory(MemoryStream stream)
+        {
+            var thriftSpan = ToThrift();
+
+            var transport = new TStreamTransport(null, stream);
+            var protocol = new TBinaryProtocol(transport);
+
+            thriftSpan.Write(protocol);
         }
 
         public override string ToString()
