@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using Thrift.Protocol;
@@ -68,20 +69,12 @@ namespace Criteo.Profiling.Tracing.Tracers.Zipkin
 
         private void LogSpan(Span span)
         {
-            var serializedSpan = ThriftSerialize(span);
+            var memoryStream = new MemoryStream();
+            span.SerializeToMemory(memoryStream);
+
+            var serializedSpan = memoryStream.ToArray();
+
             _spanSender.Send(serializedSpan);
-        }
-
-        private static byte[] ThriftSerialize(Span span)
-        {
-            var thriftSpan = span.ToThrift();
-
-            var transport = new TMemoryBuffer();
-            var protocol = new TBinaryProtocol(transport);
-
-            thriftSpan.Write(protocol);
-
-            return transport.GetBuffer();
         }
 
         /// <summary>
