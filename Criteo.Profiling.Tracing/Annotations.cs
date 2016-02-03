@@ -9,25 +9,29 @@ namespace Criteo.Profiling.Tracing
     /// </summary>
     public static class Annotations
     {
+        private static readonly IAnnotation AnnClientReceive = new ClientRecv();
+        private static readonly IAnnotation AnnClientSend = new ClientSend();
+        private static readonly IAnnotation AnnServerReceive = new ServerRecv();
+        private static readonly IAnnotation AnnServerSend = new ServerSend();
 
         public static IAnnotation ClientRecv()
         {
-            return new ClientRecv();
+            return AnnClientReceive;
         }
 
         public static IAnnotation ClientSend()
         {
-            return new ClientSend();
+            return AnnClientSend;
         }
 
         public static IAnnotation ServerRecv()
         {
-            return new ServerRecv();
+            return AnnServerReceive;
         }
 
         public static IAnnotation ServerSend()
         {
-            return new ServerSend();
+            return AnnServerSend;
         }
 
         public static IAnnotation Rpc(string name)
