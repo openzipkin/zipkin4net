@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Text;
 using Criteo.Profiling.Tracing.Annotation;
 using Criteo.Profiling.Tracing.Tracers.Zipkin.Thrift;
 
@@ -63,97 +62,51 @@ namespace Criteo.Profiling.Tracing.Tracers.Zipkin
 
         /// <summary>
         /// Cast binary object Value to one of the following types :
-        /// string, bool, int16, int32, int64, byte[], double
+        /// string, bool, short, int, long, byte[], double
         /// </summary>
         /// <param name="binaryAnnotation"></param>
         public void Visit(Annotation.BinaryAnnotation binaryAnnotation)
         {
             if (binaryAnnotation.Value is string)
             {
-                var strValue = (String)(binaryAnnotation.Value);
-                AddBinaryString(binaryAnnotation, strValue);
+                var bytes = BinaryAnnotationValueEncoder.Encode((string)binaryAnnotation.Value);
+                _span.AddBinaryAnnotation(new BinaryAnnotation(binaryAnnotation.Key, bytes, AnnotationType.STRING));
             }
             else if (binaryAnnotation.Value is bool)
             {
-                var bValue = (bool)(binaryAnnotation.Value);
-                AddBinaryBool(binaryAnnotation, bValue);
+                var bytes = BinaryAnnotationValueEncoder.Encode((bool)binaryAnnotation.Value);
+                _span.AddBinaryAnnotation(new BinaryAnnotation(binaryAnnotation.Key, bytes, AnnotationType.BOOL));
             }
-            else if (binaryAnnotation.Value is Int16)
+            else if (binaryAnnotation.Value is short)
             {
-                var iValue = (Int16)(binaryAnnotation.Value);
-                AddBinaryInt16(binaryAnnotation, iValue);
+                var bytes = BinaryAnnotationValueEncoder.Encode((short)binaryAnnotation.Value);
+                _span.AddBinaryAnnotation(new BinaryAnnotation(binaryAnnotation.Key, bytes, AnnotationType.I16));
             }
-            else if (binaryAnnotation.Value is Int32)
+            else if (binaryAnnotation.Value is int)
             {
-                var iValue = (Int32)(binaryAnnotation.Value);
-                AddBinaryInt32(binaryAnnotation, iValue);
+                var bytes = BinaryAnnotationValueEncoder.Encode((int)binaryAnnotation.Value);
+                _span.AddBinaryAnnotation(new BinaryAnnotation(binaryAnnotation.Key, bytes, AnnotationType.I32));
             }
-            else if (binaryAnnotation.Value is Int64)
+            else if (binaryAnnotation.Value is long)
             {
-                var iValue = (Int64)(binaryAnnotation.Value);
-                AddBinaryInt64(binaryAnnotation, iValue);
+                var bytes = BinaryAnnotationValueEncoder.Encode((long)binaryAnnotation.Value);
+                _span.AddBinaryAnnotation(new BinaryAnnotation(binaryAnnotation.Key, bytes, AnnotationType.I64));
             }
             else if (binaryAnnotation.Value is byte[])
             {
                 var bytes = (byte[])(binaryAnnotation.Value);
-                AddBinaryBytes(binaryAnnotation, bytes);
+                _span.AddBinaryAnnotation(new BinaryAnnotation(binaryAnnotation.Key, bytes, AnnotationType.BYTES));
             }
             else if (binaryAnnotation.Value is double)
             {
-                var dValue = (double)(binaryAnnotation.Value);
-                AddBinaryDouble(binaryAnnotation, dValue);
+                var bytes = BinaryAnnotationValueEncoder.Encode((double)binaryAnnotation.Value);
+                _span.AddBinaryAnnotation(new BinaryAnnotation(binaryAnnotation.Key, bytes, AnnotationType.DOUBLE));
             }
             else
             {
                 throw new ArgumentException("Unsupported object type for binary annotation.");
             }
-        }
 
-        private void AddBinaryString(Annotation.BinaryAnnotation binaryAnnotation, string value)
-        {
-            var bytes = Encoding.ASCII.GetBytes(value);
-            AddBinaryAnnotation(binaryAnnotation.Key, bytes, AnnotationType.STRING);
-        }
-
-        private void AddBinaryBool(Annotation.BinaryAnnotation binaryAnnotation, bool value)
-        {
-            var bytes = BitConverter.GetBytes(value);
-            AddBinaryAnnotation(binaryAnnotation.Key, bytes, AnnotationType.BOOL);
-        }
-
-        private void AddBinaryInt16(Annotation.BinaryAnnotation binaryAnnotation, Int16 value)
-        {
-            var bytes = BitConverter.GetBytes(value);
-            AddBinaryAnnotation(binaryAnnotation.Key, bytes, AnnotationType.I16);
-        }
-
-        private void AddBinaryInt32(Annotation.BinaryAnnotation binaryAnnotation, Int32 value)
-        {
-            var bytes = BitConverter.GetBytes(value);
-            AddBinaryAnnotation(binaryAnnotation.Key, bytes, AnnotationType.I32);
-        }
-
-        private void AddBinaryInt64(Annotation.BinaryAnnotation binaryAnnotation, Int64 value)
-        {
-            var bytes = BitConverter.GetBytes(value);
-            AddBinaryAnnotation(binaryAnnotation.Key, bytes, AnnotationType.I64);
-        }
-
-        private void AddBinaryBytes(Annotation.BinaryAnnotation binaryAnnotation, byte[] bytes)
-        {
-            var annotation = new BinaryAnnotation(binaryAnnotation.Key, bytes, AnnotationType.BYTES);
-            _span.AddBinaryAnnotation(annotation);
-        }
-
-        private void AddBinaryDouble(Annotation.BinaryAnnotation binaryAnnotation, double value)
-        {
-            var bytes = BitConverter.GetBytes(value);
-            AddBinaryAnnotation(binaryAnnotation.Key, bytes, AnnotationType.DOUBLE);
-        }
-
-        private void AddBinaryAnnotation(String key, byte[] value, AnnotationType type)
-        {
-            _span.AddBinaryAnnotation(new BinaryAnnotation(key, value, type));
         }
 
     }

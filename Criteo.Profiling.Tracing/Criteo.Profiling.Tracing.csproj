@@ -79,6 +79,7 @@
     <Compile Include="Tracers\SamplerTracer.cs" />
     <Compile Include="Tracers\VoidTracer.cs" />
     <Compile Include="Tracers\Zipkin\BinaryAnnotation.cs" />
+    <Compile Include="Tracers\Zipkin\BinaryAnnotationValueEncoder.cs" />
     <Compile Include="Tracers\Zipkin\IZipkinSender.cs" />
     <Compile Include="Tracers\Zipkin\Span.cs" />
     <Compile Include="Tracers\Zipkin\ZipkinAnnotation.cs" />

@@ -56,6 +56,7 @@
     <Compile Include="Tracers\T_InMemoryTracer.cs" />
     <Compile Include="Tracers\T_SampleTracer.cs" />
     <Compile Include="Tracers\Zipkin\T_BinaryAnnotation.cs" />
+    <Compile Include="Tracers\Zipkin\T_BinaryAnnotationValueEncoder.cs" />
     <Compile Include="Tracers\Zipkin\T_Span.cs" />
     <Compile Include="Tracers\Zipkin\T_ZipkinAnnotation.cs" />
     <Compile Include="Tracers\Zipkin\T_ZipkinAnnotationVisitor.cs" />
