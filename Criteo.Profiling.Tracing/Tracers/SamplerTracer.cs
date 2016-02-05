@@ -1,7 +1,4 @@
-﻿using Criteo.Profiling.Tracing.Sampling;
-using Criteo.Profiling.Tracing.Utils;
-
-namespace Criteo.Profiling.Tracing.Tracers
+﻿namespace Criteo.Profiling.Tracing.Tracers
 {
 
     /// <summary>
@@ -9,26 +6,11 @@ namespace Criteo.Profiling.Tracing.Tracers
     /// </summary>
     public class SamplerTracer : ITracer
     {
-
-        private readonly ISampler _sampler;
         private readonly ITracer _underlyingTracer;
 
-        public float SamplingRate
-        {
-            get { return _sampler.SamplingRate; }
-            set { _sampler.SamplingRate = value; }
-        }
-
         public SamplerTracer(ITracer underlyingTracer)
-            : this(underlyingTracer, new DefaultSampler(RandomUtils.NextLong()))
-        {
-
-        }
-
-        internal SamplerTracer(ITracer underlyingTracer, ISampler sampler)
         {
             _underlyingTracer = underlyingTracer;
-            _sampler = sampler;
         }
 
         public void Record(Record record)
@@ -41,7 +23,7 @@ namespace Criteo.Profiling.Tracing.Tracers
 
         /// <summary>
         /// Determines if the trace should be sampled or not.
-        /// If the sampling is known it uses the "sampled" value. Otherwise randomly decides.
+        /// If the sampling is known it uses the "sampled" value.
         /// </summary>
         /// <param name="spanId"></param>
         /// <returns></returns>
@@ -51,10 +33,9 @@ namespace Criteo.Profiling.Tracing.Tracers
             {
                 return spanId.Flags.IsSampled();
             }
-            else
-            {
-                return _sampler.Sample(spanId.TraceId);
-            }
+            //Backward compatibility mode. If sample flag is not set,
+            //the fact that the trace exists means that it is sampled
+            return true;
         }
 
     }
