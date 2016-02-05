@@ -70,11 +70,11 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
 
         [TestCase("string", new byte[] { 0x73, 0x74, 0x72, 0x69, 0x6E, 0x67 }, AnnotationType.STRING)]
         [TestCase(true, new byte[] { 0x1 }, AnnotationType.BOOL)]
-        [TestCase(Int16.MaxValue, new byte[] { 0xFF, 0x7F }, AnnotationType.I16)]
-        [TestCase(Int32.MaxValue, new byte[] { 0xFF, 0xFF, 0xFF, 0x7F }, AnnotationType.I32)]
-        [TestCase(Int64.MaxValue, new byte[] { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x7F }, AnnotationType.I64)]
+        [TestCase(short.MaxValue, new byte[] { 0x7F, 0xFF }, AnnotationType.I16)]
+        [TestCase(int.MaxValue, new byte[] { 0x7F, 0xFF, 0xFF, 0xFF }, AnnotationType.I32)]
+        [TestCase(long.MaxValue, new byte[] { 0x7F, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF }, AnnotationType.I64)]
         [TestCase(new byte[] { 0x93 }, new byte[] { 0x93 }, AnnotationType.BYTES)]
-        [TestCase(9.3d, new byte[] { 0x9A, 0x99, 0x99, 0x99, 0x99, 0x99, 0x22, 0x40 }, AnnotationType.DOUBLE)]
+        [TestCase(9.3d, new byte[] { 0x40, 0x22, 0x99, 0x99, 0x99, 0x99, 0x99, 0x9A, }, AnnotationType.DOUBLE)]
         public void BinaryAnnotationCorrectlyAdded(object value, byte[] expectedBytes, AnnotationType expectedType)
         {
             var spanId = new SpanId(1, 0, 2, Flags.Empty());
