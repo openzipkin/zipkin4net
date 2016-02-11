@@ -22,5 +22,18 @@ namespace Criteo.Profiling.Tracing.Annotation
         {
             visitor.Visit(this);
         }
+
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            if (obj.GetType() != this.GetType()) return false;
+            return string.Equals(Key, ((BinaryAnnotation)obj).Key);
+        }
+
+        public override int GetHashCode()
+        {
+            return (Key != null ? Key.GetHashCode() : 0);
+        }
     }
 }
