@@ -16,6 +16,19 @@ namespace Criteo.Profiling.Tracing.Annotation
             return String.Format("{0}: {1}", GetType().Name, EventName);
         }
 
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            if (obj.GetType() != this.GetType()) return false;
+            return string.Equals(EventName, ((Event)obj).EventName, StringComparison.OrdinalIgnoreCase);
+        }
+
+        public override int GetHashCode()
+        {
+            return (EventName != null ? EventName.GetHashCode() : 0);
+        }
+
         public void Accept(IAnnotationVisitor visitor)
         {
             visitor.Visit(this);
