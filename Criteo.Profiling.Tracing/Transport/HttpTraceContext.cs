@@ -59,8 +59,8 @@ namespace Criteo.Profiling.Tracing.Transport
 
                 if (sampled != null)
                 {
-                    flags = Tracing.Flags.Empty(); // "sampled" header overrides all flags
-                    flags = sampled.Value ? flags.SetSampled() : flags.SetNotSampled();
+                    // When "sampled" header exists, it overrides any existing flags
+                    flags = sampled.Value ? Tracing.Flags.Empty().SetSampled() : Tracing.Flags.Empty().SetNotSampled();
                 }
 
 
@@ -131,12 +131,14 @@ namespace Criteo.Profiling.Tracing.Transport
 
         private static bool? ParseSampledHeader(String header)
         {
-            if (String.Equals(header, "1"))
+            if (header == null) return null;
+
+            if (header.Equals("1", StringComparison.OrdinalIgnoreCase) || header.Equals("true", StringComparison.OrdinalIgnoreCase))
             {
                 return true;
             }
 
-            if (String.Equals(header, "0"))
+            if (header.Equals("0", StringComparison.OrdinalIgnoreCase) || header.Equals("false", StringComparison.OrdinalIgnoreCase))
             {
                 return false;
             }
