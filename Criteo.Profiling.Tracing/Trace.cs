@@ -75,7 +75,8 @@ namespace Criteo.Profiling.Tracing
                       (int)Status.Stopped)
             {
                 _dispatcher = new InOrderAsyncDispatcher(Tracer.Push);
-                _logger.LogInformation("Tracing dispatcher service started");
+                _logger.LogInformation("Tracing dispatcher started");
+                _logger.LogInformation("HighResolutionDateTime is " + (HighResolutionDateTime.IsAvailable ? "available" : "not available"));
                 return true;
             }
 
@@ -93,7 +94,7 @@ namespace Criteo.Profiling.Tracing
             {
                 _dispatcher.Stop(); // InOrderAsyncDispatcher
                 _dispatcher = new VoidDispatcher();
-                _logger.LogInformation("Tracing dispatcher service stopped");
+                _logger.LogInformation("Tracing dispatcher stopped");
                 return true;
             }
 
@@ -162,7 +163,7 @@ namespace Criteo.Profiling.Tracing
 
         internal void RecordAnnotation(IAnnotation annotation)
         {
-            var record = new Record(CurrentId, DateTime.UtcNow, annotation);
+            var record = new Record(CurrentId, TimeUtils.UtcNow, annotation);
             _dispatcher.Dispatch(record);
         }
 
