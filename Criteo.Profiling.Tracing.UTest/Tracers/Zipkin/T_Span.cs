@@ -2,6 +2,7 @@
 using System.Net;
 using Criteo.Profiling.Tracing.Tracers.Zipkin;
 using Criteo.Profiling.Tracing.Tracers.Zipkin.Thrift;
+using Criteo.Profiling.Tracing.Utils;
 using NUnit.Framework;
 using BinaryAnnotation = Criteo.Profiling.Tracing.Tracers.Zipkin.BinaryAnnotation;
 using Span = Criteo.Profiling.Tracing.Tracers.Zipkin.Span;
@@ -94,7 +95,7 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
             {
                 Assert.AreEqual(expectedHost, ann.Host);
                 Assert.IsNull(ann.Duration);
-                Assert.AreEqual(ZipkinAnnotation.ToUnixTimestamp(zipkinAnnDateTime), ann.Timestamp);
+                Assert.AreEqual(TimeUtils.ToUnixTimestamp(zipkinAnnDateTime), ann.Timestamp);
             });
 
             Assert.AreEqual(1, thriftSpan.Binary_annotations.Count);

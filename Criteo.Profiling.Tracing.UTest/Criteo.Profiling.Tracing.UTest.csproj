@@ -67,6 +67,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="T_Trace.cs" />
     <Compile Include="T_Tracer.cs" />
+    <Compile Include="Utils\T_TimeUtils.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Criteo.Profiling.Tracing\Criteo.Profiling.Tracing.csproj">

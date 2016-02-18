@@ -94,6 +94,8 @@
     <Compile Include="Tracers\Zipkin\obj\gen_zipkinCore.thrift\Criteo\Profiling\Tracing\Tracers\Zipkin\Thrift\Span.cs" />
     <Compile Include="Tracers\Zipkin\obj\gen_zipkinCore.thrift\Criteo\Profiling\Tracing\Tracers\Zipkin\Thrift\zipkinCore.Constants.cs" />
     <Compile Include="Utils\IpUtils.cs" />
+    <Compile Include="Utils\HighResolutionDateTime.cs" />
+    <Compile Include="Utils\TimeUtils.cs" />
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Service References\" />
