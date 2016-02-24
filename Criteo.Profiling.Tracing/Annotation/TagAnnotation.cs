@@ -2,9 +2,9 @@
 
 namespace Criteo.Profiling.Tracing.Annotation
 {
-    public sealed class BinaryAnnotation : IAnnotation
+    public sealed class TagAnnotation : IAnnotation
     {
-        internal BinaryAnnotation(string key, object value)
+        internal TagAnnotation(string key, object value)
         {
             this.Key = key;
             this.Value = value;
@@ -28,7 +28,7 @@ namespace Criteo.Profiling.Tracing.Annotation
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
             if (obj.GetType() != this.GetType()) return false;
-            return string.Equals(Key, ((BinaryAnnotation)obj).Key);
+            return string.Equals(Key, ((TagAnnotation)obj).Key);
         }
 
         public override int GetHashCode()

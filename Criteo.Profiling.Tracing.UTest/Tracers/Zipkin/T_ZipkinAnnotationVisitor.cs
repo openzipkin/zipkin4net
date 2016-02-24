@@ -75,12 +75,12 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
         [TestCase(long.MaxValue, new byte[] { 0x7F, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF }, AnnotationType.I64)]
         [TestCase(new byte[] { 0x93 }, new byte[] { 0x93 }, AnnotationType.BYTES)]
         [TestCase(9.3d, new byte[] { 0x40, 0x22, 0x99, 0x99, 0x99, 0x99, 0x99, 0x9A, }, AnnotationType.DOUBLE)]
-        public void BinaryAnnotationCorrectlyAdded(object value, byte[] expectedBytes, AnnotationType expectedType)
+        public void TagAnnotationCorrectlyAdded(object value, byte[] expectedBytes, AnnotationType expectedType)
         {
             var spanId = new SpanId(1, 0, 2, Flags.Empty());
             var span = new Span(spanId, started: DateTime.UtcNow);
 
-            var record = new Record(spanId, DateTime.UtcNow, Annotations.Binary("magicKey", value));
+            var record = new Record(spanId, DateTime.UtcNow, new TagAnnotation("magicKey", value));
             var visitor = new ZipkinAnnotationVisitor(record, span);
 
             Assert.AreEqual(0, span.Annotations.Count);
@@ -99,18 +99,16 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
         }
 
         [Test]
-        public void UnsupportedBinaryAnnotationShouldThrow()
+        public void UnsupportedTagAnnotationShouldThrow()
         {
             var spanId = new SpanId(1, 0, 2, Flags.Empty());
             var span = new Span(spanId, started: DateTime.UtcNow);
 
-            var record = new Record(spanId, DateTime.UtcNow, Annotations.Binary("magicKey", 1f));
+            var record = new Record(spanId, DateTime.UtcNow, new TagAnnotation("magicKey", 1f));
             var visitor = new ZipkinAnnotationVisitor(record, span);
 
             Assert.Throws<ArgumentException>(() => record.Annotation.Accept(visitor));
         }
-
-
 
         [Test]
         public void SimpleAnnotationsCorrectlyAdded()
