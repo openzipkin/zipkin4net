@@ -37,6 +37,7 @@
       <HintPath>$(SolutionDir)\packages\Microsoft.Tpl.Dataflow.4.5.24\lib\portable-net45+win8+wpa81\System.Threading.Tasks.Dataflow.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="System.Web" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -85,7 +86,11 @@
     <Compile Include="Tracers\Zipkin\ZipkinAnnotation.cs" />
     <Compile Include="Tracers\Zipkin\ZipkinAnnotationVisitor.cs" />
     <Compile Include="Tracers\Zipkin\ZipkinTracer.cs" />
+    <Compile Include="Transport\HttpTraceExtractor.cs" />
+    <Compile Include="Transport\HttpTraceInjector.cs" />
     <Compile Include="Transport\HttpTraceContext.cs" />
+    <Compile Include="Transport\ITraceExtractor.cs" />
+    <Compile Include="Transport\ITraceInjector.cs" />
     <Compile Include="Utils\RandomUtils.cs" />
     <Compile Include="Tracers\Zipkin\obj\gen_zipkinCore.thrift\Criteo\Profiling\Tracing\Tracers\Zipkin\Thrift\Annotation.cs" />
     <Compile Include="Tracers\Zipkin\obj\gen_zipkinCore.thrift\Criteo\Profiling\Tracing\Tracers\Zipkin\Thrift\AnnotationType.cs" />
