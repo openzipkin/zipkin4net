@@ -9,7 +9,7 @@
         void Visit(Rpc rpc);
         void Visit(ServiceName serviceName);
         void Visit(LocalAddr localAddr);
-        void Visit(BinaryAnnotation binaryAnnotation);
+        void Visit(TagAnnotation tagAnnotation);
         void Visit(Event ev);
     }
 }

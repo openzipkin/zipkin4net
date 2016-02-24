@@ -64,43 +64,43 @@ namespace Criteo.Profiling.Tracing.Tracers.Zipkin
         /// Cast binary object Value to one of the following types :
         /// string, bool, short, int, long, byte[], double
         /// </summary>
-        /// <param name="binaryAnnotation"></param>
-        public void Visit(Annotation.BinaryAnnotation binaryAnnotation)
+        /// <param name="tagAnnotation"></param>
+        public void Visit(Annotation.TagAnnotation tagAnnotation)
         {
-            if (binaryAnnotation.Value is string)
+            if (tagAnnotation.Value is string)
             {
-                var bytes = BinaryAnnotationValueEncoder.Encode((string)binaryAnnotation.Value);
-                _span.AddBinaryAnnotation(new BinaryAnnotation(binaryAnnotation.Key, bytes, AnnotationType.STRING));
+                var bytes = BinaryAnnotationValueEncoder.Encode((string)tagAnnotation.Value);
+                _span.AddBinaryAnnotation(new BinaryAnnotation(tagAnnotation.Key, bytes, AnnotationType.STRING));
             }
-            else if (binaryAnnotation.Value is bool)
+            else if (tagAnnotation.Value is bool)
             {
-                var bytes = BinaryAnnotationValueEncoder.Encode((bool)binaryAnnotation.Value);
-                _span.AddBinaryAnnotation(new BinaryAnnotation(binaryAnnotation.Key, bytes, AnnotationType.BOOL));
+                var bytes = BinaryAnnotationValueEncoder.Encode((bool)tagAnnotation.Value);
+                _span.AddBinaryAnnotation(new BinaryAnnotation(tagAnnotation.Key, bytes, AnnotationType.BOOL));
             }
-            else if (binaryAnnotation.Value is short)
+            else if (tagAnnotation.Value is short)
             {
-                var bytes = BinaryAnnotationValueEncoder.Encode((short)binaryAnnotation.Value);
-                _span.AddBinaryAnnotation(new BinaryAnnotation(binaryAnnotation.Key, bytes, AnnotationType.I16));
+                var bytes = BinaryAnnotationValueEncoder.Encode((short)tagAnnotation.Value);
+                _span.AddBinaryAnnotation(new BinaryAnnotation(tagAnnotation.Key, bytes, AnnotationType.I16));
             }
-            else if (binaryAnnotation.Value is int)
+            else if (tagAnnotation.Value is int)
             {
-                var bytes = BinaryAnnotationValueEncoder.Encode((int)binaryAnnotation.Value);
-                _span.AddBinaryAnnotation(new BinaryAnnotation(binaryAnnotation.Key, bytes, AnnotationType.I32));
+                var bytes = BinaryAnnotationValueEncoder.Encode((int)tagAnnotation.Value);
+                _span.AddBinaryAnnotation(new BinaryAnnotation(tagAnnotation.Key, bytes, AnnotationType.I32));
             }
-            else if (binaryAnnotation.Value is long)
+            else if (tagAnnotation.Value is long)
             {
-                var bytes = BinaryAnnotationValueEncoder.Encode((long)binaryAnnotation.Value);
-                _span.AddBinaryAnnotation(new BinaryAnnotation(binaryAnnotation.Key, bytes, AnnotationType.I64));
+                var bytes = BinaryAnnotationValueEncoder.Encode((long)tagAnnotation.Value);
+                _span.AddBinaryAnnotation(new BinaryAnnotation(tagAnnotation.Key, bytes, AnnotationType.I64));
             }
-            else if (binaryAnnotation.Value is byte[])
+            else if (tagAnnotation.Value is byte[])
             {
-                var bytes = (byte[])(binaryAnnotation.Value);
-                _span.AddBinaryAnnotation(new BinaryAnnotation(binaryAnnotation.Key, bytes, AnnotationType.BYTES));
+                var bytes = (byte[])(tagAnnotation.Value);
+                _span.AddBinaryAnnotation(new BinaryAnnotation(tagAnnotation.Key, bytes, AnnotationType.BYTES));
             }
-            else if (binaryAnnotation.Value is double)
+            else if (tagAnnotation.Value is double)
             {
-                var bytes = BinaryAnnotationValueEncoder.Encode((double)binaryAnnotation.Value);
-                _span.AddBinaryAnnotation(new BinaryAnnotation(binaryAnnotation.Key, bytes, AnnotationType.DOUBLE));
+                var bytes = BinaryAnnotationValueEncoder.Encode((double)tagAnnotation.Value);
+                _span.AddBinaryAnnotation(new BinaryAnnotation(tagAnnotation.Key, bytes, AnnotationType.DOUBLE));
             }
             else
             {

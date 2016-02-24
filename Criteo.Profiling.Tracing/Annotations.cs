@@ -49,9 +49,9 @@ namespace Criteo.Profiling.Tracing
             return new LocalAddr(endPoint);
         }
 
-        public static IAnnotation Binary(string key, object value)
+        public static IAnnotation Tag(string key, string value)
         {
-            return new BinaryAnnotation(key, value);
+            return new TagAnnotation(key, value);
         }
 
         public static IAnnotation Event(string name)

@@ -10,7 +10,7 @@ namespace Criteo.Profiling.Tracing.UTest
         [Test]
         public void FactoryReturnsCorrectTypes()
         {
-            Assert.IsInstanceOf<BinaryAnnotation>(Annotations.Binary("",""));
+            Assert.IsInstanceOf<TagAnnotation>(Annotations.Tag("",""));
             Assert.IsInstanceOf<ClientRecv>(Annotations.ClientRecv());
             Assert.IsInstanceOf<ClientSend>(Annotations.ClientSend());
             Assert.IsInstanceOf<LocalAddr>(Annotations.LocalAddr(null));
