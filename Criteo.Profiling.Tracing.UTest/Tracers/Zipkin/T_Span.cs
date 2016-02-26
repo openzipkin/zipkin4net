@@ -94,7 +94,6 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
             thriftSpan.Annotations.ForEach(ann =>
             {
                 Assert.AreEqual(expectedHost, ann.Host);
-                Assert.IsNull(ann.Duration);
                 Assert.AreEqual(TimeUtils.ToUnixTimestamp(zipkinAnnDateTime), ann.Timestamp);
             });
 
