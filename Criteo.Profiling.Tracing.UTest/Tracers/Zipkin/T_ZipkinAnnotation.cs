@@ -22,7 +22,6 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
             Assert.AreEqual(TimeUtils.ToUnixTimestamp(now), thriftAnn.Timestamp);
             Assert.AreEqual(value, thriftAnn.Value);
             Assert.IsNull(thriftAnn.Host);
-            Assert.IsNull(thriftAnn.Duration);
         }
 
     }
