@@ -120,9 +120,9 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
             AssertSpanHasRequiredFields(thriftSpan);
 
             const string defaultName = Span.DefaultRpcMethod;
-            var defaultServiceName = Trace.DefaultServiceName;
-            var defaultIpv4 = Span.IpToInt(Trace.DefaultEndPoint.Address);
-            var defaultPort = Trace.DefaultEndPoint.Port;
+            var defaultServiceName = Trace.Configuration.DefaultServiceName;
+            var defaultIpv4 = Span.IpToInt(Trace.Configuration.DefaultEndPoint.Address);
+            var defaultPort = Trace.Configuration.DefaultEndPoint.Port;
 
             Assert.AreEqual(2, thriftSpan.Annotations.Count);
             thriftSpan.Annotations.ForEach(ann =>
@@ -142,8 +142,8 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
             var started = DateTime.UtcNow;
 
             // Make sure we choose something different thant the default values
-            var serviceName = Trace.DefaultServiceName + "_notDefault";
-            var hostPort = Trace.DefaultEndPoint.Port + 1;
+            var serviceName = Trace.Configuration.DefaultServiceName + "_notDefault";
+            var hostPort = Trace.Configuration.DefaultEndPoint.Port + 1;
             const string name = "myRPCmethod";
 
             var span = new Span(spanId, started) { Endpoint = new IPEndPoint(IPAddress.Loopback, hostPort), ServiceName = serviceName, Name = name };

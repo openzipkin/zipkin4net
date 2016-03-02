@@ -50,7 +50,7 @@ namespace Criteo.Profiling.Tracing
                 catch (Exception ex)
                 {
                     // No exception coming for traces should disrupt the main application as tracing is optional.
-                    Trace.Logger.LogWarning("An error occured while recording the annotation. Msg: " + ex.Message);
+                    Trace.Configuration.Logger.LogWarning("An error occured while recording the annotation. Msg: " + ex.Message);
                 }
             }
         }

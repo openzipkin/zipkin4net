@@ -13,7 +13,7 @@ namespace Criteo.Profiling.Tracing.UTest
         public void SetUp()
         {
             Tracer.Clear();
-            Trace.Start();
+            Trace.Start(new Configuration());
             Trace.SamplingRate = 1f;
 
             _mockTracer = new Mock<ITracer>();
@@ -87,7 +87,7 @@ namespace Criteo.Profiling.Tracing.UTest
         public void CannotStartMultipleTimes()
         {
             Assert.True(Trace.TracingRunning, "Test setup failed?");
-            Assert.False(Trace.Start());
+            Assert.False(Trace.Start(new Configuration()));
         }
 
     }
