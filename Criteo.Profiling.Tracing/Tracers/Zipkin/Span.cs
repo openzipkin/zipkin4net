@@ -14,7 +14,6 @@ namespace Criteo.Profiling.Tracing.Tracers.Zipkin
     /// </summary>
     internal class Span
     {
-
         public SpanId SpanId { get; private set; }
 
         public ICollection<ZipkinAnnotation> Annotations { get; private set; }
@@ -101,8 +100,8 @@ namespace Criteo.Profiling.Tracing.Tracers.Zipkin
             }
 
             // Use default value if no information were recorded
-            if (Endpoint == null) Endpoint = Trace.DefaultEndPoint;
-            if (String.IsNullOrWhiteSpace(ServiceName)) ServiceName = Trace.DefaultServiceName;
+            if (Endpoint == null) Endpoint = Trace.Configuration.DefaultEndPoint;
+            if (String.IsNullOrWhiteSpace(ServiceName)) ServiceName = Trace.Configuration.DefaultServiceName;
 
             ServiceName = ServiceName.Replace(" ", "_"); // whitespaces cause issues with the query and ui
 

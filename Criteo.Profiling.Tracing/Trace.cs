@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Net;
 using System.Threading;
 using Criteo.Profiling.Tracing.Annotation;
 using Criteo.Profiling.Tracing.Dispatcher;
-using Criteo.Profiling.Tracing.Logger;
 using Criteo.Profiling.Tracing.Sampling;
 using Criteo.Profiling.Tracing.Utils;
 
@@ -18,43 +16,11 @@ namespace Criteo.Profiling.Tracing
 
         internal SpanId CurrentId { get; private set; }
 
-        private static IPEndPoint _defaultEndPoint = new IPEndPoint(IpUtils.GetLocalIpAddress() ?? IPAddress.Loopback, 0);
-        private static string _defaultServiceName = "UnknownService";
-
         private static readonly ISampler Sampler = new DefaultSampler(salt: RandomUtils.NextLong(), samplingRate: 0f);
-
-        private static ILogger _logger = new VoidLogger();
-
         private static IRecordDispatcher _dispatcher = new VoidDispatcher();
         private static int _status = (int)Status.Stopped;
 
-        /// <summary>
-        /// Basic logger to record events. By default NO-OP logger.
-        /// </summary>
-        public static ILogger Logger
-        {
-            get { return _logger; }
-            set { _logger = value; }
-        }
-
-        /// <summary>
-        /// Default endpoint to use if none was recorded using an annotation.
-        /// </summary>
-        public static IPEndPoint DefaultEndPoint
-        {
-            get { return _defaultEndPoint; }
-            set { _defaultEndPoint = value; }
-        }
-
-        /// <summary>
-        /// Default service/application name if none was recorded using an annotation.
-        /// Avoid spaces as they are not correctly handled by zipkin-web-service (at least up to v1.19.1)
-        /// </summary>
-        public static string DefaultServiceName
-        {
-            get { return _defaultServiceName; }
-            set { _defaultServiceName = value; }
-        }
+        internal static Configuration Configuration = new Configuration();
 
         /// <summary>
         /// Returns true if tracing is currently running and forwarding records to the registered tracers.
@@ -68,15 +34,21 @@ namespace Criteo.Profiling.Tracing
         /// <summary>
         /// Start tracing, records will be forwarded to the registered tracers.
         /// </summary>
-        /// <returns></returns>
-        public static bool Start()
+        /// <returns>True if successfully started, false if error or the service was already running.</returns>
+        public static bool Start(Configuration configuration)
+        {
+            return Start(configuration, new InOrderAsyncDispatcher(Tracer.Push));
+        }
+
+        internal static bool Start(Configuration configuration, IRecordDispatcher dispatcher)
         {
             if (Interlocked.CompareExchange(ref _status, (int)Status.Started, (int)Status.Stopped) ==
                       (int)Status.Stopped)
             {
-                _dispatcher = new InOrderAsyncDispatcher(Tracer.Push);
-                _logger.LogInformation("Tracing dispatcher started");
-                _logger.LogInformation("HighResolutionDateTime is " + (HighResolutionDateTime.IsAvailable ? "available" : "not available"));
+                Configuration = configuration;
+                _dispatcher = dispatcher;
+                Configuration.Logger.LogInformation("Tracing dispatcher started");
+                Configuration.Logger.LogInformation("HighResolutionDateTime is " + (HighResolutionDateTime.IsAvailable ? "available" : "not available"));
                 return true;
             }
 
@@ -94,7 +66,7 @@ namespace Criteo.Profiling.Tracing
             {
                 _dispatcher.Stop(); // InOrderAsyncDispatcher
                 _dispatcher = new VoidDispatcher();
-                _logger.LogInformation("Tracing dispatcher stopped");
+                Configuration.Logger.LogInformation("Tracing dispatcher stopped");
                 return true;
             }
 

@@ -17,7 +17,7 @@ namespace Criteo.Profiling.Tracing.UTest
             Tracer.Clear();
 
             _mockLogger = new Mock<ILogger>();
-            Trace.Logger = _mockLogger.Object;
+            Trace.Configuration = new Configuration { Logger = _mockLogger.Object };
 
             _mockTracer = new Mock<ITracer>();
             Tracer.Register(_mockTracer.Object);

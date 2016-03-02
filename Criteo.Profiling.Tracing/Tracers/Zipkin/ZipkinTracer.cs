@@ -3,8 +3,6 @@ using System.Collections.Concurrent;
 using System.IO;
 using System.Linq;
 using System.Threading;
-using Thrift.Protocol;
-using Thrift.Transport;
 
 namespace Criteo.Profiling.Tracing.Tracers.Zipkin
 {
