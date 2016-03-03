@@ -59,6 +59,7 @@ namespace Criteo.Profiling.Tracing.UTest
 
             // Should share the same global id
             Assert.AreEqual(parent.CurrentId.TraceId, child.CurrentId.TraceId);
+            Assert.AreEqual(parent.CorrelationId, child.CorrelationId);
 
             // Parent id of the child should be the parent span id
             Assert.AreEqual(parent.CurrentId.Id, child.CurrentId.ParentSpanId);
@@ -89,6 +90,5 @@ namespace Criteo.Profiling.Tracing.UTest
             Assert.True(Trace.TracingRunning, "Test setup failed?");
             Assert.False(Trace.Start(new Configuration()));
         }
-
     }
 }
