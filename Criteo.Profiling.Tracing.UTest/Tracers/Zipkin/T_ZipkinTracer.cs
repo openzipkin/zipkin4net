@@ -13,7 +13,7 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
         [SetUp]
         public void Setup()
         {
-            Trace.SamplingRate = 1f;
+            TraceManager.SamplingRate = 1f;
         }
 
         [Test]

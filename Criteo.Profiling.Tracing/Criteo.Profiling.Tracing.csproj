@@ -76,7 +76,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Record.cs" />
     <Compile Include="Trace.cs" />
-    <Compile Include="Tracer.cs" />
+    <Compile Include="TraceManager.cs" />
     <Compile Include="Tracers\InMemoryTracer.cs" />
     <Compile Include="Tracers\ConsoleTracer.cs" />
     <Compile Include="Tracers\SamplerTracer.cs" />
