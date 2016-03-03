@@ -13,7 +13,6 @@ namespace Criteo.Profiling.Tracing
     /// </summary>
     public sealed class Trace : IEquatable<Trace>
     {
-
         internal SpanId CurrentId { get; private set; }
 
         private static readonly ISampler Sampler = new DefaultSampler(salt: RandomUtils.NextLong(), samplingRate: 0f);
@@ -115,6 +114,14 @@ namespace Criteo.Profiling.Tracing
         private static SpanId CreateRootSpanId(long traceId)
         {
             return new SpanId(traceId: traceId, parentSpanId: null, id: RandomUtils.NextLong(), flags: Flags.Empty());
+        }
+
+        /// <summary>
+        /// Returns the trace id. It represents the correlation id
+        /// of a request through the platform.
+        /// </summary>
+        public long CorrelationId {
+            get { return CurrentId.TraceId; }
         }
 
         /// <summary>
