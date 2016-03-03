@@ -90,5 +90,17 @@ namespace Criteo.Profiling.Tracing.UTest
             Assert.True(TraceManager.Started, "Test setup failed?");
             Assert.False(TraceManager.Start(new Configuration()));
         }
+
+        [Test]
+        public void TraceSamplingForced()
+        {
+            var trace = Trace.CreateIfSampled();
+
+            Assert.False(trace.CurrentId.Flags.IsSamplingKnown());
+            Assert.False(trace.CurrentId.Flags.IsSampled());
+            trace.ForceSampled();
+            Assert.True(trace.CurrentId.Flags.IsSamplingKnown());
+            Assert.True(trace.CurrentId.Flags.IsSampled());
+        }
     }
 }

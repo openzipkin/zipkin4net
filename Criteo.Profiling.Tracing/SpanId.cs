@@ -25,6 +25,11 @@ namespace Criteo.Profiling.Tracing
             this.Flags = flags;
         }
 
+        public void ForceSampled()
+        {
+            this.Flags = this.Flags.SetSampled();
+        }
+
         public bool Equals(SpanId other)
         {
             if (ReferenceEquals(null, other)) return false;

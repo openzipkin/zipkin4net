@@ -66,6 +66,11 @@ namespace Criteo.Profiling.Tracing
             return new Trace(CreateChildSpanId());
         }
 
+        public void ForceSampled()
+        {
+            CurrentId.ForceSampled();
+        }
+
         private SpanId CreateChildSpanId()
         {
             return new SpanId(traceId: CurrentId.TraceId, parentSpanId: CurrentId.Id, id: RandomUtils.NextLong(), flags: CurrentId.Flags);
