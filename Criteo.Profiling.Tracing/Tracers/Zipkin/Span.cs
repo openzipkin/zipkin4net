@@ -100,8 +100,8 @@ namespace Criteo.Profiling.Tracing.Tracers.Zipkin
             }
 
             // Use default value if no information were recorded
-            if (Endpoint == null) Endpoint = Trace.Configuration.DefaultEndPoint;
-            if (String.IsNullOrWhiteSpace(ServiceName)) ServiceName = Trace.Configuration.DefaultServiceName;
+            if (Endpoint == null) Endpoint = TraceManager.Configuration.DefaultEndPoint;
+            if (String.IsNullOrWhiteSpace(ServiceName)) ServiceName = TraceManager.Configuration.DefaultServiceName;
 
             ServiceName = ServiceName.Replace(" ", "_"); // whitespaces cause issues with the query and ui
 

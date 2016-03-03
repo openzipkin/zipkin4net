@@ -16,7 +16,8 @@ namespace Criteo.Profiling.Tracing.UTest.Transport
         public void Setup()
         {
             _mockLogger = new Mock<ILogger>();
-            Trace.Configuration = new Configuration {Logger = _mockLogger.Object};
+            TraceManager.Configuration = new Configuration {Logger = _mockLogger.Object};
+
         }
 
         #region TryGet/TryParse Context

@@ -12,19 +12,19 @@ namespace Criteo.Profiling.Tracing.UTest
         [SetUp]
         public void SetUp()
         {
-            Tracer.Clear();
-            Trace.Start(new Configuration());
-            Trace.SamplingRate = 1f;
+            TraceManager.ClearTracers();
+            TraceManager.Start(new Configuration());
+            TraceManager.SamplingRate = 1f;
 
             _mockTracer = new Mock<ITracer>();
-            Tracer.Register(_mockTracer.Object);
+            TraceManager.RegisterTracer(_mockTracer.Object);
         }
 
         [TearDown]
         public void TearDown()
         {
-            Trace.Stop();
-            Tracer.Clear();
+            TraceManager.Stop();
+            TraceManager.ClearTracers();
         }
 
         [Test]
@@ -32,9 +32,9 @@ namespace Criteo.Profiling.Tracing.UTest
         {
             var trace = Trace.CreateIfSampled();
 
-            Assert.IsTrue(Trace.TracingRunning);
+            Assert.IsTrue(TraceManager.Started);
             trace.Record(Annotations.ServerSend());
-            Trace.Stop();
+            TraceManager.Stop();
 
             _mockTracer.Verify(tracer => tracer.Record(It.IsAny<Record>()), Times.Once());
         }
@@ -44,8 +44,8 @@ namespace Criteo.Profiling.Tracing.UTest
         {
             var trace = Trace.CreateIfSampled();
 
-            Trace.Stop();
-            Assert.IsFalse(Trace.TracingRunning);
+            TraceManager.Stop();
+            Assert.IsFalse(TraceManager.Started);
             trace.Record(Annotations.ServerSend());
 
             _mockTracer.Verify(tracer => tracer.Record(It.IsAny<Record>()), Times.Never());
@@ -79,7 +79,7 @@ namespace Criteo.Profiling.Tracing.UTest
             var clientRcv = Annotations.ClientRecv();
             trace.Record(clientRcv);
 
-            Trace.Stop();
+            TraceManager.Stop();
 
             _mockTracer.Verify(t => t.Record(It.Is<Record>(r => r.Annotation == clientRcv && r.SpanId.Equals(trace.CurrentId))), Times.Once());
         }
@@ -87,8 +87,8 @@ namespace Criteo.Profiling.Tracing.UTest
         [Test]
         public void CannotStartMultipleTimes()
         {
-            Assert.True(Trace.TracingRunning, "Test setup failed?");
-            Assert.False(Trace.Start(new Configuration()));
+            Assert.True(TraceManager.Started, "Test setup failed?");
+            Assert.False(TraceManager.Start(new Configuration()));
         }
     }
 }

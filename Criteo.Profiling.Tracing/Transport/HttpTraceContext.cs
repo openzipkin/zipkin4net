@@ -70,7 +70,7 @@ namespace Criteo.Profiling.Tracing.Transport
             }
             catch (Exception ex)
             {
-                Trace.Configuration.Logger.LogWarning("Couldn't parse trace context. Trace is ignored. Message:" + ex.Message);
+                TraceManager.Configuration.Logger.LogWarning("Couldn't parse trace context. Trace is ignored. Message:" + ex.Message);
             }
 
             trace = default(Trace);
