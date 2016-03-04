@@ -64,7 +64,7 @@ namespace Criteo.Profiling.Tracing.UTest.Transport
             Trace trace;
             Assert.True(HttpTraceContext.TryParseTrace(encodedTraceId: "0000000000000001", encodedSpanId: "00000000000000FA", encodedParentSpanId: encodedParentSpanId, sampledStr: null, flagsStr: null, trace: out trace));
 
-            Assert.AreEqual(1, trace.CorrelationId);
+            Assert.AreEqual(1, trace.CurrentSpan.TraceId);
             Assert.AreEqual(250, trace.CurrentSpan.SpanId);
             Assert.AreEqual(Flags.Empty, trace.CurrentSpan.Flags);
 

@@ -93,6 +93,7 @@
     <Compile Include="Transport\HttpTraceContext.cs" />
     <Compile Include="Transport\ITraceExtractor.cs" />
     <Compile Include="Transport\ITraceInjector.cs" />
+    <Compile Include="Utils\NumberUtils.cs" />
     <Compile Include="Utils\RandomUtils.cs" />
     <Compile Include="Tracers\Zipkin\obj\gen_zipkinCore.thrift\Criteo\Profiling\Tracing\Tracers\Zipkin\Thrift\Annotation.cs" />
     <Compile Include="Tracers\Zipkin\obj\gen_zipkinCore.thrift\Criteo\Profiling\Tracing\Tracers\Zipkin\Thrift\AnnotationType.cs" />

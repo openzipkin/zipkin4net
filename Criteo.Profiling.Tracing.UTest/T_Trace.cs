@@ -15,7 +15,6 @@ namespace Criteo.Profiling.Tracing.UTest
         {
             TraceManager.ClearTracers();
             TraceManager.Stop();
-
         }
 
         [Test]

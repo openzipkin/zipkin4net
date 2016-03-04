@@ -12,6 +12,8 @@ namespace Criteo.Profiling.Tracing
     {
         public SpanState CurrentSpan { get; private set; }
 
+        private Guid? _correlationId;
+
         /// <summary>
         /// Starts a new trace with a random id, no parent and empty flags.
         /// </summary>
@@ -50,10 +52,18 @@ namespace Criteo.Profiling.Tracing
         /// <summary>
         /// Returns the trace id. It represents the correlation id
         /// of a request through the platform.
+        /// For now it is based on the CurrentSpan.TraceId which is only 8 bytes instead of 16.
         /// </summary>
-        public long CorrelationId
+        public Guid CorrelationId
         {
-            get { return CurrentSpan.TraceId; }
+            get
+            {
+                if (_correlationId == null)
+                {
+                    _correlationId = NumberUtils.LongToGuid(CurrentSpan.TraceId);
+                }
+                return _correlationId.Value;
+            }
         }
 
         /// <summary>
