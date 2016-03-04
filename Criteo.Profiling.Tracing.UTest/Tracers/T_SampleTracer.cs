@@ -1,6 +1,7 @@
 ﻿using System;
 using Criteo.Profiling.Tracing.Sampling;
 using Criteo.Profiling.Tracing.Tracers;
+using Criteo.Profiling.Tracing.Utils;
 using Moq;
 using NUnit.Framework;
 
@@ -49,8 +50,8 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers
 
         private static void RecordTrace(ITracer tracer, Flags flags)
         {
-            var spanId = new SpanId(1, 0, 1, flags);
-            var record = new Record(spanId, DateTime.UtcNow, Annotations.ClientRecv());
+            var spanState = new SpanState(1, 0, 1, flags);
+            var record = new Record(spanState, TimeUtils.UtcNow, Annotations.ClientRecv());
 
             tracer.Record(record);
         }

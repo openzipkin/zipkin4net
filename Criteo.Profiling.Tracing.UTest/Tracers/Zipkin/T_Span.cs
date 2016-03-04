@@ -19,27 +19,27 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
         [Description("Span should only be marked as complete when either ClientRecv or ServerSend are present.")]
         public void SpansAreLabeledAsCompleteWhenCrOrSs()
         {
-            var spanId = new SpanId(1, 0, 2, Flags.Empty);
-            var started = DateTime.UtcNow;
+            var spanState = new SpanState(1, 0, 2, Flags.Empty);
+            var started = TimeUtils.UtcNow;
 
-            var spanClientRecv = new Span(spanId, started);
+            var spanClientRecv = new Span(spanState, started);
             Assert.False(spanClientRecv.Complete);
 
-            spanClientRecv.AddAnnotation(new ZipkinAnnotation(DateTime.UtcNow, zipkinCoreConstants.CLIENT_RECV));
+            spanClientRecv.AddAnnotation(new ZipkinAnnotation(TimeUtils.UtcNow, zipkinCoreConstants.CLIENT_RECV));
             Assert.True(spanClientRecv.Complete);
 
-            var spanServSend = new Span(spanId, started);
+            var spanServSend = new Span(spanState, started);
             Assert.False(spanServSend.Complete);
 
-            spanServSend.AddAnnotation(new ZipkinAnnotation(DateTime.UtcNow, zipkinCoreConstants.SERVER_SEND));
+            spanServSend.AddAnnotation(new ZipkinAnnotation(TimeUtils.UtcNow, zipkinCoreConstants.SERVER_SEND));
             Assert.True(spanServSend.Complete);
 
 
-            var spanOtherAnn = new Span(spanId, started);
+            var spanOtherAnn = new Span(spanState, started);
             Assert.False(spanOtherAnn.Complete);
 
-            spanServSend.AddAnnotation(new ZipkinAnnotation(DateTime.UtcNow, zipkinCoreConstants.SERVER_RECV));
-            spanServSend.AddAnnotation(new ZipkinAnnotation(DateTime.UtcNow, zipkinCoreConstants.CLIENT_SEND));
+            spanServSend.AddAnnotation(new ZipkinAnnotation(TimeUtils.UtcNow, zipkinCoreConstants.SERVER_RECV));
+            spanServSend.AddAnnotation(new ZipkinAnnotation(TimeUtils.UtcNow, zipkinCoreConstants.CLIENT_SEND));
             Assert.False(spanOtherAnn.Complete);
         }
 
@@ -52,10 +52,10 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
             const string serviceName = "myCriteoService";
             const string methodName = "GET";
 
-            var spanId = new SpanId(1, parentSpanId, 2, Flags.Empty);
-            var span = new Span(spanId, DateTime.UtcNow) { Endpoint = new IPEndPoint(hostIp, hostPort), ServiceName = serviceName, Name = methodName };
+            var spanState = new SpanState(1, parentSpanId, 2, Flags.Empty);
+            var span = new Span(spanState, TimeUtils.UtcNow) { Endpoint = new IPEndPoint(hostIp, hostPort), ServiceName = serviceName, Name = methodName };
 
-            var zipkinAnnDateTime = DateTime.UtcNow;
+            var zipkinAnnDateTime = TimeUtils.UtcNow;
             AddClientSendReceiveAnnotations(span, zipkinAnnDateTime);
             span.AddAnnotation(new ZipkinAnnotation(zipkinAnnDateTime, SomeRandomAnnotation));
 
@@ -112,8 +112,8 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
         [Description("Span should never be sent without required fields such as Name, ServiceName, Ipv4 or Port")]
         public void DefaultsValuesAreUsedIfNothingSpecified()
         {
-            var spanId = new SpanId(1, 0, 2, Flags.Empty);
-            var span = new Span(spanId, DateTime.UtcNow);
+            var spanState = new SpanState(1, 0, 2, Flags.Empty);
+            var span = new Span(spanState, TimeUtils.UtcNow);
             AddClientSendReceiveAnnotations(span);
 
             var thriftSpan = span.ToThrift();
@@ -138,8 +138,8 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
         [Test]
         public void DefaultsValuesAreNotUsedIfValuesSpecified()
         {
-            var spanId = new SpanId(1, 0, 2, Flags.Empty);
-            var started = DateTime.UtcNow;
+            var spanState = new SpanState(1, 0, 2, Flags.Empty);
+            var started = TimeUtils.UtcNow;
 
             // Make sure we choose something different thant the default values
             var serviceName = TraceManager.Configuration.DefaultServiceName + "_notDefault";
@@ -147,7 +147,7 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
 
             const string name = "myRPCmethod";
 
-            var span = new Span(spanId, started) { Endpoint = new IPEndPoint(IPAddress.Loopback, hostPort), ServiceName = serviceName, Name = name };
+            var span = new Span(spanState, started) { Endpoint = new IPEndPoint(IPAddress.Loopback, hostPort), ServiceName = serviceName, Name = name };
             AddClientSendReceiveAnnotations(span);
 
             var thriftSpan = span.ToThrift();
@@ -183,8 +183,8 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
         [TestCase(123456L)]
         public void RootSpanPropertyIsCorrect(long? parentSpanId)
         {
-            var spanId = new SpanId(1, parentSpanId, 1, Flags.Empty);
-            var span = new Span(spanId, DateTime.UtcNow);
+            var spanState = new SpanState(1, parentSpanId, 1, Flags.Empty);
+            var span = new Span(spanState, TimeUtils.UtcNow);
 
             Assert.AreEqual(parentSpanId == null, span.IsRoot);
         }
@@ -192,8 +192,8 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
         [Test]
         public void WhiteSpacesAreRemovedFromServiceName()
         {
-            var spanId = new SpanId(1, 0, 2, Flags.Empty);
-            var span = new Span(spanId, DateTime.UtcNow) { ServiceName = "my Criteo Service" };
+            var spanState = new SpanState(1, 0, 2, Flags.Empty);
+            var span = new Span(spanState, TimeUtils.UtcNow) { ServiceName = "my Criteo Service" };
             AddClientSendReceiveAnnotations(span);
 
             var thriftSpan = span.ToThrift();
@@ -203,7 +203,7 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
 
         private static void AddClientSendReceiveAnnotations(Span span)
         {
-            AddClientSendReceiveAnnotations(span, DateTime.UtcNow);
+            AddClientSendReceiveAnnotations(span, TimeUtils.UtcNow);
         }
 
         private static void AddClientSendReceiveAnnotations(Span span, DateTime dateTime)

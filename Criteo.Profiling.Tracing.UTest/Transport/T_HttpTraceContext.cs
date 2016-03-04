@@ -65,11 +65,11 @@ namespace Criteo.Profiling.Tracing.UTest.Transport
             Assert.True(HttpTraceContext.TryParseTrace(encodedTraceId: "0000000000000001", encodedSpanId: "00000000000000FA", encodedParentSpanId: encodedParentSpanId, sampledStr: null, flagsStr: null, trace: out trace));
 
             Assert.AreEqual(1, trace.CorrelationId);
-            Assert.AreEqual(250, trace.CurrentId.Id);
-            Assert.AreEqual(Flags.Empty, trace.CurrentId.Flags);
+            Assert.AreEqual(250, trace.CurrentSpan.SpanId);
+            Assert.AreEqual(Flags.Empty, trace.CurrentSpan.Flags);
 
             var expectedParentSpanId = (encodedParentSpanId == null) ? (long?)null : 0L;
-            Assert.AreEqual(expectedParentSpanId, trace.CurrentId.ParentSpanId);
+            Assert.AreEqual(expectedParentSpanId, trace.CurrentSpan.ParentSpanId);
         }
 
         #endregion
@@ -81,8 +81,8 @@ namespace Criteo.Profiling.Tracing.UTest.Transport
         [TestCase("0000000000000001", null, null, "00000000000000FA", true, "6", "1", 4)]
         public void HeadersAreCorrectlySet(string expectedTraceId, long? parentSpanId, string expectedParentSpanId, string expectedSpanId, bool setSampled, string expectedFlags, string expectedSampled, int expectedCount)
         {
-            var spanId = new SpanId(1, parentSpanId, 250, setSampled ? Flags.Empty.SetSampled() : Flags.Empty);
-            var trace = Trace.CreateFromId(spanId);
+            var spanState = new SpanState(1, parentSpanId, 250, setSampled ? Flags.Empty.SetSampled() : Flags.Empty);
+            var trace = Trace.CreateFromId(spanState);
 
             var headersNvc = new NameValueCollection();
             HttpTraceContext.Set(headersNvc, trace);
@@ -166,8 +166,8 @@ namespace Criteo.Profiling.Tracing.UTest.Transport
 
         private static void CheckSetHeadersThenGetTrace_Dict(long? parentSpanId)
         {
-            var spanId = new SpanId(1, parentSpanId, 250, Flags.Empty);
-            var originalTrace = Trace.CreateFromId(spanId);
+            var spanState = new SpanState(1, parentSpanId, 250, Flags.Empty);
+            var originalTrace = Trace.CreateFromId(spanState);
 
             var headers = new Dictionary<string, string>();
             HttpTraceContext.Set(headers, originalTrace);
@@ -180,8 +180,8 @@ namespace Criteo.Profiling.Tracing.UTest.Transport
 
         private static void CheckSetHeadersThenGetTrace_NVC(long? parentSpanId)
         {
-            var spanId = new SpanId(1, parentSpanId, 250, Flags.Empty);
-            var originalTrace = Trace.CreateFromId(spanId);
+            var spanState = new SpanState(1, parentSpanId, 250, Flags.Empty);
+            var originalTrace = Trace.CreateFromId(spanState);
 
             var headers = new NameValueCollection();
             HttpTraceContext.Set(headers, originalTrace);
@@ -243,17 +243,17 @@ namespace Criteo.Profiling.Tracing.UTest.Transport
         public void SampledHeaderFollowFlagsValueForCompatibility()
         {
             var headers = new Dictionary<string, string>();
-            var spanNoFlags = Trace.CreateFromId(new SpanId(1, 2, 250, Flags.Empty));
+            var spanNoFlags = Trace.CreateFromId(new SpanState(1, 2, 250, Flags.Empty));
             HttpTraceContext.Set(headers, spanNoFlags);
             Assert.False(headers.ContainsKey(HttpTraceContext.Sampled)); // no flags then no sampled header
 
             headers = new Dictionary<string, string>();
-            var spanFlagNotSampled = Trace.CreateFromId(new SpanId(1, 2, 250, Flags.Empty.SetNotSampled()));
+            var spanFlagNotSampled = Trace.CreateFromId(new SpanState(1, 2, 250, Flags.Empty.SetNotSampled()));
             HttpTraceContext.Set(headers, spanFlagNotSampled);
             Assert.AreEqual("0", headers[HttpTraceContext.Sampled]); // header sampled to false since flags set to not sampled
 
             headers = new Dictionary<string, string>();
-            var spanFlagSampled = Trace.CreateFromId(new SpanId(1, 2, 250, Flags.Empty.SetSampled()));
+            var spanFlagSampled = Trace.CreateFromId(new SpanState(1, 2, 250, Flags.Empty.SetSampled()));
             HttpTraceContext.Set(headers, spanFlagSampled);
             Assert.AreEqual("1", headers[HttpTraceContext.Sampled]); // header sampled to true since flags set to sampled
         }
@@ -293,7 +293,7 @@ namespace Criteo.Profiling.Tracing.UTest.Transport
 
             Assert.True(HttpTraceContext.TryGet(headers, out trace));
 
-            var flags = trace.CurrentId.Flags;
+            var flags = trace.CurrentSpan.Flags;
             Assert.AreEqual(isSampledExpected, flags.IsSampled());
         }
 

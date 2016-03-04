@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.Threading;
 using Criteo.Profiling.Tracing.Dispatcher;
+using Criteo.Profiling.Tracing.Utils;
 using NUnit.Framework;
 
 namespace Criteo.Profiling.Tracing.UTest.Dispatchers
@@ -15,7 +16,7 @@ namespace Criteo.Profiling.Tracing.UTest.Dispatchers
         {
             var sync = new AutoResetEvent(false);
 
-            var record = new Record(new SpanId(1, 0, 1, Flags.Empty), DateTime.UtcNow, Annotations.ClientRecv());
+            var record = new Record(new SpanState(1, 0, 1, Flags.Empty), TimeUtils.UtcNow, Annotations.ClientRecv());
 
             var dispatcher = new InOrderAsyncDispatcher(r =>
             {
@@ -34,8 +35,8 @@ namespace Criteo.Profiling.Tracing.UTest.Dispatchers
         {
             var sync = new CountdownEvent(2);
 
-            var firstRecord = new Record(new SpanId(1, 0, 1, Flags.Empty), DateTime.UtcNow, Annotations.ClientRecv());
-            var secondRecord = new Record(new SpanId(1, 0, 1, Flags.Empty), DateTime.UtcNow, Annotations.ClientRecv());
+            var firstRecord = new Record(new SpanState(1, 0, 1, Flags.Empty), TimeUtils.UtcNow, Annotations.ClientRecv());
+            var secondRecord = new Record(new SpanState(1, 0, 1, Flags.Empty), TimeUtils.UtcNow, Annotations.ClientRecv());
 
 
             var queue = new ConcurrentQueue<Record>();

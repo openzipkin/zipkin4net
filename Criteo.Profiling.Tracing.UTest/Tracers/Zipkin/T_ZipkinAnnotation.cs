@@ -12,7 +12,7 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
         [Test]
         public void ThriftConversionIsCorrect()
         {
-            var now = DateTime.UtcNow;
+            var now = TimeUtils.UtcNow;
             const string value = "anything";
             var ann = new ZipkinAnnotation(now, value);
 

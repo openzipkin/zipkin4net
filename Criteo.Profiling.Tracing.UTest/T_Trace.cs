@@ -8,7 +8,7 @@ namespace Criteo.Profiling.Tracing.UTest
     class T_Trace
     {
 
-        private readonly SpanId _spanId = new SpanId(1, null, 2, Flags.Empty);
+        private readonly SpanState _spanState = new SpanState(1, null, 2, Flags.Empty);
 
         [SetUp]
         public void SetUp()
@@ -21,7 +21,7 @@ namespace Criteo.Profiling.Tracing.UTest
         [Test]
         public void TracerRecordShouldBeCalledIfTracingIsStarted()
         {
-            var trace = Trace.CreateFromId(_spanId);
+            var trace = Trace.CreateFromId(_spanState);
 
             var mockTracer = new Mock<ITracer>();
             TraceManager.RegisterTracer(mockTracer.Object);
@@ -38,7 +38,7 @@ namespace Criteo.Profiling.Tracing.UTest
         [Test]
         public void RecordsShouldntBeSentToTracersIfTracingIsStopped()
         {
-            var trace = Trace.CreateFromId(_spanId);
+            var trace = Trace.CreateFromId(_spanState);
 
             var mockTracer = new Mock<ITracer>();
             TraceManager.RegisterTracer(mockTracer.Object);
@@ -53,27 +53,27 @@ namespace Criteo.Profiling.Tracing.UTest
         [Test]
         public void ChildTraceIsCorrectlyCreated()
         {
-            var parent = Trace.CreateFromId(_spanId);
+            var parent = Trace.CreateFromId(_spanState);
             var child = parent.Child();
 
             // Should share the same global id
-            Assert.AreEqual(parent.CurrentId.TraceId, child.CurrentId.TraceId);
+            Assert.AreEqual(parent.CurrentSpan.TraceId, child.CurrentSpan.TraceId);
             Assert.AreEqual(parent.CorrelationId, child.CorrelationId);
 
             // Parent id of the child should be the parent span id
-            Assert.AreEqual(parent.CurrentId.Id, child.CurrentId.ParentSpanId);
+            Assert.AreEqual(parent.CurrentSpan.SpanId, child.CurrentSpan.ParentSpanId);
 
             // Flags should be copied
-            Assert.AreEqual(parent.CurrentId.Flags, child.CurrentId.Flags);
+            Assert.AreEqual(parent.CurrentSpan.Flags, child.CurrentSpan.Flags);
 
             // Child cannot have the same span id
-            Assert.AreNotEqual(parent.CurrentId.Id, child.CurrentId.Id);
+            Assert.AreNotEqual(parent.CurrentSpan.SpanId, child.CurrentSpan.SpanId);
         }
 
         [Test]
         public void TraceCreatesCorrectRecord()
         {
-            var trace = Trace.CreateFromId(_spanId);
+            var trace = Trace.CreateFromId(_spanState);
 
             var dispatcher = new Mock<IRecordDispatcher>();
             TraceManager.Start(new Configuration(), dispatcher.Object);
@@ -81,20 +81,20 @@ namespace Criteo.Profiling.Tracing.UTest
             var clientRcv = Annotations.ClientRecv();
             trace.Record(clientRcv);
 
-            dispatcher.Verify(d => d.Dispatch(It.Is<Record>(r => r.Annotation == clientRcv && r.SpanId.Equals(trace.CurrentId))), Times.Once());
+            dispatcher.Verify(d => d.Dispatch(It.Is<Record>(r => r.Annotation == clientRcv && r.SpanState.Equals(trace.CurrentSpan))), Times.Once());
         }
 
 
         [Test]
         public void TraceSamplingForced()
         {
-            var trace = Trace.CreateFromId(_spanId);
+            var trace = Trace.CreateFromId(_spanState);
 
-            Assert.False(trace.CurrentId.Flags.IsSamplingKnown());
-            Assert.False(trace.CurrentId.Flags.IsSampled());
+            Assert.False(trace.CurrentSpan.Flags.IsSamplingKnown());
+            Assert.False(trace.CurrentSpan.Flags.IsSampled());
             trace.ForceSampled();
-            Assert.True(trace.CurrentId.Flags.IsSamplingKnown());
-            Assert.True(trace.CurrentId.Flags.IsSampled());
+            Assert.True(trace.CurrentSpan.Flags.IsSamplingKnown());
+            Assert.True(trace.CurrentSpan.Flags.IsSampled());
         }
 
     }

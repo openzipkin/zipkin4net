@@ -14,7 +14,7 @@ namespace Criteo.Profiling.Tracing.Tracers.Zipkin
     /// </summary>
     public class ZipkinTracer : ITracer
     {
-        private readonly ConcurrentDictionary<SpanId, Span> _spanMap = new ConcurrentDictionary<SpanId, Span>();
+        private readonly ConcurrentDictionary<SpanState, Span> _spanMap = new ConcurrentDictionary<SpanState, Span>();
         private readonly IZipkinSender _spanSender;
 
         /// <summary>
@@ -37,13 +37,13 @@ namespace Criteo.Profiling.Tracing.Tracers.Zipkin
 
         public void Record(Record record)
         {
-            var updatedSpan = _spanMap.AddOrUpdate(record.SpanId,
-                id => VisitAnnotation(record, new Span(record.SpanId, record.Timestamp)),
+            var updatedSpan = _spanMap.AddOrUpdate(record.SpanState,
+                id => VisitAnnotation(record, new Span(record.SpanState, record.Timestamp)),
                 (id, span) => VisitAnnotation(record, span));
 
             if (updatedSpan.Complete)
             {
-                RemoveThenLogSpan(record.SpanId);
+                RemoveThenLogSpan(record.SpanState);
             }
         }
 
@@ -56,10 +56,10 @@ namespace Criteo.Profiling.Tracing.Tracers.Zipkin
             return span;
         }
 
-        private void RemoveThenLogSpan(SpanId spanId)
+        private void RemoveThenLogSpan(SpanState spanState)
         {
             Span spanToLog;
-            if (_spanMap.TryRemove(spanId, out spanToLog))
+            if (_spanMap.TryRemove(spanState, out spanToLog))
             {
                 LogSpan(spanToLog);
             }

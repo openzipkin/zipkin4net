@@ -15,7 +15,7 @@
 
         public void Record(Record record)
         {
-            if (Sample(record.SpanId))
+            if (Sample(record.SpanState))
             {
                 _underlyingTracer.Record(record);
             }
@@ -25,13 +25,13 @@
         /// Determines if the trace should be sampled or not.
         /// If the sampling is known it uses the "sampled" value.
         /// </summary>
-        /// <param name="spanId"></param>
+        /// <param name="spanState"></param>
         /// <returns></returns>
-        private bool Sample(SpanId spanId)
+        private bool Sample(SpanState spanState)
         {
-            if (spanId.Flags.IsSamplingKnown())
+            if (spanState.Flags.IsSamplingKnown())
             {
-                return spanId.Flags.IsSampled();
+                return spanState.Flags.IsSampled();
             }
             //Backward compatibility mode. If sample flag is not set,
             //the fact that the trace exists means that it is sampled
