@@ -59,7 +59,7 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
 
             var now = DateTime.UtcNow;
 
-            var firstSpanId = new SpanId(traceId: 1, parentSpanId: 0, id: 4874542152, flags: Flags.Empty());
+            var firstSpanId = new SpanId(traceId: 1, parentSpanId: 0, id: 4874542152, flags: Flags.Empty);
             var record = new Record(firstSpanId, now, Annotations.ServerRecv());
 
             zipkinTracer.Record(record);
@@ -71,7 +71,7 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
 
             mockedSender.Verify(sender => sender.Send(It.IsAny<byte[]>()), Times.Never());
 
-            var newerSpanId = new SpanId(traceId: 2, parentSpanId: 0, id: 9988415021, flags: Flags.Empty());
+            var newerSpanId = new SpanId(traceId: 2, parentSpanId: 0, id: 9988415021, flags: Flags.Empty);
             var newerRecord = new Record(newerSpanId, futureTime, Annotations.ServerRecv());
             zipkinTracer.Record(newerRecord); // creates a second span
 

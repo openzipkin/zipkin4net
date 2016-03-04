@@ -14,7 +14,7 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers
         {
             var memoryTracer = new InMemoryTracer();
 
-            var spanId = new SpanId(1, 0, 1, Flags.Empty());
+            var spanId = new SpanId(1, 0, 1, Flags.Empty);
 
             var rpcAnn = Annotations.Rpc("GET RPC");
             var recordRpc = new Record(spanId, DateTime.UtcNow, rpcAnn);

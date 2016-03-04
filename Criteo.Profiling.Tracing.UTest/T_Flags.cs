@@ -9,7 +9,7 @@ namespace Criteo.Profiling.Tracing.UTest
         [Test]
         public void EmptyFlagHasNoDebugNorSampling()
         {
-            var flags = Flags.Empty();
+            var flags = Flags.Empty;
 
             Assert.False(flags.IsDebug());
             Assert.False(flags.IsSamplingKnown());
@@ -19,7 +19,7 @@ namespace Criteo.Profiling.Tracing.UTest
         [Test]
         public void DebugFlagCanBeSet()
         {
-            var flagsWithDebug = Flags.Empty().SetDebug();
+            var flagsWithDebug = Flags.Empty.SetDebug();
 
             Assert.True(flagsWithDebug.IsDebug());
             Assert.AreEqual(1, flagsWithDebug.ToLong());
@@ -28,7 +28,7 @@ namespace Criteo.Profiling.Tracing.UTest
         [Test]
         public void SetSampledLeadsToSamplingKnownAndSampled()
         {
-            var flagsWithSampled = Flags.Empty().SetSampled();
+            var flagsWithSampled = Flags.Empty.SetSampled();
 
             Assert.True(flagsWithSampled.IsSamplingKnown());
             Assert.True(flagsWithSampled.IsSampled());
@@ -39,7 +39,7 @@ namespace Criteo.Profiling.Tracing.UTest
         [Test]
         public void SetNotSampledLeadsToSamplingKnownAndNotSampled()
         {
-            var flagsWithNotSampled = Flags.Empty().SetNotSampled();
+            var flagsWithNotSampled = Flags.Empty.SetNotSampled();
 
             Assert.True(flagsWithNotSampled.IsSamplingKnown());
             Assert.False(flagsWithNotSampled.IsSampled());
@@ -50,7 +50,7 @@ namespace Criteo.Profiling.Tracing.UTest
         [Test]
         public void FlagsRecreatedEqualsToOriginal()
         {
-            var originalFlags = Flags.Empty().SetDebug().SetSampled();
+            var originalFlags = Flags.Empty.SetDebug().SetSampled();
 
             var flagsAsLong = originalFlags.ToLong();
 

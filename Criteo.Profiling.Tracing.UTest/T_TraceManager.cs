@@ -6,7 +6,7 @@ using NUnit.Framework;
 namespace Criteo.Profiling.Tracing.UTest
 {
     [TestFixture]
-    class T_Tracer
+    class T_TraceManager
     {
         private Mock<ILogger> _mockLogger;
         private Mock<ITracer> _mockTracer;
@@ -17,12 +17,19 @@ namespace Criteo.Profiling.Tracing.UTest
             TraceManager.ClearTracers();
 
             _mockLogger = new Mock<ILogger>();
-
-            TraceManager.Configuration = new Configuration { Logger = _mockLogger.Object };
-
             _mockTracer = new Mock<ITracer>();
             TraceManager.RegisterTracer(_mockTracer.Object);
+
+            TraceManager.Start(new Configuration {Logger = _mockLogger.Object});
         }
+
+        [TearDown]
+        public void TearDown()
+        {
+            TraceManager.Stop();
+            TraceManager.ClearTracers();
+        }
+
 
         [Test]
         public void TracersAreCorrectlyRegistered()
@@ -59,12 +66,18 @@ namespace Criteo.Profiling.Tracing.UTest
 
             _mockTracer.Setup(tracer1 => tracer1.Record(It.IsAny<Record>())).Throws(new Exception(errorMsg));
 
-            var record = new Record(new SpanId(0, null, 1, Flags.Empty()), DateTime.UtcNow, Annotations.ClientRecv());
+            var record = new Record(new SpanId(0, null, 1, Flags.Empty), DateTime.UtcNow, Annotations.ClientRecv());
 
             Assert.DoesNotThrow(() => TraceManager.Push(record));
 
             _mockLogger.Verify(logger1 => logger1.LogWarning(It.Is<string>(s => s.Contains(errorMsg))), Times.Once());
         }
 
+        [Test]
+        public void CannotStartMultipleTimes()
+        {
+            Assert.True(TraceManager.Started, "Test setup failed?");
+            Assert.False(TraceManager.Start(new Configuration()));
+        }
     }
 }

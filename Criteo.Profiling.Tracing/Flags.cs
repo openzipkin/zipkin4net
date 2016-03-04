@@ -1,4 +1,6 @@
-﻿namespace Criteo.Profiling.Tracing
+﻿using System.Diagnostics.Contracts;
+
+namespace Criteo.Profiling.Tracing
 {
 
     /// <summary>
@@ -13,14 +15,11 @@
 
         private readonly long _value;
 
+        public static readonly Flags Empty = new Flags(0L);
+
         private Flags(long flags)
         {
             _value = flags;
-        }
-
-        public static Flags Empty()
-        {
-            return new Flags(0L);
         }
 
         public static Flags FromLong(long value)
@@ -33,6 +32,7 @@
             return (_value & mask) == mask;
         }
 
+        [Pure]
         public Flags SetFlag(long mask)
         {
             return new Flags(_value | mask);
@@ -43,16 +43,19 @@
             return IsFlagSet(DebugMask);
         }
 
+        [Pure]
         public Flags SetDebug()
         {
             return SetFlag(DebugMask);
         }
 
+        [Pure]
         public Flags SetSampled()
         {
             return SetFlag(SamplingSetMask).SetFlag(SampledMask);
         }
 
+        [Pure]
         public Flags SetNotSampled()
         {
             return SetFlag(SamplingSetMask);

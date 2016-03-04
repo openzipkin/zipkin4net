@@ -19,7 +19,7 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
         [Description("Span should only be marked as complete when either ClientRecv or ServerSend are present.")]
         public void SpansAreLabeledAsCompleteWhenCrOrSs()
         {
-            var spanId = new SpanId(1, 0, 2, Flags.Empty());
+            var spanId = new SpanId(1, 0, 2, Flags.Empty);
             var started = DateTime.UtcNow;
 
             var spanClientRecv = new Span(spanId, started);
@@ -52,7 +52,7 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
             const string serviceName = "myCriteoService";
             const string methodName = "GET";
 
-            var spanId = new SpanId(1, parentSpanId, 2, Flags.Empty());
+            var spanId = new SpanId(1, parentSpanId, 2, Flags.Empty);
             var span = new Span(spanId, DateTime.UtcNow) { Endpoint = new IPEndPoint(hostIp, hostPort), ServiceName = serviceName, Name = methodName };
 
             var zipkinAnnDateTime = DateTime.UtcNow;
@@ -112,7 +112,7 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
         [Description("Span should never be sent without required fields such as Name, ServiceName, Ipv4 or Port")]
         public void DefaultsValuesAreUsedIfNothingSpecified()
         {
-            var spanId = new SpanId(1, 0, 2, Flags.Empty());
+            var spanId = new SpanId(1, 0, 2, Flags.Empty);
             var span = new Span(spanId, DateTime.UtcNow);
             AddClientSendReceiveAnnotations(span);
 
@@ -138,7 +138,7 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
         [Test]
         public void DefaultsValuesAreNotUsedIfValuesSpecified()
         {
-            var spanId = new SpanId(1, 0, 2, Flags.Empty());
+            var spanId = new SpanId(1, 0, 2, Flags.Empty);
             var started = DateTime.UtcNow;
 
             // Make sure we choose something different thant the default values
@@ -183,7 +183,7 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
         [TestCase(123456L)]
         public void RootSpanPropertyIsCorrect(long? parentSpanId)
         {
-            var spanId = new SpanId(1, parentSpanId, 1, Flags.Empty());
+            var spanId = new SpanId(1, parentSpanId, 1, Flags.Empty);
             var span = new Span(spanId, DateTime.UtcNow);
 
             Assert.AreEqual(parentSpanId == null, span.IsRoot);
@@ -192,7 +192,7 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
         [Test]
         public void WhiteSpacesAreRemovedFromServiceName()
         {
-            var spanId = new SpanId(1, 0, 2, Flags.Empty());
+            var spanId = new SpanId(1, 0, 2, Flags.Empty);
             var span = new Span(spanId, DateTime.UtcNow) { ServiceName = "my Criteo Service" };
             AddClientSendReceiveAnnotations(span);
 
