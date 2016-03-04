@@ -14,7 +14,7 @@ namespace Criteo.Profiling.Tracing.Tracers.Zipkin
     /// </summary>
     internal class Span
     {
-        public SpanId SpanId { get; private set; }
+        public SpanState SpanState { get; private set; }
 
         public ICollection<ZipkinAnnotation> Annotations { get; private set; }
 
@@ -45,7 +45,7 @@ namespace Criteo.Profiling.Tracing.Tracers.Zipkin
         /// </summary>
         public bool IsRoot
         {
-            get { return !SpanId.ParentSpanId.HasValue; }
+            get { return !SpanState.ParentSpanId.HasValue; }
         }
 
         /// <summary>
@@ -55,12 +55,12 @@ namespace Criteo.Profiling.Tracing.Tracers.Zipkin
 
         internal const string DefaultRpcMethod = "UnknownRpc";
 
-        public Span(SpanId spanId, DateTime started)
+        public Span(SpanState spanState, DateTime started)
         {
             Annotations = new List<ZipkinAnnotation>();
             BinaryAnnotations = new List<BinaryAnnotation>();
             Complete = false;
-            SpanId = spanId;
+            SpanState = spanState;
             Started = started;
         }
 
@@ -88,15 +88,15 @@ namespace Criteo.Profiling.Tracing.Tracers.Zipkin
         {
             var thriftSpan = new Thrift.Span()
             {
-                Id = SpanId.Id,
-                Trace_id = SpanId.TraceId,
+                Id = SpanState.SpanId,
+                Trace_id = SpanState.TraceId,
                 Name = Name ?? DefaultRpcMethod,
                 Debug = false
             };
 
             if (!IsRoot)
             {
-                thriftSpan.Parent_id = SpanId.ParentSpanId;
+                thriftSpan.Parent_id = SpanState.ParentSpanId;
             }
 
             // Use default value if no information were recorded
@@ -155,7 +155,7 @@ namespace Criteo.Profiling.Tracing.Tracers.Zipkin
 
         public override string ToString()
         {
-            return String.Format("Span: {0} name={1} Annotations={2} BinAnnotations={3}", SpanId, Name, ToString(Annotations, ","), ToString(BinaryAnnotations, ","));
+            return String.Format("Span: {0} name={1} Annotations={2} BinAnnotations={3}", SpanState, Name, ToString(Annotations, ","), ToString(BinaryAnnotations, ","));
         }
 
         private static string ToString<T>(IEnumerable<T> l, string separator)

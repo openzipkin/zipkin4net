@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using Criteo.Profiling.Tracing.Tracers;
+using Criteo.Profiling.Tracing.Utils;
 using NUnit.Framework;
 
 namespace Criteo.Profiling.Tracing.UTest.Tracers
@@ -14,19 +15,19 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers
         {
             var memoryTracer = new InMemoryTracer();
 
-            var spanId = new SpanId(1, 0, 1, Flags.Empty);
+            var spanState = new SpanState(1, 0, 1, Flags.Empty);
 
             var rpcAnn = Annotations.Rpc("GET RPC");
-            var recordRpc = new Record(spanId, DateTime.UtcNow, rpcAnn);
+            var recordRpc = new Record(spanState, TimeUtils.UtcNow, rpcAnn);
 
             var servAnn = Annotations.ServiceName("MyCriteoService");
-            var recordServName = new Record(spanId, DateTime.UtcNow, servAnn);
+            var recordServName = new Record(spanState, TimeUtils.UtcNow, servAnn);
 
             var servRecv = Annotations.ServerRecv();
-            var recordServR = new Record(spanId, DateTime.UtcNow, servRecv);
+            var recordServR = new Record(spanState, TimeUtils.UtcNow, servRecv);
 
             var servSend = Annotations.ServerSend();
-            var recordServS = new Record(spanId, DateTime.UtcNow, servSend);
+            var recordServS = new Record(spanState, TimeUtils.UtcNow, servSend);
 
             memoryTracer.Record(recordRpc);
             memoryTracer.Record(recordServName);

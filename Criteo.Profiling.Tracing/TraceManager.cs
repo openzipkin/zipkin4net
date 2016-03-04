@@ -91,8 +91,7 @@ namespace Criteo.Profiling.Tracing
         /// <param name="tracer"></param>
         public static void RegisterTracer(ITracer tracer)
         {
-            var tracers = new List<ITracer>(_tracers);
-            tracers.Add(tracer);
+            var tracers = new List<ITracer>(_tracers) {tracer};
 
             _tracers = tracers;
         }

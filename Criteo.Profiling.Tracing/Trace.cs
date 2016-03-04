@@ -10,7 +10,7 @@ namespace Criteo.Profiling.Tracing
     /// </summary>
     public sealed class Trace : IEquatable<Trace>
     {
-        internal SpanId CurrentId { get; private set; }
+        public SpanState CurrentSpan { get; private set; }
 
         /// <summary>
         /// Starts a new trace with a random id, no parent and empty flags.
@@ -23,36 +23,37 @@ namespace Criteo.Profiling.Tracing
         }
 
         /// <summary>
-        /// Creates a trace from an existing span id.
+        /// Creates a trace from an existing span state.
         /// </summary>
-        /// <param name="spanId"></param>
+        /// <param name="spanState"></param>
         /// <returns></returns>
-        public static Trace CreateFromId(SpanId spanId)
+        public static Trace CreateFromId(SpanState spanState)
         {
-            return new Trace(spanId);
+            return new Trace(spanState);
         }
 
-        private Trace(SpanId spanId)
+        private Trace(SpanState spanState)
         {
-            CurrentId = new SpanId(spanId.TraceId, spanId.ParentSpanId, spanId.Id, spanId.Flags);
+            CurrentSpan = new SpanState(spanState.TraceId, spanState.ParentSpanId, spanState.SpanId, spanState.Flags);
         }
 
         private Trace(long traceId)
         {
-            CurrentId = CreateRootSpanId(traceId);
+            CurrentSpan = CreateRootSpanId(traceId);
         }
 
-        private static SpanId CreateRootSpanId(long traceId)
+        private static SpanState CreateRootSpanId(long traceId)
         {
-            return new SpanId(traceId: traceId, parentSpanId: null, id: RandomUtils.NextLong(), flags: Flags.Empty);
+            return new SpanState(traceId: traceId, parentSpanId: null, spanId: RandomUtils.NextLong(), flags: Flags.Empty);
         }
 
         /// <summary>
         /// Returns the trace id. It represents the correlation id
         /// of a request through the platform.
         /// </summary>
-        public long CorrelationId {
-            get { return CurrentId.TraceId; }
+        public long CorrelationId
+        {
+            get { return CurrentSpan.TraceId; }
         }
 
         /// <summary>
@@ -68,17 +69,17 @@ namespace Criteo.Profiling.Tracing
 
         public void ForceSampled()
         {
-            CurrentId.ForceSampled();
+            CurrentSpan.SetSampled();
         }
 
-        private SpanId CreateChildSpanId()
+        private SpanState CreateChildSpanId()
         {
-            return new SpanId(traceId: CurrentId.TraceId, parentSpanId: CurrentId.Id, id: RandomUtils.NextLong(), flags: CurrentId.Flags);
+            return new SpanState(traceId: CurrentSpan.TraceId, parentSpanId: CurrentSpan.SpanId, spanId: RandomUtils.NextLong(), flags: CurrentSpan.Flags);
         }
 
         internal void RecordAnnotation(IAnnotation annotation)
         {
-            var record = new Record(CurrentId, TimeUtils.UtcNow, annotation);
+            var record = new Record(CurrentSpan, TimeUtils.UtcNow, annotation);
             TraceManager.Dispatcher.Dispatch(record);
         }
 
@@ -86,7 +87,7 @@ namespace Criteo.Profiling.Tracing
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
-            return Equals(CurrentId, other.CurrentId);
+            return Equals(CurrentSpan, other.CurrentSpan);
         }
 
         public override bool Equals(object obj)
@@ -99,12 +100,12 @@ namespace Criteo.Profiling.Tracing
 
         public override int GetHashCode()
         {
-            return (CurrentId != null ? CurrentId.GetHashCode() : 0);
+            return (CurrentSpan != null ? CurrentSpan.GetHashCode() : 0);
         }
 
         public override string ToString()
         {
-            return String.Format("Trace [{0}]", CurrentId);
+            return String.Format("Trace [{0}]", CurrentSpan);
         }
     }
 

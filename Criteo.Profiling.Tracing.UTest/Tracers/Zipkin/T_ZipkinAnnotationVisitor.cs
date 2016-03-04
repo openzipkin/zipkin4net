@@ -4,6 +4,7 @@ using System.Net;
 using Criteo.Profiling.Tracing.Annotation;
 using Criteo.Profiling.Tracing.Tracers.Zipkin;
 using Criteo.Profiling.Tracing.Tracers.Zipkin.Thrift;
+using Criteo.Profiling.Tracing.Utils;
 using NUnit.Framework;
 using Span = Criteo.Profiling.Tracing.Tracers.Zipkin.Span;
 
@@ -16,8 +17,8 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
         [Test]
         public void RpcNameAnnotationChangesSpanName()
         {
-            var spanId = new SpanId(1, 0, 2, Flags.Empty);
-            var span = new Span(spanId, started: DateTime.UtcNow);
+            var spanState = new SpanState(1, 0, 2, Flags.Empty);
+            var span = new Span(spanState, started: TimeUtils.UtcNow);
 
             CreateAndVisitRecord(span, Annotations.Rpc("myRPCmethod"));
 
@@ -27,8 +28,8 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
         [Test]
         public void ServNameAnnotationChangesSpanServName()
         {
-            var spanId = new SpanId(1, 0, 2, Flags.Empty);
-            var span = new Span(spanId, started: DateTime.UtcNow);
+            var spanState = new SpanState(1, 0, 2, Flags.Empty);
+            var span = new Span(spanState, started: TimeUtils.UtcNow);
 
             CreateAndVisitRecord(span, Annotations.ServiceName("myService"));
 
@@ -38,8 +39,8 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
         [Test]
         public void LocalAddrAnnotationChangesSpanLocalAddr()
         {
-            var spanId = new SpanId(1, 0, 2, Flags.Empty);
-            var span = new Span(spanId, started: DateTime.UtcNow);
+            var spanState = new SpanState(1, 0, 2, Flags.Empty);
+            var span = new Span(spanState, started: TimeUtils.UtcNow);
 
             var ipEndpoint = new IPEndPoint(IPAddress.Loopback, 9987);
             CreateAndVisitRecord(span, Annotations.LocalAddr(ipEndpoint));
@@ -51,8 +52,8 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
         [Description("RPC, ServiceName and LocalAddr annotations override any previous recorded value.")]
         public void LastAnnotationValueIsKeptIfMultipleRecord()
         {
-            var spanId = new SpanId(1, 0, 2, Flags.Empty);
-            var span = new Span(spanId, started: DateTime.UtcNow);
+            var spanState = new SpanState(1, 0, 2, Flags.Empty);
+            var span = new Span(spanState, started: TimeUtils.UtcNow);
 
             CreateAndVisitRecord(span, Annotations.ServiceName("myService"));
             CreateAndVisitRecord(span, Annotations.ServiceName("someOtherName"));
@@ -62,7 +63,7 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
 
         private static void CreateAndVisitRecord(Span span, IAnnotation annotation)
         {
-            var record = new Record(span.SpanId, DateTime.UtcNow, annotation);
+            var record = new Record(span.SpanState, TimeUtils.UtcNow, annotation);
             var visitor = new ZipkinAnnotationVisitor(record, span);
 
             record.Annotation.Accept(visitor);
@@ -77,10 +78,10 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
         [TestCase(9.3d, new byte[] { 0x40, 0x22, 0x99, 0x99, 0x99, 0x99, 0x99, 0x9A, }, AnnotationType.DOUBLE)]
         public void TagAnnotationCorrectlyAdded(object value, byte[] expectedBytes, AnnotationType expectedType)
         {
-            var spanId = new SpanId(1, 0, 2, Flags.Empty);
-            var span = new Span(spanId, started: DateTime.UtcNow);
+            var spanState = new SpanState(1, 0, 2, Flags.Empty);
+            var span = new Span(spanState, started: TimeUtils.UtcNow);
 
-            var record = new Record(spanId, DateTime.UtcNow, new TagAnnotation("magicKey", value));
+            var record = new Record(spanState, TimeUtils.UtcNow, new TagAnnotation("magicKey", value));
             var visitor = new ZipkinAnnotationVisitor(record, span);
 
             Assert.AreEqual(0, span.Annotations.Count);
@@ -101,10 +102,10 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
         [Test]
         public void UnsupportedTagAnnotationShouldThrow()
         {
-            var spanId = new SpanId(1, 0, 2, Flags.Empty);
-            var span = new Span(spanId, started: DateTime.UtcNow);
+            var spanState = new SpanState(1, 0, 2, Flags.Empty);
+            var span = new Span(spanState, started: TimeUtils.UtcNow);
 
-            var record = new Record(spanId, DateTime.UtcNow, new TagAnnotation("magicKey", 1f));
+            var record = new Record(spanState, TimeUtils.UtcNow, new TagAnnotation("magicKey", 1f));
             var visitor = new ZipkinAnnotationVisitor(record, span);
 
             Assert.Throws<ArgumentException>(() => record.Annotation.Accept(visitor));
@@ -122,10 +123,10 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
 
         private static void AnnotationCorrectlyAdded(IAnnotation ann, String expectedValue)
         {
-            var spanId = new SpanId(1, 0, 2, Flags.Empty);
-            var span = new Span(spanId, started: DateTime.UtcNow);
+            var spanState = new SpanState(1, 0, 2, Flags.Empty);
+            var span = new Span(spanState, started: TimeUtils.UtcNow);
 
-            var record = new Record(spanId, DateTime.UtcNow, ann);
+            var record = new Record(spanState, TimeUtils.UtcNow, ann);
             var visitor = new ZipkinAnnotationVisitor(record, span);
 
             Assert.AreEqual(0, span.Annotations.Count);

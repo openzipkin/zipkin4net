@@ -4,37 +4,37 @@ using System.Globalization;
 namespace Criteo.Profiling.Tracing
 {
 
-    public sealed class SpanId : IEquatable<SpanId>
+    public sealed class SpanState : IEquatable<SpanState>
     {
         public long TraceId { get; private set; }
 
         public long? ParentSpanId { get; private set; }
 
-        public long Id { get; private set; }
+        public long SpanId { get; private set; }
 
         /// <summary>
         /// Bitfield which allows for several options (e.g. debug mode, sampling)
         /// </summary>
         public Flags Flags { get; private set; }
 
-        public SpanId(long traceId, long? parentSpanId, long id, Flags flags)
+        public SpanState(long traceId, long? parentSpanId, long spanId, Flags flags)
         {
             this.TraceId = traceId;
             this.ParentSpanId = parentSpanId;
-            this.Id = id;
+            this.SpanId = spanId;
             this.Flags = flags;
         }
 
-        public void ForceSampled()
+        internal void SetSampled()
         {
             this.Flags = this.Flags.SetSampled();
         }
 
-        public bool Equals(SpanId other)
+        public bool Equals(SpanState other)
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
-            return TraceId == other.TraceId && ParentSpanId == other.ParentSpanId && Id == other.Id;
+            return TraceId == other.TraceId && ParentSpanId == other.ParentSpanId && SpanId == other.SpanId;
         }
 
         public override bool Equals(object obj)
@@ -42,7 +42,7 @@ namespace Criteo.Profiling.Tracing
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
             if (obj.GetType() != this.GetType()) return false;
-            return Equals((SpanId)obj);
+            return Equals((SpanState)obj);
         }
 
         public override int GetHashCode()
@@ -50,14 +50,14 @@ namespace Criteo.Profiling.Tracing
             unchecked
             {
                 int hashCode = TraceId.GetHashCode();
-                hashCode = (hashCode * 397) ^ Id.GetHashCode();
+                hashCode = (hashCode * 397) ^ SpanId.GetHashCode();
                 return hashCode;
             }
         }
 
         public override string ToString()
         {
-            return String.Format("{0}.{1}<:{2}", TraceId, Id, (ParentSpanId.HasValue) ? ParentSpanId.Value.ToString(CultureInfo.InvariantCulture) : "_");
+            return String.Format("{0}.{1}<:{2}", TraceId, SpanId, (ParentSpanId.HasValue) ? ParentSpanId.Value.ToString(CultureInfo.InvariantCulture) : "_");
         }
 
     }

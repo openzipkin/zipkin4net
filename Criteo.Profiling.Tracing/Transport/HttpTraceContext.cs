@@ -64,8 +64,8 @@ namespace Criteo.Profiling.Tracing.Transport
                 }
 
 
-                var id = new SpanId(traceId, parentSpanId, spanId, flags);
-                trace = Trace.CreateFromId(id);
+                var state = new SpanState(traceId, parentSpanId, spanId, flags);
+                trace = Trace.CreateFromId(state);
                 return true;
             }
             catch (Exception ex)
@@ -80,10 +80,10 @@ namespace Criteo.Profiling.Tracing.Transport
         // Duplicate code... Don't know any way to avoid this
         public static void Set(NameValueCollection headers, Trace trace)
         {
-            var traceId = trace.CurrentId;
+            var traceId = trace.CurrentSpan;
 
             headers[TraceId] = EncodeLongToHexString(traceId.TraceId);
-            headers[SpanId] = EncodeLongToHexString(traceId.Id);
+            headers[SpanId] = EncodeLongToHexString(traceId.SpanId);
             if (traceId.ParentSpanId != null)
             {
                 // Cannot be null in theory, the root span must have been created on request receive hence further RPC calls are necessary children
@@ -101,10 +101,10 @@ namespace Criteo.Profiling.Tracing.Transport
         // Duplicate code... Don't know any way to avoid this
         public static void Set(IDictionary<string, string> headers, Trace trace)
         {
-            var traceId = trace.CurrentId;
+            var traceId = trace.CurrentSpan;
 
             headers[TraceId] = EncodeLongToHexString(traceId.TraceId);
-            headers[SpanId] = EncodeLongToHexString(traceId.Id);
+            headers[SpanId] = EncodeLongToHexString(traceId.SpanId);
             if (traceId.ParentSpanId != null)
             {
                 // Cannot be null in theory, the root span must have been created on request receive hence further RPC calls are necessary children
