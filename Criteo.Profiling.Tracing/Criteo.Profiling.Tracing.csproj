@@ -75,6 +75,7 @@
     <Compile Include="ITracer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Record.cs" />
+    <Compile Include="Tracers\Zipkin\Statistics.cs" />
     <Compile Include="Trace.cs" />
     <Compile Include="TraceManager.cs" />
     <Compile Include="Tracers\InMemoryTracer.cs" />
