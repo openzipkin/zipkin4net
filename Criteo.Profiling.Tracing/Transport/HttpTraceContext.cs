@@ -60,7 +60,7 @@ namespace Criteo.Profiling.Tracing.Transport
                 if (sampled != null)
                 {
                     // When "sampled" header exists, it overrides any existing flags
-                    flags = sampled.Value ? Tracing.Flags.Empty().SetSampled() : Tracing.Flags.Empty().SetNotSampled();
+                    flags = sampled.Value ? Tracing.Flags.Empty.SetSampled() : Tracing.Flags.Empty.SetNotSampled();
                 }
 
 
@@ -155,7 +155,7 @@ namespace Criteo.Profiling.Tracing.Transport
                 return Tracing.Flags.FromLong(flagsLong);
             }
 
-            return Tracing.Flags.Empty();
+            return Tracing.Flags.Empty;
         }
 
 

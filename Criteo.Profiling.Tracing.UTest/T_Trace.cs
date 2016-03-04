@@ -1,4 +1,5 @@
-﻿using Moq;
+﻿using Criteo.Profiling.Tracing.Dispatcher;
+using Moq;
 using NUnit.Framework;
 
 namespace Criteo.Profiling.Tracing.UTest
@@ -7,54 +8,52 @@ namespace Criteo.Profiling.Tracing.UTest
     class T_Trace
     {
 
-        private Mock<ITracer> _mockTracer;
+        private readonly SpanId _spanId = new SpanId(1, null, 2, Flags.Empty);
 
         [SetUp]
         public void SetUp()
         {
             TraceManager.ClearTracers();
-            TraceManager.Start(new Configuration());
-            TraceManager.SamplingRate = 1f;
-
-            _mockTracer = new Mock<ITracer>();
-            TraceManager.RegisterTracer(_mockTracer.Object);
-        }
-
-        [TearDown]
-        public void TearDown()
-        {
             TraceManager.Stop();
-            TraceManager.ClearTracers();
+
         }
 
         [Test]
         public void TracerRecordShouldBeCalledIfTracingIsStarted()
         {
-            var trace = Trace.CreateIfSampled();
+            var trace = Trace.CreateFromId(_spanId);
 
+            var mockTracer = new Mock<ITracer>();
+            TraceManager.RegisterTracer(mockTracer.Object);
+
+            TraceManager.Start(new Configuration());
             Assert.IsTrue(TraceManager.Started);
+
             trace.Record(Annotations.ServerSend());
             TraceManager.Stop();
 
-            _mockTracer.Verify(tracer => tracer.Record(It.IsAny<Record>()), Times.Once());
+            mockTracer.Verify(tracer => tracer.Record(It.IsAny<Record>()), Times.Once());
         }
 
         [Test]
         public void RecordsShouldntBeSentToTracersIfTracingIsStopped()
         {
-            var trace = Trace.CreateIfSampled();
+            var trace = Trace.CreateFromId(_spanId);
 
-            TraceManager.Stop();
+            var mockTracer = new Mock<ITracer>();
+            TraceManager.RegisterTracer(mockTracer.Object);
+
             Assert.IsFalse(TraceManager.Started);
+
             trace.Record(Annotations.ServerSend());
 
-            _mockTracer.Verify(tracer => tracer.Record(It.IsAny<Record>()), Times.Never());
+            mockTracer.Verify(tracer => tracer.Record(It.IsAny<Record>()), Times.Never());
         }
 
         [Test]
         public void ChildTraceIsCorrectlyCreated()
         {
-            var parent = Trace.CreateIfSampled();
+            var parent = Trace.CreateFromId(_spanId);
             var child = parent.Child();
 
             // Should share the same global id
@@ -74,27 +73,22 @@ namespace Criteo.Profiling.Tracing.UTest
         [Test]
         public void TraceCreatesCorrectRecord()
         {
-            var trace = Trace.CreateIfSampled();
+            var trace = Trace.CreateFromId(_spanId);
+
+            var dispatcher = new Mock<IRecordDispatcher>();
+            TraceManager.Start(new Configuration(), dispatcher.Object);
 
             var clientRcv = Annotations.ClientRecv();
             trace.Record(clientRcv);
 
-            TraceManager.Stop();
-
-            _mockTracer.Verify(t => t.Record(It.Is<Record>(r => r.Annotation == clientRcv && r.SpanId.Equals(trace.CurrentId))), Times.Once());
+            dispatcher.Verify(d => d.Dispatch(It.Is<Record>(r => r.Annotation == clientRcv && r.SpanId.Equals(trace.CurrentId))), Times.Once());
         }
 
-        [Test]
-        public void CannotStartMultipleTimes()
-        {
-            Assert.True(TraceManager.Started, "Test setup failed?");
-            Assert.False(TraceManager.Start(new Configuration()));
-        }
 
         [Test]
         public void TraceSamplingForced()
         {
-            var trace = Trace.CreateIfSampled();
+            var trace = Trace.CreateFromId(_spanId);
 
             Assert.False(trace.CurrentId.Flags.IsSamplingKnown());
             Assert.False(trace.CurrentId.Flags.IsSampled());
@@ -102,5 +96,6 @@ namespace Criteo.Profiling.Tracing.UTest
             Assert.True(trace.CurrentId.Flags.IsSamplingKnown());
             Assert.True(trace.CurrentId.Flags.IsSampled());
         }
+
     }
 }

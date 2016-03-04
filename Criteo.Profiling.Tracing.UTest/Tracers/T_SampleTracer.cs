@@ -22,7 +22,7 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers
         {
             var sampleTracer = new SamplerTracer(_mockUnderlyingTracer.Object);
 
-            RecordTrace(sampleTracer, Flags.Empty().SetSampled());
+            RecordTrace(sampleTracer, Flags.Empty.SetSampled());
 
             _mockUnderlyingTracer.Verify(tracer => tracer.Record(It.IsAny<Record>()), Times.Once());
         }
@@ -32,7 +32,7 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers
         {
             var sampleTracer = new SamplerTracer(_mockUnderlyingTracer.Object);
 
-            RecordTrace(sampleTracer, Flags.Empty().SetNotSampled());
+            RecordTrace(sampleTracer, Flags.Empty.SetNotSampled());
 
             _mockUnderlyingTracer.Verify(tracer => tracer.Record(It.IsAny<Record>()), Times.Never());
         }
@@ -42,7 +42,7 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers
         {
             var sampleTracer = new SamplerTracer(_mockUnderlyingTracer.Object);
 
-            RecordTrace(sampleTracer, Flags.Empty());
+            RecordTrace(sampleTracer, Flags.Empty);
 
             _mockUnderlyingTracer.Verify(tracer => tracer.Record(It.IsAny<Record>()), Times.Once());
         }
