@@ -29,9 +29,9 @@
         /// <returns></returns>
         private bool Sample(SpanState spanState)
         {
-            if (spanState.Flags.IsSamplingKnown())
+            if (spanState.Flags.HasFlag(SpanFlags.SamplingKnown))
             {
-                return spanState.Flags.IsSampled();
+                return spanState.Flags.HasFlag(SpanFlags.Sampled);
             }
             //Backward compatibility mode. If sample flag is not set,
             //the fact that the trace exists means that it is sampled

@@ -8,7 +8,7 @@ namespace Criteo.Profiling.Tracing.UTest
     class T_Trace
     {
 
-        private readonly SpanState _spanState = new SpanState(1, null, 2, Flags.Empty);
+        private readonly SpanState _spanState = new SpanState(1, null, 2, SpanFlags.None);
 
         [SetUp]
         public void SetUp()
@@ -89,11 +89,9 @@ namespace Criteo.Profiling.Tracing.UTest
         {
             var trace = Trace.CreateFromId(_spanState);
 
-            Assert.False(trace.CurrentSpan.Flags.IsSamplingKnown());
-            Assert.False(trace.CurrentSpan.Flags.IsSampled());
+            Assert.AreEqual(SamplingStatus.NoDecision, trace.CurrentSpan.SamplingStatus);
             trace.ForceSampled();
-            Assert.True(trace.CurrentSpan.Flags.IsSamplingKnown());
-            Assert.True(trace.CurrentSpan.Flags.IsSampled());
+            Assert.AreEqual(SamplingStatus.Sampled, trace.CurrentSpan.SamplingStatus);
         }
 
     }

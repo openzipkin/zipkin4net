@@ -70,7 +70,7 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
             const string serviceName = "myCriteoService";
             const string methodName = "GET";
 
-            var spanState = new SpanState(1, parentSpanId, 2, Flags.Empty);
+            var spanState = new SpanState(1, parentSpanId, 2, SpanFlags.None);
             var span = new Span(spanState, TimeUtils.UtcNow) { Endpoint = new IPEndPoint(hostIp, hostPort), ServiceName = serviceName, Name = methodName };
 
             var zipkinAnnDateTime = TimeUtils.UtcNow;
@@ -130,7 +130,7 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
         [Description("Span should never be sent without required fields such as Name, ServiceName, Ipv4 or Port")]
         public void DefaultsValuesAreUsedIfNothingSpecified()
         {
-            var spanState = new SpanState(1, 0, 2, Flags.Empty);
+            var spanState = new SpanState(1, 0, 2, SpanFlags.None);
             var span = new Span(spanState, TimeUtils.UtcNow);
             AddClientSendReceiveAnnotations(span);
 
@@ -156,7 +156,7 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
         [Test]
         public void DefaultsValuesAreNotUsedIfValuesSpecified()
         {
-            var spanState = new SpanState(1, 0, 2, Flags.Empty);
+            var spanState = new SpanState(1, 0, 2, SpanFlags.None);
             var started = TimeUtils.UtcNow;
 
             // Make sure we choose something different thant the default values
@@ -188,7 +188,7 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
         [TestCase(123456L)]
         public void RootSpanPropertyIsCorrect(long? parentSpanId)
         {
-            var spanState = new SpanState(1, parentSpanId, 1, Flags.Empty);
+            var spanState = new SpanState(1, parentSpanId, 1, SpanFlags.None);
             var span = new Span(spanState, TimeUtils.UtcNow);
 
             Assert.AreEqual(parentSpanId == null, span.IsRoot);
@@ -197,7 +197,7 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
         [Test]
         public void WhiteSpacesAreRemovedFromServiceName()
         {
-            var spanState = new SpanState(1, 0, 2, Flags.Empty);
+            var spanState = new SpanState(1, 0, 2, SpanFlags.None);
             var span = new Span(spanState, TimeUtils.UtcNow) { ServiceName = "my Criteo Service" };
             AddClientSendReceiveAnnotations(span);
 

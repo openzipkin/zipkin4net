@@ -46,7 +46,7 @@ namespace Criteo.Profiling.Tracing
 
         private static SpanState CreateRootSpanId(long traceId)
         {
-            return new SpanState(traceId: traceId, parentSpanId: null, spanId: RandomUtils.NextLong(), flags: Flags.Empty);
+            return new SpanState(traceId: traceId, parentSpanId: null, spanId: RandomUtils.NextLong(), flags: SpanFlags.None);
         }
 
         /// <summary>
@@ -77,6 +77,9 @@ namespace Criteo.Profiling.Tracing
             return new Trace(CreateChildSpanId());
         }
 
+        /// <summary>
+        /// Force this trace to be sent.
+        /// </summary>
         public void ForceSampled()
         {
             CurrentSpan.SetSampled();

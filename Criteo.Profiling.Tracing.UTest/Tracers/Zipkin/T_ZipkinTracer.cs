@@ -11,7 +11,7 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
     [TestFixture]
     class T_ZipkinTracer
     {
-        private readonly SpanState _spanState = new SpanState(1, null, 5, Flags.Empty);
+        private readonly SpanState _spanState = new SpanState(1, null, 5, SpanFlags.None);
 
         private Mock<ISpanSerializer> _spanSerializer;
         private Mock<IZipkinSender> _spanSender;
@@ -64,7 +64,7 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
         {
             var now = TimeUtils.UtcNow;
 
-            var firstSpanState = new SpanState(traceId: 1, parentSpanId: 0, spanId: 4874542152, flags: Flags.Empty);
+            var firstSpanState = new SpanState(traceId: 1, parentSpanId: 0, spanId: 4874542152, flags: SpanFlags.None);
             var record = new Record(firstSpanState, now, Annotations.ServerRecv());
 
             _tracer.Record(record);
@@ -76,7 +76,7 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
 
             _spanSender.Verify(sender => sender.Send(It.IsAny<byte[]>()), Times.Never());
 
-            var newerSpanState = new SpanState(traceId: 2, parentSpanId: 0, spanId: 9988415021, flags: Flags.Empty);
+            var newerSpanState = new SpanState(traceId: 2, parentSpanId: 0, spanId: 9988415021, flags: SpanFlags.None);
             var newerRecord = new Record(newerSpanState, futureTime, Annotations.ServerRecv());
             _tracer.Record(newerRecord); // creates a second span
 

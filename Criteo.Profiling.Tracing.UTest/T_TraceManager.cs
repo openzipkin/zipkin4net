@@ -67,7 +67,7 @@ namespace Criteo.Profiling.Tracing.UTest
 
             _mockTracer.Setup(tracer1 => tracer1.Record(It.IsAny<Record>())).Throws(new Exception(errorMsg));
 
-            var record = new Record(new SpanState(0, null, 1, Flags.Empty), TimeUtils.UtcNow, Annotations.ClientRecv());
+            var record = new Record(new SpanState(0, null, 1, SpanFlags.None), TimeUtils.UtcNow, Annotations.ClientRecv());
 
             Assert.DoesNotThrow(() => TraceManager.Push(record));
 

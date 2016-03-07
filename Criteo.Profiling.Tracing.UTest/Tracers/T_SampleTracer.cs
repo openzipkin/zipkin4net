@@ -1,6 +1,4 @@
-﻿using System;
-using Criteo.Profiling.Tracing.Sampling;
-using Criteo.Profiling.Tracing.Tracers;
+﻿using Criteo.Profiling.Tracing.Tracers;
 using Criteo.Profiling.Tracing.Utils;
 using Moq;
 using NUnit.Framework;
@@ -23,7 +21,7 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers
         {
             var sampleTracer = new SamplerTracer(_mockUnderlyingTracer.Object);
 
-            RecordTrace(sampleTracer, Flags.Empty.SetSampled());
+            RecordTrace(sampleTracer, SpanFlags.SamplingKnown | SpanFlags.Sampled);
 
             _mockUnderlyingTracer.Verify(tracer => tracer.Record(It.IsAny<Record>()), Times.Once());
         }
@@ -33,7 +31,7 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers
         {
             var sampleTracer = new SamplerTracer(_mockUnderlyingTracer.Object);
 
-            RecordTrace(sampleTracer, Flags.Empty.SetNotSampled());
+            RecordTrace(sampleTracer, SpanFlags.SamplingKnown);
 
             _mockUnderlyingTracer.Verify(tracer => tracer.Record(It.IsAny<Record>()), Times.Never());
         }
@@ -43,12 +41,12 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers
         {
             var sampleTracer = new SamplerTracer(_mockUnderlyingTracer.Object);
 
-            RecordTrace(sampleTracer, Flags.Empty);
+            RecordTrace(sampleTracer, SpanFlags.None);
 
             _mockUnderlyingTracer.Verify(tracer => tracer.Record(It.IsAny<Record>()), Times.Once());
         }
 
-        private static void RecordTrace(ITracer tracer, Flags flags)
+        private static void RecordTrace(ITracer tracer, SpanFlags flags)
         {
             var spanState = new SpanState(1, 0, 1, flags);
             var record = new Record(spanState, TimeUtils.UtcNow, Annotations.ClientRecv());
