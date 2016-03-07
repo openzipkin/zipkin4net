@@ -60,7 +60,11 @@ namespace Criteo.Profiling.Tracing.Transport
                 if (sampled != null)
                 {
                     // When "sampled" header exists, it overrides any existing flags
-                    flags = sampled.Value ? Tracing.Flags.Empty.SetSampled() : Tracing.Flags.Empty.SetNotSampled();
+                    flags = SpanFlags.SamplingKnown;
+                    if (sampled.Value)
+                    {
+                        flags = flags | SpanFlags.Sampled;
+                    }
                 }
 
 
@@ -89,12 +93,12 @@ namespace Criteo.Profiling.Tracing.Transport
                 // Cannot be null in theory, the root span must have been created on request receive hence further RPC calls are necessary children
                 headers[ParentSpanId] = EncodeLongToHexString(traceId.ParentSpanId.Value);
             }
-            headers[Flags] = traceId.Flags.ToLong().ToString(CultureInfo.InvariantCulture);
+            headers[Flags] = ((long)traceId.Flags).ToString(CultureInfo.InvariantCulture);
 
             // Add "Sampled" header for compatibility with Finagle
-            if (traceId.Flags.IsSamplingKnown())
+            if (traceId.Flags.HasFlag(SpanFlags.SamplingKnown))
             {
-                headers[Sampled] = traceId.Flags.IsSampled() ? "1" : "0";
+                headers[Sampled] = traceId.Flags.HasFlag(SpanFlags.Sampled) ? "1" : "0";
             }
         }
 
@@ -110,12 +114,12 @@ namespace Criteo.Profiling.Tracing.Transport
                 // Cannot be null in theory, the root span must have been created on request receive hence further RPC calls are necessary children
                 headers[ParentSpanId] = EncodeLongToHexString(traceId.ParentSpanId.Value);
             }
-            headers[Flags] = traceId.Flags.ToLong().ToString(CultureInfo.InvariantCulture);
+            headers[Flags] = ((long)traceId.Flags).ToString(CultureInfo.InvariantCulture);
 
             // Add "Sampled" header for compatibility with Finagle
-            if (traceId.Flags.IsSamplingKnown())
+            if (traceId.Flags.HasFlag(SpanFlags.SamplingKnown))
             {
-                headers[Sampled] = traceId.Flags.IsSampled() ? "1" : "0";
+                headers[Sampled] = traceId.Flags.HasFlag(SpanFlags.Sampled) ? "1" : "0";
             }
         }
 
@@ -146,16 +150,16 @@ namespace Criteo.Profiling.Tracing.Transport
             return null;
         }
 
-        private static Flags ParseFlagsHeader(String header)
+        private static SpanFlags ParseFlagsHeader(String header)
         {
             long flagsLong;
 
             if (!String.IsNullOrEmpty(header) && Int64.TryParse(header, out flagsLong))
             {
-                return Tracing.Flags.FromLong(flagsLong);
+                return (SpanFlags)flagsLong;
             }
 
-            return Tracing.Flags.Empty;
+            return SpanFlags.None;
         }
 
 

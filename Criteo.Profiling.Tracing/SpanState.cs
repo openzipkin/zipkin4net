@@ -12,12 +12,22 @@ namespace Criteo.Profiling.Tracing
 
         public long SpanId { get; private set; }
 
-        /// <summary>
-        /// Bitfield which allows for several options (e.g. debug mode, sampling)
-        /// </summary>
-        public Flags Flags { get; private set; }
+        public SamplingStatus SamplingStatus
+        {
+            get
+            {
+                if (!Flags.HasFlag(SpanFlags.SamplingKnown)) return SamplingStatus.NoDecision;
 
-        public SpanState(long traceId, long? parentSpanId, long spanId, Flags flags)
+                return Flags.HasFlag(SpanFlags.Sampled) ? SamplingStatus.Sampled : SamplingStatus.NotSampled;
+            }
+        }
+
+        /// <summary>
+        /// Allows for several options (e.g. debug mode, sampling)
+        /// </summary>
+        internal SpanFlags Flags { get; private set; }
+
+        public SpanState(long traceId, long? parentSpanId, long spanId, SpanFlags flags)
         {
             this.TraceId = traceId;
             this.ParentSpanId = parentSpanId;
@@ -25,9 +35,12 @@ namespace Criteo.Profiling.Tracing
             this.Flags = flags;
         }
 
+        /// <summary>
+        /// Indicate that this span is relevant and should be sent.
+        /// </summary>
         internal void SetSampled()
         {
-            this.Flags = this.Flags.SetSampled();
+            this.Flags = Flags | SpanFlags.SamplingKnown | SpanFlags.Sampled;
         }
 
         public bool Equals(SpanState other)
@@ -60,5 +73,21 @@ namespace Criteo.Profiling.Tracing
             return String.Format("{0}.{1}<:{2}", TraceId, SpanId, (ParentSpanId.HasValue) ? ParentSpanId.Value.ToString(CultureInfo.InvariantCulture) : "_");
         }
 
+    }
+
+    [Flags]
+    public enum SpanFlags
+    {
+        None = 0,
+        Debug = 1 << 0,
+        SamplingKnown = 1 << 1,
+        Sampled = 1 << 2
+    }
+
+    public enum SamplingStatus
+    {
+        NoDecision = 0,
+        Sampled = 1,
+        NotSampled = 2,
     }
 }

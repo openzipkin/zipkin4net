@@ -14,7 +14,7 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
         [Description("Span should only be marked as complete when either ClientRecv or ServerSend are present.")]
         public void SpansAreLabeledAsCompleteWhenCrOrSs()
         {
-            var spanState = new SpanState(1, 0, 2, Flags.Empty);
+            var spanState = new SpanState(1, 0, 2, SpanFlags.None);
             var started = TimeUtils.UtcNow;
 
             var spanClientRecv = new Span(spanState, started);
