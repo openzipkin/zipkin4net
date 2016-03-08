@@ -18,11 +18,6 @@ namespace Criteo.Profiling.Tracing.Tracers.Zipkin
             this.AnnotationType = annotationType;
         }
 
-        public Thrift.BinaryAnnotation ToThrift()
-        {
-            return new Thrift.BinaryAnnotation { Annotation_type = AnnotationType, Key = Key, Value = Value };
-        }
-
         public override string ToString()
         {
             return String.Format("BinAnn: type={0} key={1}", AnnotationType, Key);

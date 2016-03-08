@@ -15,17 +15,6 @@ namespace Criteo.Profiling.Tracing.Tracers.Zipkin
             Value = value;
         }
 
-        public Thrift.Annotation ToThrift()
-        {
-            var thriftAnn = new Thrift.Annotation()
-            {
-                Timestamp = TimeUtils.ToUnixTimestamp(Timestamp),
-                Value = this.Value
-            };
-
-            return thriftAnn;
-        }
-
         public override string ToString()
         {
             return String.Format("ZipkinAnn: ts={0} val={1}", TimeUtils.ToUnixTimestamp(Timestamp), Value);
