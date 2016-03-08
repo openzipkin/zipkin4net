@@ -105,7 +105,7 @@ namespace Criteo.Profiling.Tracing.Tracers.Zipkin
 
             ServiceName = ServiceName.Replace(" ", "_"); // whitespaces cause issues with the query and ui
 
-            var host = new Endpoint()
+            var host = new Endpoint
             {
                 Ipv4 = IpToInt(Endpoint.Address),
                 Port = (short)Endpoint.Port,
