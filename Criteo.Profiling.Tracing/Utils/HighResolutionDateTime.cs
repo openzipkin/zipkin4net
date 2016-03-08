@@ -28,6 +28,13 @@ namespace Criteo.Profiling.Tracing.Utils
 
         static HighResolutionDateTime()
         {
+            if (!HasSufficientWindowsVersion(Environment.OSVersion.Platform, Environment.OSVersion.Version))
+            {
+                IsAvailable = false;
+                return;
+            }
+
+            // Make sure the API is actually available
             try
             {
                 long filetime;
@@ -36,9 +43,21 @@ namespace Criteo.Profiling.Tracing.Utils
             }
             catch (EntryPointNotFoundException)
             {
-                // Not running Windows 8 or higher.
                 IsAvailable = false;
             }
+        }
+
+        /// <summary>
+        /// Check whether the given OS is Windows 8, Windows Server 2012 or above.
+        /// </summary>
+        /// <param name="platformId">PlatformId on which the application is currently running</param>
+        /// <param name="windowsVersion">Windows version on which the application is currently running</param>
+        /// <returns></returns>
+        private static bool HasSufficientWindowsVersion(PlatformID platformId, Version windowsVersion)
+        {
+            var minimumRequiredVersion = new Version(6, 2, 9200, 0); // Windows 8, Windows Server 2012
+
+            return (platformId == PlatformID.Win32NT) && (windowsVersion >= minimumRequiredVersion);
         }
     }
 }
