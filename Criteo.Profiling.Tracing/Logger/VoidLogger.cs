@@ -1,7 +1,6 @@
 ﻿namespace Criteo.Profiling.Tracing.Logger
 {
-
-    class VoidLogger : ILogger
+    internal class VoidLogger : ILogger
     {
         public void LogInformation(string message)
         {

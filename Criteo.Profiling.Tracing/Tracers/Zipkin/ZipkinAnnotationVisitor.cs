@@ -65,7 +65,7 @@ namespace Criteo.Profiling.Tracing.Tracers.Zipkin
         /// string, bool, short, int, long, byte[], double
         /// </summary>
         /// <param name="tagAnnotation"></param>
-        public void Visit(Annotation.TagAnnotation tagAnnotation)
+        public void Visit(TagAnnotation tagAnnotation)
         {
             if (tagAnnotation.Value is string)
             {
