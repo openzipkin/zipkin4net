@@ -18,6 +18,7 @@ namespace Criteo.Profiling.Tracing.Tracers.Zipkin
 
         private readonly ConcurrentDictionary<SpanState, Span> _spanMap = new ConcurrentDictionary<SpanState, Span>();
         private readonly IZipkinSender _spanSender;
+        private readonly ISpanSerializer _spanSerializer;
 
         /// <summary>
         /// Flush old records when fired.
@@ -30,11 +31,19 @@ namespace Criteo.Profiling.Tracing.Tracers.Zipkin
         /// </summary>
         internal const int TimeToLive = 10;
 
-        public ZipkinTracer(IZipkinSender sender, IStatistics statistics = null)
+        public ZipkinTracer(IZipkinSender sender, IStatistics statistics = null) : this(sender, new ThriftSpanSerializer(), statistics)
+        {
+        }
+
+        internal ZipkinTracer(IZipkinSender sender, ISpanSerializer spanSerializer, IStatistics statistics)
         {
             if (sender == null) throw new ArgumentNullException("sender", "You have to specify a non-null sender for Zipkin tracer.");
             Statistics = statistics ?? new Statistics();
             _spanSender = sender;
+
+            if (sender == null) throw new ArgumentNullException("spanSerializer", "You have to specify a non-null span serializer for Zipkin tracer.");
+            _spanSerializer = spanSerializer;
+
             _flushTimer = new Timer(_ => FlushOldSpans(DateTime.UtcNow), null, TimeSpan.FromSeconds(TimeToLive), TimeSpan.FromSeconds(TimeToLive));
         }
 
@@ -73,8 +82,7 @@ namespace Criteo.Profiling.Tracing.Tracers.Zipkin
         private void LogSpan(Span span)
         {
             var memoryStream = new MemoryStream();
-            span.SerializeToMemory(memoryStream);
-
+            _spanSerializer.SerializeTo(memoryStream, span);
             var serializedSpan = memoryStream.ToArray();
 
             _spanSender.Send(serializedSpan);

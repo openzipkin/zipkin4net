@@ -55,10 +55,9 @@
     <Compile Include="Sampling\T_Sampler.cs" />
     <Compile Include="Tracers\T_InMemoryTracer.cs" />
     <Compile Include="Tracers\T_SampleTracer.cs" />
-    <Compile Include="Tracers\Zipkin\T_BinaryAnnotation.cs" />
     <Compile Include="Tracers\Zipkin\T_BinaryAnnotationValueEncoder.cs" />
     <Compile Include="Tracers\Zipkin\T_Span.cs" />
-    <Compile Include="Tracers\Zipkin\T_ZipkinAnnotation.cs" />
+    <Compile Include="Tracers\Zipkin\T_ThriftSpanSerializer.cs" />
     <Compile Include="Tracers\Zipkin\T_ZipkinAnnotationVisitor.cs" />
     <Compile Include="Transport\T_HttpTraceContext.cs" />
     <Compile Include="Tracers\Zipkin\T_ZipkinTracer.cs" />
