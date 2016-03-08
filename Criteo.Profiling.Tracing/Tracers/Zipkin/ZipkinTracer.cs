@@ -14,6 +14,8 @@ namespace Criteo.Profiling.Tracing.Tracers.Zipkin
     /// </summary>
     public class ZipkinTracer : ITracer
     {
+        public IStatistics Statistics { get; private set; }
+
         private readonly ConcurrentDictionary<SpanState, Span> _spanMap = new ConcurrentDictionary<SpanState, Span>();
         private readonly IZipkinSender _spanSender;
 
@@ -28,15 +30,18 @@ namespace Criteo.Profiling.Tracing.Tracers.Zipkin
         /// </summary>
         internal const int TimeToLive = 10;
 
-        public ZipkinTracer(IZipkinSender sender)
+        public ZipkinTracer(IZipkinSender sender, IStatistics statistics = null)
         {
             if (sender == null) throw new ArgumentNullException("sender", "You have to specify a non-null sender for Zipkin tracer.");
+            Statistics = statistics ?? new Statistics();
             _spanSender = sender;
             _flushTimer = new Timer(_ => FlushOldSpans(DateTime.UtcNow), null, TimeSpan.FromSeconds(TimeToLive), TimeSpan.FromSeconds(TimeToLive));
         }
 
         public void Record(Record record)
         {
+            Statistics.UpdateRecordProcessed();
+
             var updatedSpan = _spanMap.AddOrUpdate(record.SpanState,
                 id => VisitAnnotation(record, new Span(record.SpanState, record.Timestamp)),
                 (id, span) => VisitAnnotation(record, span));
@@ -73,6 +78,8 @@ namespace Criteo.Profiling.Tracing.Tracers.Zipkin
             var serializedSpan = memoryStream.ToArray();
 
             _spanSender.Send(serializedSpan);
+            Statistics.UpdateSpanSent();
+            Statistics.UpdateSpanSentBytes(serializedSpan.Length);
         }
 
         /// <summary>
@@ -89,6 +96,7 @@ namespace Criteo.Profiling.Tracing.Tracers.Zipkin
                 if (!oldSpanEntry.Value.Complete)
                 {
                     oldSpanEntry.Value.AddAnnotation(new ZipkinAnnotation(DateTime.UtcNow, "flush.timeout"));
+                    Statistics.UpdateSpanFlushed();
                 }
                 RemoveThenLogSpan(oldSpanEntry.Key);
             }

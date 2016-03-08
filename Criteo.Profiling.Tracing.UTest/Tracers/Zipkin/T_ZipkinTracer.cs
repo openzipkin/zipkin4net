@@ -11,11 +11,7 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
     class T_ZipkinTracer
     {
 
-        [SetUp]
-        public void Setup()
-        {
-            TraceManager.SamplingRate = 1f;
-        }
+        private readonly SpanState _spanState = new SpanState(1, null, 2, Flags.Empty);
 
         [Test]
         [ExpectedException(typeof(ArgumentNullException))]
@@ -30,12 +26,16 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
             var mockedSender = new Mock<IZipkinSender>();
             var zipkinTracer = new ZipkinTracer(mockedSender.Object);
 
-            var trace = Trace.CreateIfSampled();
+            var trace = Trace.CreateFromId(_spanState);
 
             Record(zipkinTracer, trace, Annotations.ClientSend());
             Record(zipkinTracer, trace, Annotations.ClientRecv());
 
             mockedSender.Verify(sender => sender.Send(It.IsAny<byte[]>()), Times.Once());
+            Assert.AreEqual(2, zipkinTracer.Statistics.RecordProcessed);
+            Assert.AreEqual(1, zipkinTracer.Statistics.SpanSent);
+            Assert.AreEqual(0, zipkinTracer.Statistics.SpanFlushed);
+            Assert.IsTrue(zipkinTracer.Statistics.SpanSentTotalBytes > 0);
         }
 
         [Test]
@@ -44,16 +44,20 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
             var mockedSender = new Mock<IZipkinSender>();
             var zipkinTracer = new ZipkinTracer(mockedSender.Object);
 
-            var trace = Trace.CreateIfSampled();
+            var trace = Trace.CreateFromId(_spanState);
 
             Record(zipkinTracer, trace, Annotations.ServerRecv());
             Record(zipkinTracer, trace, Annotations.ServerSend());
 
             mockedSender.Verify(sender => sender.Send(It.IsAny<byte[]>()), Times.Once());
+            Assert.AreEqual(2, zipkinTracer.Statistics.RecordProcessed);
+            Assert.AreEqual(1, zipkinTracer.Statistics.SpanSent);
+            Assert.AreEqual(0, zipkinTracer.Statistics.SpanFlushed);
+            Assert.IsTrue(zipkinTracer.Statistics.SpanSentTotalBytes > 0);
         }
 
         [Test]
-        public void RecordsShouldBeFlushedAfterTtl()
+        public void SpansShouldBeFlushedAfterTtl()
         {
             var mockedSender = new Mock<IZipkinSender>();
             var zipkinTracer = new ZipkinTracer(mockedSender.Object);
@@ -87,6 +91,54 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
             zipkinTracer.Record(newerComplementaryRecord);
 
             mockedSender.Verify(sender => sender.Send(It.IsAny<byte[]>()), Times.Exactly(2));
+
+            Assert.AreEqual(3, zipkinTracer.Statistics.RecordProcessed);
+            Assert.AreEqual(2, zipkinTracer.Statistics.SpanSent);
+            Assert.AreEqual(1, zipkinTracer.Statistics.SpanFlushed);
+            Assert.IsTrue(zipkinTracer.Statistics.SpanSentTotalBytes > 0);
+        }
+
+        [Test]
+        public void StatisticsAreUpdatedForFlush()
+        {
+            var mockedSender = new Mock<IZipkinSender>();
+            var statistics = new Mock<IStatistics>();
+            var zipkinTracer = new ZipkinTracer(mockedSender.Object, statistics.Object);
+
+            var record = new Record(_spanState, TimeUtils.UtcNow.AddSeconds(-2 * ZipkinTracer.TimeToLive), Annotations.ServerRecv());
+            zipkinTracer.Record(record);
+            zipkinTracer.FlushOldSpans(TimeUtils.UtcNow);
+
+            statistics.Verify(s => s.UpdateSpanFlushed(), Times.Once());
+        }
+
+
+        [Test]
+        public void StatisticsAreUpdatedForSent()
+        {
+            var mockedSender = new Mock<IZipkinSender>();
+            var statistics = new Mock<IStatistics>();
+            var zipkinTracer = new ZipkinTracer(mockedSender.Object, statistics.Object);
+
+            var trace = Trace.CreateFromId(_spanState);
+
+            Record(zipkinTracer, trace, Annotations.ServerSend());
+
+            statistics.Verify(s => s.UpdateSpanSent(), Times.Once());
+            statistics.Verify(s => s.UpdateSpanSentBytes(It.Is<int>(n => n > 0)), Times.Once());
+        }
+
+        [Test]
+        public void StatisticsAreUpdatedForRecord()
+        {
+            var mockedSender = new Mock<IZipkinSender>();
+            var statistics = new Mock<IStatistics>();
+            var zipkinTracer = new ZipkinTracer(mockedSender.Object, statistics.Object);
+
+            var trace = Trace.CreateFromId(_spanState);
+
+            Record(zipkinTracer, trace, Annotations.ServerRecv());
+            statistics.Verify(s => s.UpdateRecordProcessed(), Times.Once());
         }
 
         private static void Record(ITracer tracer, Trace trace, IAnnotation annotation)
