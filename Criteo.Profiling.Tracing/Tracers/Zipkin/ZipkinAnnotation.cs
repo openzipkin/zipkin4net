@@ -20,6 +20,5 @@ namespace Criteo.Profiling.Tracing.Tracers.Zipkin
             return String.Format("ZipkinAnn: ts={0} val={1}", TimeUtils.ToUnixTimestamp(Timestamp), Value);
         }
 
-
     }
 }

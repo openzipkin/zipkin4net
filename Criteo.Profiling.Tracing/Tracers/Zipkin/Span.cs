@@ -76,7 +76,6 @@ namespace Criteo.Profiling.Tracing.Tracers.Zipkin
             BinaryAnnotations.Add(binaryAnnotation);
         }
 
-
         public override string ToString()
         {
             return String.Format("Span: {0} name={1} Annotations={2} BinAnnotations={3}", SpanState, Name, ToString(Annotations, ","), ToString(BinaryAnnotations, ","));
