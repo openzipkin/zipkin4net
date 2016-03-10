@@ -16,6 +16,8 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
     {
         private const string SomeRandomAnnotation = "SomethingHappenedHere";
 
+        private readonly Endpoint _someHost = new Endpoint { Service_name = "myService", Port = 80, Ipv4 = 123456 };
+
         [Test]
         public void ThriftConversionBinaryAnnotationIsCorrect()
         {
@@ -24,12 +26,13 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
             const AnnotationType type = AnnotationType.STRING;
 
             var binAnn = new BinaryAnnotation(key, data, type);
-            var thriftBinAnn = ThriftSpanSerializer.ConvertToThrift(binAnn);
+
+            var thriftBinAnn = ThriftSpanSerializer.ConvertToThrift(binAnn, _someHost);
 
             Assert.AreEqual(key, thriftBinAnn.Key);
             Assert.AreEqual(data, thriftBinAnn.Value);
-            Assert.IsNull(thriftBinAnn.Host);
             Assert.AreEqual(type, thriftBinAnn.Annotation_type);
+            AssertEndpointIsCorrect(thriftBinAnn.Host);
         }
 
         [Test]
@@ -39,14 +42,20 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
             const string value = "anything";
             var ann = new ZipkinAnnotation(now, value);
 
-            var thriftAnn = ThriftSpanSerializer.ConvertToThrift(ann);
+            var thriftAnn = ThriftSpanSerializer.ConvertToThrift(ann, _someHost);
 
             Assert.NotNull(thriftAnn);
             Assert.AreEqual(TimeUtils.ToUnixTimestamp(now), thriftAnn.Timestamp);
             Assert.AreEqual(value, thriftAnn.Value);
-            Assert.IsNull(thriftAnn.Host);
+            AssertEndpointIsCorrect(thriftAnn.Host);
         }
 
+        private void AssertEndpointIsCorrect(Endpoint endpoint)
+        {
+            Assert.AreEqual(_someHost.Service_name, endpoint.Service_name);
+            Assert.AreEqual(_someHost.Port, endpoint.Port);
+            Assert.AreEqual(_someHost.Ipv4, endpoint.Ipv4);
+        }
 
         [Test]
         public void IpToIntConversionIsCorrect()
@@ -124,6 +133,9 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
                 Assert.AreEqual(binAnnVal, ann.Value);
                 Assert.AreEqual(binAnnType, ann.Annotation_type);
             });
+
+
+            Assert.IsNull(thriftSpan.Duration);
         }
 
         [Test]
@@ -204,6 +216,66 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
             var thriftSpan = ThriftSpanSerializer.ConvertToThrift(span);
 
             Assert.AreEqual("my_Criteo_Service", thriftSpan.Annotations[0].Host.Service_name);
+        }
+
+
+        [TestCase(-200, false)]
+        [TestCase(-1, false)]
+        [TestCase(0, false)]
+        [TestCase(1, true)]
+        [TestCase(200, true)]
+        public void SpanHasDurationOnlyIfValueIsPositive(int offset, bool shouldHaveDuration)
+        {
+            var duration = GetSpanDuration(offset, zipkinCoreConstants.CLIENT_SEND, zipkinCoreConstants.CLIENT_RECV);
+            if (shouldHaveDuration)
+            {
+                Assert.AreEqual(offset * 1000, duration);
+            }
+            else
+            {
+                Assert.IsNull(duration);
+            }
+        }
+
+        [Test]
+        public void SpanDoesntHaveDurationIfIncomplete()
+        {
+            const int offset = 10;
+
+            Assert.IsNull(GetSpanDuration(offset, zipkinCoreConstants.SERVER_RECV));
+            Assert.IsNull(GetSpanDuration(offset, zipkinCoreConstants.SERVER_SEND));
+            Assert.IsNull(GetSpanDuration(offset, zipkinCoreConstants.CLIENT_RECV));
+            Assert.IsNull(GetSpanDuration(offset, zipkinCoreConstants.CLIENT_SEND));
+        }
+
+        [Test]
+        public void ClientDurationIsPreferredOverServer()
+        {
+            var spanState = new SpanState(1, 0, 2, SpanFlags.None);
+            var span = new Span(spanState, TimeUtils.UtcNow);
+            const int offset = 10;
+
+            var annotationTime = TimeUtils.UtcNow;
+            span.AddAnnotation(new ZipkinAnnotation(annotationTime, zipkinCoreConstants.SERVER_RECV));
+            span.AddAnnotation(new ZipkinAnnotation(annotationTime.AddMilliseconds(offset), zipkinCoreConstants.SERVER_SEND));
+            span.AddAnnotation(new ZipkinAnnotation(annotationTime.AddMilliseconds(-offset), zipkinCoreConstants.CLIENT_SEND));
+            span.AddAnnotation(new ZipkinAnnotation(annotationTime.AddMilliseconds(2 * offset), zipkinCoreConstants.CLIENT_RECV));
+
+            var duration = ThriftSpanSerializer.ConvertToThrift(span).Duration;
+
+            Assert.AreEqual(3 * offset * 1000 /* microseconds */, duration);
+        }
+
+        private static long? GetSpanDuration(int offset, string firstAnnValue, string secondAnnValue = null)
+        {
+            var spanState = new SpanState(1, 0, 2, SpanFlags.None);
+            var span = new Span(spanState, TimeUtils.UtcNow);
+
+            var annotationTime = TimeUtils.UtcNow;
+            span.AddAnnotation(new ZipkinAnnotation(annotationTime, firstAnnValue));
+            if (secondAnnValue != null) span.AddAnnotation(new ZipkinAnnotation(annotationTime.AddMilliseconds(offset), secondAnnValue));
+
+            return ThriftSpanSerializer.ConvertToThrift(span).Duration;
         }
 
         private static void AddClientSendReceiveAnnotations(Span span)
