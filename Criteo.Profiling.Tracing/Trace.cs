@@ -92,7 +92,12 @@ namespace Criteo.Profiling.Tracing
 
         internal void RecordAnnotation(IAnnotation annotation)
         {
-            var record = new Record(CurrentSpan, TimeUtils.UtcNow, annotation);
+            RecordAnnotation(annotation, TimeUtils.UtcNow);
+        }
+
+        internal void RecordAnnotation(IAnnotation annotation, DateTime recordTime)
+        {
+            var record = new Record(CurrentSpan, recordTime, annotation);
             TraceManager.Dispatcher.Dispatch(record);
         }
 
@@ -133,6 +138,14 @@ namespace Criteo.Profiling.Tracing
             if (trace != null)
             {
                 trace.RecordAnnotation(annotation);
+            }
+        }
+
+        public static void Record(this Trace trace, IAnnotation annotation, DateTime recordTime)
+        {
+            if (trace != null)
+            {
+                trace.RecordAnnotation(annotation, recordTime);
             }
         }
     }
