@@ -2,7 +2,7 @@
 
 namespace Criteo.Profiling.Tracing.Utils
 {
-    internal static class TimeUtils
+    public static class TimeUtils
     {
 
         private static readonly DateTime Epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
