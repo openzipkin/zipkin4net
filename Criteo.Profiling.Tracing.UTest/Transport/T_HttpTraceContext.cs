@@ -166,8 +166,7 @@ namespace Criteo.Profiling.Tracing.UTest.Transport
 
         private static void CheckSetHeadersThenGetTrace_Dict(long? parentSpanId)
         {
-            var spanState = new SpanState(1, parentSpanId, 250, SpanFlags.None);
-            var originalTrace = Trace.CreateFromId(spanState);
+            var originalTrace = Trace.Create();
 
             var headers = new Dictionary<string, string>();
             HttpTraceContext.Set(headers, originalTrace);
@@ -181,8 +180,7 @@ namespace Criteo.Profiling.Tracing.UTest.Transport
 
         private static void CheckSetHeadersThenGetTrace_NVC(long? parentSpanId)
         {
-            var spanState = new SpanState(1, parentSpanId, 250, SpanFlags.None);
-            var originalTrace = Trace.CreateFromId(spanState);
+            var originalTrace = Trace.Create();
 
             var headers = new NameValueCollection();
             HttpTraceContext.Set(headers, originalTrace);

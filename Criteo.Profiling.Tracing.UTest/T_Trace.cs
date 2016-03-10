@@ -7,9 +7,6 @@ namespace Criteo.Profiling.Tracing.UTest
     [TestFixture]
     class T_Trace
     {
-
-        private readonly SpanState _spanState = new SpanState(1, null, 2, SpanFlags.None);
-
         [SetUp]
         public void SetUp()
         {
@@ -20,7 +17,7 @@ namespace Criteo.Profiling.Tracing.UTest
         [Test]
         public void TracerRecordShouldBeCalledIfTracingIsStarted()
         {
-            var trace = Trace.CreateFromId(_spanState);
+            var trace = Trace.Create();
 
             var mockTracer = new Mock<ITracer>();
             TraceManager.RegisterTracer(mockTracer.Object);
@@ -37,7 +34,7 @@ namespace Criteo.Profiling.Tracing.UTest
         [Test]
         public void RecordsShouldntBeSentToTracersIfTracingIsStopped()
         {
-            var trace = Trace.CreateFromId(_spanState);
+            var trace = Trace.Create();
 
             var mockTracer = new Mock<ITracer>();
             TraceManager.RegisterTracer(mockTracer.Object);
@@ -52,7 +49,7 @@ namespace Criteo.Profiling.Tracing.UTest
         [Test]
         public void ChildTraceIsCorrectlyCreated()
         {
-            var parent = Trace.CreateFromId(_spanState);
+            var parent = Trace.Create();
             var child = parent.Child();
 
             // Should share the same global id
@@ -72,7 +69,7 @@ namespace Criteo.Profiling.Tracing.UTest
         [Test]
         public void TraceCreatesCorrectRecord()
         {
-            var trace = Trace.CreateFromId(_spanState);
+            var trace = Trace.Create();
 
             var dispatcher = new Mock<IRecordDispatcher>();
             TraceManager.Start(new Configuration(), dispatcher.Object);
@@ -87,11 +84,13 @@ namespace Criteo.Profiling.Tracing.UTest
         [Test]
         public void TraceSamplingForced()
         {
-            var trace = Trace.CreateFromId(_spanState);
+            TraceManager.Sampler.SamplingRate = 0.0f;
+            var trace = Trace.Create();
 
-            Assert.AreEqual(SamplingStatus.NoDecision, trace.CurrentSpan.SamplingStatus);
+            Assert.True(trace.CurrentSpan.Flags.HasFlag(SpanFlags.SamplingKnown));
+            Assert.False(trace.CurrentSpan.Flags.HasFlag(SpanFlags.Sampled));
             trace.ForceSampled();
-            Assert.AreEqual(SamplingStatus.Sampled, trace.CurrentSpan.SamplingStatus);
+            Assert.True(trace.CurrentSpan.Flags.HasFlag(SpanFlags.Sampled));
         }
 
     }

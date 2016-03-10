@@ -11,8 +11,6 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
     [TestFixture]
     class T_ZipkinTracer
     {
-        private readonly SpanState _spanState = new SpanState(1, null, 5, SpanFlags.None);
-
         private Mock<ISpanSerializer> _spanSerializer;
         private Mock<IZipkinSender> _spanSender;
         private Mock<IStatistics> _statistics;
@@ -37,7 +35,7 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
         [Test]
         public void SpansAreLoggedAfterEndAnnotationClientRecv()
         {
-            var trace = Trace.CreateFromId(_spanState);
+            var trace = Trace.Create();
 
             Record(trace, Annotations.ClientSend());
             Record(trace, Annotations.ClientRecv());
@@ -49,7 +47,7 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
         [Test]
         public void SpansAreLoggedAfterEndAnnotationServerSend()
         {
-            var trace = Trace.CreateFromId(_spanState);
+            var trace = Trace.Create();
 
             Record(trace, Annotations.ServerRecv());
             Record(trace, Annotations.ServerSend());
@@ -97,7 +95,7 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
         public void StatisticsAreUpdatedForFlush()
         {
 
-            var record = new Record(_spanState, TimeUtils.UtcNow.AddSeconds(-2 * ZipkinTracer.TimeToLive), Annotations.ServerRecv());
+            var record = new Record(Trace.Create().CurrentSpan, TimeUtils.UtcNow.AddSeconds(-2 * ZipkinTracer.TimeToLive), Annotations.ServerRecv());
             _tracer.Record(record);
             _tracer.FlushOldSpans(TimeUtils.UtcNow);
 
@@ -108,7 +106,7 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
         [Test]
         public void StatisticsAreUpdatedForSent()
         {
-            var trace = Trace.CreateFromId(_spanState);
+            var trace = Trace.Create();
 
             Record(trace, Annotations.ServerSend());
 
@@ -119,7 +117,7 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
         [Test]
         public void StatisticsAreUpdatedForRecord()
         {
-            var trace = Trace.CreateFromId(_spanState);
+            var trace = Trace.Create();
 
             Record(trace, Annotations.ServerRecv());
 

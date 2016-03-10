@@ -18,10 +18,11 @@ namespace Criteo.Profiling.Tracing
         /// Starts a new trace with a random id, no parent and empty flags.
         /// </summary>
         /// <returns></returns>
-        public static Trace CreateIfSampled()
+        public static Trace Create()
         {
             var traceId = RandomUtils.NextLong();
-            return TraceManager.Sampler.Sample(traceId) ? new Trace(traceId) : null;
+            var isSampled = TraceManager.Sampler.Sample(traceId);
+            return new Trace(traceId, isSampled);
         }
 
         /// <summary>
@@ -39,14 +40,19 @@ namespace Criteo.Profiling.Tracing
             CurrentSpan = new SpanState(spanState.TraceId, spanState.ParentSpanId, spanState.SpanId, spanState.Flags);
         }
 
-        private Trace(long traceId)
+        private Trace(long traceId, bool isSampled)
         {
-            CurrentSpan = CreateRootSpanId(traceId);
+            CurrentSpan = CreateRootSpanId(traceId, isSampled);
         }
 
-        private static SpanState CreateRootSpanId(long traceId)
+        private static SpanState CreateRootSpanId(long traceId, bool isSampled)
         {
-            return new SpanState(traceId: traceId, parentSpanId: null, spanId: RandomUtils.NextLong(), flags: SpanFlags.None);
+            var flags = SpanFlags.SamplingKnown;
+            if (isSampled)
+            {
+                flags = flags | SpanFlags.Sampled;
+            }
+            return new SpanState(traceId: traceId, parentSpanId: null, spanId: RandomUtils.NextLong(), flags: flags);
         }
 
         /// <summary>
