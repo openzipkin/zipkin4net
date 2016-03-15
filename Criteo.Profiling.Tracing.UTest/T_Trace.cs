@@ -81,16 +81,16 @@ namespace Criteo.Profiling.Tracing.UTest
         }
 
 
-        [Test]
-        public void TraceSamplingForced()
+        [TestCase(SpanFlags.SamplingKnown)]
+        [TestCase(SpanFlags.None)]
+        [TestCase(SpanFlags.SamplingKnown | SpanFlags.Sampled)]
+        public void TraceSamplingForced(SpanFlags initialFlags)
         {
-            TraceManager.Sampler.SamplingRate = 0.0f;
-            var trace = Trace.Create();
+            var spanState = new SpanState(1, 0, 1, initialFlags);
+            var trace = Trace.CreateFromId(spanState);
 
-            Assert.True(trace.CurrentSpan.Flags.HasFlag(SpanFlags.SamplingKnown));
-            Assert.False(trace.CurrentSpan.Flags.HasFlag(SpanFlags.Sampled));
             trace.ForceSampled();
-            Assert.True(trace.CurrentSpan.Flags.HasFlag(SpanFlags.Sampled));
+            Assert.AreEqual(SamplingStatus.Sampled, trace.CurrentSpan.SamplingStatus);
         }
 
     }
