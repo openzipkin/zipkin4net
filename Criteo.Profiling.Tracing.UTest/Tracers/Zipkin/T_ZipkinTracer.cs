@@ -94,8 +94,9 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
         [Test]
         public void StatisticsAreUpdatedForFlush()
         {
+            var trace = Trace.Create();
 
-            var record = new Record(Trace.Create().CurrentSpan, TimeUtils.UtcNow.AddSeconds(-2 * ZipkinTracer.TimeToLive), Annotations.ServerRecv());
+            var record = new Record(trace.CurrentSpan, TimeUtils.UtcNow.AddSeconds(-2 * ZipkinTracer.TimeToLive), Annotations.ServerRecv());
             _tracer.Record(record);
             _tracer.FlushOldSpans(TimeUtils.UtcNow);
 
