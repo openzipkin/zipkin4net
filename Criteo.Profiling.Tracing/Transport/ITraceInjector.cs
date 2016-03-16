@@ -2,6 +2,6 @@
 {
     public interface ITraceInjector<in TE>
     {
-        bool Inject(Trace trace, TE transport);
+        bool Inject(Trace trace, TE carrier);
     }
 }

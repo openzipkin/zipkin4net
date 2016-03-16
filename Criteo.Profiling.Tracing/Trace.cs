@@ -12,7 +12,12 @@ namespace Criteo.Profiling.Tracing
     {
         public SpanState CurrentSpan { get; private set; }
 
-        private Guid? _correlationId;
+        /// <summary>
+        /// Returns the trace id. It represents the correlation id
+        /// of a request through the platform.
+        /// For now it is based on the CurrentSpan.TraceId which is only 8 bytes instead of 16.
+        /// </summary>
+        public Guid CorrelationId { get; private set; }
 
         /// <summary>
         /// Starts a new trace with a random id, no parent and empty flags.
@@ -20,9 +25,23 @@ namespace Criteo.Profiling.Tracing
         /// <returns></returns>
         public static Trace Create()
         {
+            return new Trace();
+        }
+        private Trace()
+        {
             var traceId = RandomUtils.NextLong();
+            var spanId = RandomUtils.NextLong();
+
             var isSampled = TraceManager.Sampler.Sample(traceId);
-            return new Trace(traceId, isSampled);
+
+            var flags = SpanFlags.SamplingKnown;
+            if (isSampled)
+            {
+                flags = flags | SpanFlags.Sampled;
+            }
+
+            CurrentSpan = new SpanState(traceId: traceId, parentSpanId: null, spanId: spanId, flags: flags);
+            CorrelationId = NumberUtils.LongToGuid(traceId);
         }
 
         /// <summary>
@@ -37,39 +56,8 @@ namespace Criteo.Profiling.Tracing
 
         private Trace(SpanState spanState)
         {
-            CurrentSpan = new SpanState(spanState.TraceId, spanState.ParentSpanId, spanState.SpanId, spanState.Flags);
-        }
-
-        private Trace(long traceId, bool isSampled)
-        {
-            CurrentSpan = CreateRootSpanId(traceId, isSampled);
-        }
-
-        private static SpanState CreateRootSpanId(long traceId, bool isSampled)
-        {
-            var flags = SpanFlags.SamplingKnown;
-            if (isSampled)
-            {
-                flags = flags | SpanFlags.Sampled;
-            }
-            return new SpanState(traceId: traceId, parentSpanId: null, spanId: RandomUtils.NextLong(), flags: flags);
-        }
-
-        /// <summary>
-        /// Returns the trace id. It represents the correlation id
-        /// of a request through the platform.
-        /// For now it is based on the CurrentSpan.TraceId which is only 8 bytes instead of 16.
-        /// </summary>
-        public Guid CorrelationId
-        {
-            get
-            {
-                if (_correlationId == null)
-                {
-                    _correlationId = NumberUtils.LongToGuid(CurrentSpan.TraceId);
-                }
-                return _correlationId.Value;
-            }
+            CurrentSpan = spanState;
+            CorrelationId = NumberUtils.LongToGuid(CurrentSpan.TraceId);
         }
 
         /// <summary>
@@ -80,7 +68,8 @@ namespace Criteo.Profiling.Tracing
         /// <returns></returns>
         public Trace Child()
         {
-            return new Trace(CreateChildSpanId());
+            var childState = new SpanState(traceId: CurrentSpan.TraceId, parentSpanId: CurrentSpan.SpanId, spanId: RandomUtils.NextLong(), flags: CurrentSpan.Flags);
+            return new Trace(childState);
         }
 
         /// <summary>
@@ -89,11 +78,6 @@ namespace Criteo.Profiling.Tracing
         public void ForceSampled()
         {
             CurrentSpan.SetSampled();
-        }
-
-        private SpanState CreateChildSpanId()
-        {
-            return new SpanState(traceId: CurrentSpan.TraceId, parentSpanId: CurrentSpan.SpanId, spanId: RandomUtils.NextLong(), flags: CurrentSpan.Flags);
         }
 
         internal void RecordAnnotation(IAnnotation annotation)
@@ -111,25 +95,27 @@ namespace Criteo.Profiling.Tracing
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
-            return Equals(CurrentSpan, other.CurrentSpan);
+            return CorrelationId.Equals(other.CorrelationId) && Equals(CurrentSpan, other.CurrentSpan);
         }
 
         public override bool Equals(object obj)
         {
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
-            var objTrace = obj as Trace;
-            return objTrace != null && Equals(objTrace);
+            return obj is Trace && Equals((Trace)obj);
         }
 
         public override int GetHashCode()
         {
-            return (CurrentSpan != null ? CurrentSpan.GetHashCode() : 0);
+            unchecked
+            {
+                return (CorrelationId.GetHashCode() * 397) ^ (CurrentSpan != null ? CurrentSpan.GetHashCode() : 0);
+            }
         }
 
         public override string ToString()
         {
-            return String.Format("Trace [{0}]", CurrentSpan);
+            return String.Format("Trace [{0}] (CorrelationId {1})", CurrentSpan, CorrelationId.ToString("D"));
         }
     }
 

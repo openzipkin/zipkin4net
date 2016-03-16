@@ -2,6 +2,6 @@
 {
     public interface ITraceExtractor<in TE>
     {
-        bool TryExtract(TE transport, out Trace trace);
+        bool TryExtract(TE carrier, out Trace trace);
     }
 }
