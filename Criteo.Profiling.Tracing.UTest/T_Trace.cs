@@ -1,4 +1,5 @@
-﻿using Criteo.Profiling.Tracing.Dispatcher;
+﻿using System;
+using Criteo.Profiling.Tracing.Dispatcher;
 using Moq;
 using NUnit.Framework;
 
@@ -19,8 +20,8 @@ namespace Criteo.Profiling.Tracing.UTest
         {
             var trace = Trace.Create();
 
-            var mockTracer = new Mock<ITracer>();
-            TraceManager.RegisterTracer(mockTracer.Object);
+            var tracer = new Mock<ITracer>();
+            TraceManager.RegisterTracer(tracer.Object);
 
             TraceManager.Start(new Configuration());
             Assert.IsTrue(TraceManager.Started);
@@ -28,7 +29,7 @@ namespace Criteo.Profiling.Tracing.UTest
             trace.Record(Annotations.ServerSend());
             TraceManager.Stop();
 
-            mockTracer.Verify(tracer => tracer.Record(It.IsAny<Record>()), Times.Once());
+            tracer.Verify(t => t.Record(It.IsAny<Record>()), Times.Once());
         }
 
         [Test]
@@ -36,34 +37,34 @@ namespace Criteo.Profiling.Tracing.UTest
         {
             var trace = Trace.Create();
 
-            var mockTracer = new Mock<ITracer>();
-            TraceManager.RegisterTracer(mockTracer.Object);
+            var tracer = new Mock<ITracer>();
+            TraceManager.RegisterTracer(tracer.Object);
 
             Assert.IsFalse(TraceManager.Started);
 
             trace.Record(Annotations.ServerSend());
 
-            mockTracer.Verify(tracer => tracer.Record(It.IsAny<Record>()), Times.Never());
+            tracer.Verify(t => t.Record(It.IsAny<Record>()), Times.Never());
         }
 
         [Test]
         public void ChildTraceIsCorrectlyCreated()
         {
-            var parent = Trace.Create();
-            var child = parent.Child();
+            var parentTrace = Trace.Create();
+            var childTrace = parentTrace.Child();
 
             // Should share the same global id
-            Assert.AreEqual(parent.CurrentSpan.TraceId, child.CurrentSpan.TraceId);
-            Assert.AreEqual(parent.CorrelationId, child.CorrelationId);
+            Assert.AreEqual(parentTrace.CurrentSpan.TraceId, childTrace.CurrentSpan.TraceId);
+            Assert.AreEqual(parentTrace.CorrelationId, childTrace.CorrelationId);
 
             // Parent id of the child should be the parent span id
-            Assert.AreEqual(parent.CurrentSpan.SpanId, child.CurrentSpan.ParentSpanId);
+            Assert.AreEqual(parentTrace.CurrentSpan.SpanId, childTrace.CurrentSpan.ParentSpanId);
 
             // Flags should be copied
-            Assert.AreEqual(parent.CurrentSpan.Flags, child.CurrentSpan.Flags);
+            Assert.AreEqual(parentTrace.CurrentSpan.Flags, childTrace.CurrentSpan.Flags);
 
             // Child cannot have the same span id
-            Assert.AreNotEqual(parent.CurrentSpan.SpanId, child.CurrentSpan.SpanId);
+            Assert.AreNotEqual(parentTrace.CurrentSpan.SpanId, childTrace.CurrentSpan.SpanId);
         }
 
         [Test]
@@ -74,10 +75,25 @@ namespace Criteo.Profiling.Tracing.UTest
             var dispatcher = new Mock<IRecordDispatcher>();
             TraceManager.Start(new Configuration(), dispatcher.Object);
 
-            var clientRcv = Annotations.ClientRecv();
-            trace.Record(clientRcv);
+            var someAnnotation = Annotations.ClientRecv();
+            trace.Record(someAnnotation);
 
-            dispatcher.Verify(d => d.Dispatch(It.Is<Record>(r => r.Annotation == clientRcv && r.SpanState.Equals(trace.CurrentSpan))), Times.Once());
+            dispatcher.Verify(d => d.Dispatch(It.Is<Record>(r => r.Annotation.Equals(someAnnotation) && r.SpanState.Equals(trace.CurrentSpan))), Times.Once());
+        }
+
+        [Test]
+        public void TraceCreatesCorrectRecordWithTimeSpecified()
+        {
+            var trace = Trace.Create();
+
+            var dispatcher = new Mock<IRecordDispatcher>();
+            TraceManager.Start(new Configuration(), dispatcher.Object);
+
+            var someAnnotation = Annotations.ClientRecv();
+            var recordTime = new DateTime(2010, 2, 3, 14, 3, 1, DateTimeKind.Utc);
+            trace.Record(someAnnotation, recordTime);
+
+            dispatcher.Verify(d => d.Dispatch(It.Is<Record>(r => r.Annotation.Equals(someAnnotation) && r.SpanState.Equals(trace.CurrentSpan) && r.Timestamp.Equals(recordTime))), Times.Once());
         }
 
 
