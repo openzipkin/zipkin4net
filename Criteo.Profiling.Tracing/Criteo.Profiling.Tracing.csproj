@@ -90,9 +90,9 @@
     <Compile Include="Tracers\Zipkin\ZipkinAnnotation.cs" />
     <Compile Include="Tracers\Zipkin\ZipkinAnnotationVisitor.cs" />
     <Compile Include="Tracers\Zipkin\ZipkinTracer.cs" />
-    <Compile Include="Transport\HttpTraceExtractor.cs" />
-    <Compile Include="Transport\HttpTraceInjector.cs" />
-    <Compile Include="Transport\HttpTraceContext.cs" />
+    <Compile Include="Transport\ZipkinHttpHeaders.cs" />
+    <Compile Include="Transport\ZipkinHttpTraceExtractor.cs" />
+    <Compile Include="Transport\ZipkinHttpTraceInjector.cs" />
     <Compile Include="Transport\ITraceExtractor.cs" />
     <Compile Include="Transport\ITraceInjector.cs" />
     <Compile Include="Utils\NumberUtils.cs" />
