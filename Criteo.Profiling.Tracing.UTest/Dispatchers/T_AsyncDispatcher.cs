@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Threading;
+using System.Threading.Tasks;
 using Criteo.Profiling.Tracing.Dispatcher;
 using Criteo.Profiling.Tracing.Utils;
+using Moq;
 using NUnit.Framework;
 
 namespace Criteo.Profiling.Tracing.UTest.Dispatchers
@@ -62,6 +64,35 @@ namespace Criteo.Profiling.Tracing.UTest.Dispatchers
             Assert.AreEqual(secondRecord, record);
 
             dispatcher.Stop();
+        }
+
+        [Test]
+        public void DispactherShouldNotEnqueueMessagesInfinitely()
+        {
+            var record = new Record(new SpanState(1, 0, 1, SpanFlags.None), TimeUtils.UtcNow, Annotations.ClientRecv());
+            var logger = new Mock<ILogger>();
+
+            const int maxCapacity = 10;
+
+            TraceManager.Configuration.Logger = logger.Object;
+
+            var dispatcher = new InOrderAsyncDispatcher(r =>
+            {
+                Thread.Sleep(TimeSpan.FromDays(1));
+            }, maxCapacity, 100);
+
+            var task = Task.Factory.StartNew(() =>
+            {
+                for (var i = 0; i < maxCapacity + 1; ++i)
+                {
+                    dispatcher.Dispatch(record);
+                }
+            }, TaskCreationOptions.LongRunning);
+
+            task.Wait();
+            dispatcher.Stop();
+
+            logger.Verify(l => l.LogWarning(It.IsAny<string>()), Times.Once());
         }
     }
 
