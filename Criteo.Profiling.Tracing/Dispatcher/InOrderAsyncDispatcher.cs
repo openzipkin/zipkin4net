@@ -9,13 +9,15 @@ namespace Criteo.Profiling.Tracing.Dispatcher
     internal class InOrderAsyncDispatcher : IRecordDispatcher
     {
         private readonly ActionBlock<Record> _actionBlock;
+        private const int MaxCapacity = 5000;
 
         public InOrderAsyncDispatcher(Action<Record> pushToTracers)
         {
             _actionBlock = new ActionBlock<Record>(pushToTracers,
                       new ExecutionDataflowBlockOptions
                       {
-                          MaxDegreeOfParallelism = 1
+                          MaxDegreeOfParallelism = 1,
+                          BoundedCapacity = MaxCapacity
                       });
         }
 
@@ -27,7 +29,10 @@ namespace Criteo.Profiling.Tracing.Dispatcher
 
         public void Dispatch(Record record)
         {
-            _actionBlock.Post(record);
+            if (!_actionBlock.Post(record))
+            {
+                TraceManager.Configuration.Logger.LogWarning("Couldn't dispatch record, actor may be blocked by another operation");
+            }
         }
 
     }
