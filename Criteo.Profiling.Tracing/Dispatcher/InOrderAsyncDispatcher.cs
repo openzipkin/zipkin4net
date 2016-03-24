@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
 
 namespace Criteo.Profiling.Tracing.Dispatcher
@@ -9,22 +10,23 @@ namespace Criteo.Profiling.Tracing.Dispatcher
     internal class InOrderAsyncDispatcher : IRecordDispatcher
     {
         private readonly ActionBlock<Record> _actionBlock;
-        private const int MaxCapacity = 5000;
+        private readonly TimeSpan _stopTimeout;
 
-        public InOrderAsyncDispatcher(Action<Record> pushToTracers)
+        public InOrderAsyncDispatcher(Action<Record> pushToTracers, int maxCapacity = 5000, int stopTimeoutMs = 10000)
         {
             _actionBlock = new ActionBlock<Record>(pushToTracers,
                       new ExecutionDataflowBlockOptions
                       {
                           MaxDegreeOfParallelism = 1,
-                          BoundedCapacity = MaxCapacity
+                          BoundedCapacity = maxCapacity
                       });
+            _stopTimeout = TimeSpan.FromMilliseconds(stopTimeoutMs);
         }
 
         public void Stop()
         {
             _actionBlock.Complete();
-            _actionBlock.Completion.Wait();
+            Task.WaitAny(_actionBlock.Completion, Task.Delay(_stopTimeout));
         }
 
         public void Dispatch(Record record)
