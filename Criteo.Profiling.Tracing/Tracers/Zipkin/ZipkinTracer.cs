@@ -97,7 +97,7 @@ namespace Criteo.Profiling.Tracing.Tracers.Zipkin
         /// <param name="utcNow"></param>
         internal void FlushOldSpans(DateTime utcNow)
         {
-            var outlivedSpans = _spanMap.Where(pair => utcNow.Subtract(pair.Value.Started).TotalSeconds > TimeToLive);
+            var outlivedSpans = _spanMap.Where(pair => utcNow.Subtract(pair.Value.Started).TotalSeconds > TimeToLive).ToList();
 
             foreach (var oldSpanEntry in outlivedSpans)
             {

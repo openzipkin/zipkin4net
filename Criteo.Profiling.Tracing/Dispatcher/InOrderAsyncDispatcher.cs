@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
+using Criteo.Profiling.Tracing.Utils;
 
 namespace Criteo.Profiling.Tracing.Dispatcher
 {
@@ -9,10 +10,13 @@ namespace Criteo.Profiling.Tracing.Dispatcher
     /// </summary>
     internal class InOrderAsyncDispatcher : IRecordDispatcher
     {
-        private readonly ActionBlock<Record> _actionBlock;
-        private readonly TimeSpan _stopTimeout;
+        private const int MinimumTimeBetweenLogsMin = 1;
 
-        public InOrderAsyncDispatcher(Action<Record> pushToTracers, int maxCapacity = 5000, int stopTimeoutMs = 10000)
+        private readonly ActionBlock<Record> _actionBlock;
+        private readonly TimeSpan _timeoutOnStop;
+        private DateTime _lastLoggedMessage = default(DateTime);
+
+        public InOrderAsyncDispatcher(Action<Record> pushToTracers, int maxCapacity = 5000, int timeoutOnStopMs = 10000)
         {
             _actionBlock = new ActionBlock<Record>(pushToTracers,
                       new ExecutionDataflowBlockOptions
@@ -20,20 +24,25 @@ namespace Criteo.Profiling.Tracing.Dispatcher
                           MaxDegreeOfParallelism = 1,
                           BoundedCapacity = maxCapacity
                       });
-            _stopTimeout = TimeSpan.FromMilliseconds(stopTimeoutMs);
+            _timeoutOnStop = TimeSpan.FromMilliseconds(timeoutOnStopMs);
         }
 
         public void Stop()
         {
             _actionBlock.Complete();
-            Task.WaitAny(_actionBlock.Completion, Task.Delay(_stopTimeout));
+            Task.WaitAny(_actionBlock.Completion, Task.Delay(_timeoutOnStop));
         }
 
         public void Dispatch(Record record)
         {
             if (!_actionBlock.Post(record))
             {
-                TraceManager.Configuration.Logger.LogWarning("Couldn't dispatch record, actor may be blocked by another operation");
+                var now = TimeUtils.UtcNow;
+                if (_lastLoggedMessage == default(DateTime) || now.Subtract(_lastLoggedMessage).TotalMinutes > MinimumTimeBetweenLogsMin)
+                {
+                    TraceManager.Configuration.Logger.LogWarning("Couldn't dispatch record, actor may be blocked by another operation");
+                    _lastLoggedMessage = now;
+                }
             }
         }
 
