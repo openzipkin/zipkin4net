@@ -5,10 +5,10 @@ namespace Criteo.Profiling.Tracing.Tracers.Zipkin
 {
     /// <summary>
     /// The RateLimiterZipkinSender throttle the trace sending via a token bucket.
-    /// This class is not thread safe.
     /// </summary>
     public class RateLimiterZipkinSender : IZipkinSender
     {
+        private readonly object _lockObject = new object();
         private readonly IZipkinSender _underlyingSender;
         private double _bucket;
         private readonly Stopwatch _timeSinceLastRequest;
@@ -47,23 +47,25 @@ namespace Criteo.Profiling.Tracing.Tracers.Zipkin
 
         /// <summary>
         /// Send the data if the current instance is not throttled, discard the data otherwise.
-        /// This is not thread safe.
         /// </summary>
         /// <param name="data"></param>
         public void Send(byte[] data)
         {
-            _requestsReceived++;
-            if (DecrementBucket())
-                _underlyingSender.Send(data);
-            else
+            lock (_lockObject)
             {
-                _throttledRequests++;
-                StartLogTimer();
+                _requestsReceived++;
+                if (DecrementBucket())
+                    _underlyingSender.Send(data);
+                else
+                {
+                    _throttledRequests++;
+                    StartLogTimer();
+                }
+                if (!ShouldLogThrottling())
+                    return;
+                LogThrottling();
+                ResetLogCountersAndTimer();
             }
-            if (!ShouldLogThrottling())
-                return;
-            LogThrottling();
-            ResetLogCountersAndTimer();
         }
 
         private bool DecrementBucket()
