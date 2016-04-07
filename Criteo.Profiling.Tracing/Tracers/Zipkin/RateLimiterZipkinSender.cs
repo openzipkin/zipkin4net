@@ -1,9 +1,5 @@
 ﻿using System;
 using System.Diagnostics;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Criteo.Profiling.Tracing.Utils;
 
 namespace Criteo.Profiling.Tracing.Tracers.Zipkin
 {
@@ -11,7 +7,7 @@ namespace Criteo.Profiling.Tracing.Tracers.Zipkin
     /// The RateLimiterZipkinSender throttle the trace sending via a token bucket.
     /// This class is not thread safe.
     /// </summary>
-    class RateLimiterZipkinSender : IZipkinSender
+    public class RateLimiterZipkinSender : IZipkinSender
     {
         private readonly IZipkinSender _underlyingSender;
         private double _bucket;
@@ -28,8 +24,7 @@ namespace Criteo.Profiling.Tracing.Tracers.Zipkin
 
         /// <summary>
         /// Instantiate a rate limited IZipkinSender which use an underlying IZipkinSender to send data.
-        /// The maximum sending rate on long term is given by maxSendRequest / duration, but on short term,
-        /// larger rate can be observed when the bucket is full.
+        /// The average sending rate is given by maxSendRequest / duration, instantaneous rate can be much higher.
         /// </summary>
         /// <param name="sender">The underlying IZipkinSender</param>
         /// <param name="maxSendRequest">The maximum send requests per duration aka the bucket size</param>
