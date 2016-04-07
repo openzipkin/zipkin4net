@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using Criteo.Profiling.Tracing.Tracers.Zipkin;
 using NUnit.Framework;
 using Moq;
@@ -51,7 +47,7 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
         {
             var sender = new RateLimiterZipkinSender(_underlyingSender.Object, maxReq, TimeSpan.FromSeconds(5));
 
-            for (int i = 0; i < maxReq + 1; i++)
+            for (var i = 0; i < maxReq + 1; i++)
                 sender.Send(_data);
 
             _underlyingSender.Verify(zipkinSender => zipkinSender.Send(It.Is<byte[]>(bytes => bytes == _data)), Times.Exactly(maxReq));
