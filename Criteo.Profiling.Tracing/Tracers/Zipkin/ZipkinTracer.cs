@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.IO;
 using System.Linq;
 using System.Threading;
+using Criteo.Profiling.Tracing.Utils;
 
 namespace Criteo.Profiling.Tracing.Tracers.Zipkin
 {
@@ -26,10 +27,9 @@ namespace Criteo.Profiling.Tracing.Tracers.Zipkin
         private readonly Timer _flushTimer;
 
         /// <summary>
-        /// Time-to-live expressed in seconds.
         /// Spans which are not completed by this time are automatically flushed.
         /// </summary>
-        internal const int TimeToLive = 60;
+        internal static readonly TimeSpan TimeToLive = TimeSpan.FromMinutes(1);
 
         public ZipkinTracer(IZipkinSender sender, IStatistics statistics = null) : this(sender, new ThriftSpanSerializer(), statistics)
         {
@@ -44,7 +44,7 @@ namespace Criteo.Profiling.Tracing.Tracers.Zipkin
             if (sender == null) throw new ArgumentNullException("spanSerializer", "You have to specify a non-null span serializer for Zipkin tracer.");
             _spanSerializer = spanSerializer;
 
-            _flushTimer = new Timer(_ => FlushOldSpans(DateTime.UtcNow), null, TimeSpan.FromSeconds(TimeToLive), TimeSpan.FromSeconds(TimeToLive));
+            _flushTimer = new Timer(_ => FlushOldSpans(TimeUtils.UtcNow), null, TimeToLive, TimeToLive);
         }
 
         public void Record(Record record)
@@ -97,19 +97,17 @@ namespace Criteo.Profiling.Tracing.Tracers.Zipkin
         /// <param name="utcNow"></param>
         internal void FlushOldSpans(DateTime utcNow)
         {
-            var outlivedSpans = _spanMap.Where(pair => utcNow.Subtract(pair.Value.Started).TotalSeconds > TimeToLive).ToList();
+            var outlivedSpans = _spanMap.Where(pair => (utcNow - pair.Value.Started) > TimeToLive).ToList();
 
             foreach (var oldSpanEntry in outlivedSpans)
             {
                 if (!oldSpanEntry.Value.Complete)
                 {
-                    oldSpanEntry.Value.AddAnnotation(new ZipkinAnnotation(DateTime.UtcNow, "flush.timeout"));
+                    oldSpanEntry.Value.AddAnnotation(new ZipkinAnnotation(TimeUtils.UtcNow, "flush.timeout"));
                     Statistics.UpdateSpanFlushed();
                 }
                 RemoveThenLogSpan(oldSpanEntry.Key);
             }
-
         }
-
     }
 }

@@ -68,7 +68,7 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
             _tracer.Record(record);
 
             // futureTime = now + (ttl - 4)
-            var futureTime = now.AddSeconds(ZipkinTracer.TimeToLive - 4); // of course test will fail if TTL is set lower than 4 seconds
+            var futureTime = now.AddSeconds(ZipkinTracer.TimeToLive.TotalSeconds - 4); // of course test will fail if TTL is set lower than 4 seconds
 
             _tracer.FlushOldSpans(futureTime); // shouldn't do anything since we haven't reached span ttl yet
 
@@ -96,9 +96,10 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
         {
             var trace = Trace.Create();
 
-            var record = new Record(trace.CurrentSpan, TimeUtils.UtcNow.AddSeconds(-2 * ZipkinTracer.TimeToLive), Annotations.ServerRecv());
+            var now = TimeUtils.UtcNow;
+            var record = new Record(trace.CurrentSpan, now.AddSeconds(-2 * ZipkinTracer.TimeToLive.TotalSeconds), Annotations.ServerRecv());
             _tracer.Record(record);
-            _tracer.FlushOldSpans(TimeUtils.UtcNow);
+            _tracer.FlushOldSpans(now);
 
             _statistics.Verify(s => s.UpdateSpanFlushed(), Times.Once());
         }
