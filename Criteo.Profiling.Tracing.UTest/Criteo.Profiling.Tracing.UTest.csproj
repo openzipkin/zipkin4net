@@ -69,6 +69,7 @@
     <Compile Include="T_Annotations.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="T_Trace.cs" />
+    <Compile Include="T_TraceContext.cs" />
     <Compile Include="T_TraceManager.cs" />
     <Compile Include="Utils\T_NumberUtils.cs" />
     <Compile Include="Utils\T_TimeUtils.cs" />
