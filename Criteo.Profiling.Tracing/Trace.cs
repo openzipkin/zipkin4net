@@ -10,6 +10,21 @@ namespace Criteo.Profiling.Tracing
     /// </summary>
     public sealed class Trace : IEquatable<Trace>
     {
+        /// <summary>
+        /// Experimental feature, do not use.
+        /// </summary>
+        public static Trace Current
+        {
+            get
+            {
+                return TraceContext.Get();
+            }
+            set
+            {
+                TraceContext.Set(value);
+            }
+        }
+
         public SpanState CurrentSpan { get; private set; }
 
         /// <summary>
@@ -141,6 +156,4 @@ namespace Criteo.Profiling.Tracing
             }
         }
     }
-
-
 }
