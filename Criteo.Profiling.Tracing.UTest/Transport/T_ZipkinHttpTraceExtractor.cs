@@ -18,7 +18,7 @@ namespace Criteo.Profiling.Tracing.UTest.Transport
         public void Setup()
         {
             _mockLogger = new Mock<ILogger>();
-            TraceManager.Configuration = new Configuration { Logger = _mockLogger.Object };
+            TraceManager.Start(_mockLogger.Object);
         }
 
         [Test]
@@ -81,7 +81,6 @@ namespace Criteo.Profiling.Tracing.UTest.Transport
             _mockLogger.Verify(logger => logger.LogWarning(It.Is<string>(s => s.Contains("Couldn't parse trace context. Trace is ignored"))), Times.Once());
         }
 
-
         [TestCase(null, "0", SamplingStatus.NotSampled)]
         [TestCase(null, "1", SamplingStatus.Sampled)]
         [TestCase("0", "1", SamplingStatus.Sampled)]
@@ -114,7 +113,5 @@ namespace Criteo.Profiling.Tracing.UTest.Transport
 
             Assert.AreEqual(expectedStatus, trace.CurrentSpan.SamplingStatus);
         }
-
-
     }
 }

@@ -149,10 +149,10 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
             var thriftSpan = ThriftSpanSerializer.ConvertToThrift(span);
             AssertSpanHasRequiredFields(thriftSpan);
 
-            const string defaultName = ThriftSpanSerializer.DefaultRpcMethod;
-            var defaultServiceName = TraceManager.Configuration.DefaultServiceName;
-            var defaultIpv4 = ThriftSpanSerializer.IpToInt(TraceManager.Configuration.DefaultEndPoint.Address);
-            var defaultPort = TraceManager.Configuration.DefaultEndPoint.Port;
+            const string defaultName = ThriftSpanSerializer.DefaultRpcMethodName;
+            const string defaultServiceName = ThriftSpanSerializer.DefaultServiceName;
+            var defaultIpv4 = ThriftSpanSerializer.IpToInt(ThriftSpanSerializer.DefaultEndPoint.Address);
+            var defaultPort = ThriftSpanSerializer.DefaultEndPoint.Port;
 
             Assert.AreEqual(2, thriftSpan.Annotations.Count);
             thriftSpan.Annotations.ForEach(ann =>
@@ -172,8 +172,8 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
             var started = TimeUtils.UtcNow;
 
             // Make sure we choose something different thant the default values
-            var serviceName = TraceManager.Configuration.DefaultServiceName + "_notDefault";
-            var hostPort = TraceManager.Configuration.DefaultEndPoint.Port + 1;
+            const string serviceName = ThriftSpanSerializer.DefaultServiceName + "_notDefault";
+            var hostPort = ThriftSpanSerializer.DefaultEndPoint.Port + 1;
 
             const string name = "myRPCmethod";
 

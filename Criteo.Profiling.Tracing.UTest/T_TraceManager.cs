@@ -21,7 +21,7 @@ namespace Criteo.Profiling.Tracing.UTest
             _mockTracer = new Mock<ITracer>();
             TraceManager.RegisterTracer(_mockTracer.Object);
 
-            TraceManager.Start(new Configuration {Logger = _mockLogger.Object});
+            TraceManager.Start(_mockLogger.Object);
         }
 
         [TearDown]
@@ -78,7 +78,7 @@ namespace Criteo.Profiling.Tracing.UTest
         public void CannotStartMultipleTimes()
         {
             Assert.True(TraceManager.Started, "Test setup failed?");
-            Assert.False(TraceManager.Start(new Configuration()));
+            Assert.False(TraceManager.Start(_mockLogger.Object));
         }
     }
 }

@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Threading;
 using System.Threading.Tasks;
 using Criteo.Profiling.Tracing.Dispatcher;
+using Criteo.Profiling.Tracing.Logger;
 using Criteo.Profiling.Tracing.Utils;
 using Moq;
 using NUnit.Framework;
@@ -24,7 +25,7 @@ namespace Criteo.Profiling.Tracing.UTest.Dispatchers
             {
                 Assert.AreEqual(record, r);
                 sync.Set();
-            });
+            }, new VoidLogger());
 
             dispatcher.Dispatch(record);
             sync.WaitOne();
@@ -47,7 +48,7 @@ namespace Criteo.Profiling.Tracing.UTest.Dispatchers
             {
                 queue.Enqueue(r);
                 sync.Signal();
-            });
+            }, new VoidLogger());
 
             dispatcher.Dispatch(firstRecord);
             dispatcher.Dispatch(secondRecord);
@@ -74,12 +75,10 @@ namespace Criteo.Profiling.Tracing.UTest.Dispatchers
 
             const int maxCapacity = 10;
 
-            TraceManager.Configuration.Logger = logger.Object;
-
             var dispatcher = new InOrderAsyncDispatcher(r =>
             {
                 Thread.Sleep(TimeSpan.FromDays(1));
-            }, maxCapacity, 100);
+            }, logger.Object, maxCapacity, 100);
 
             var task = Task.Factory.StartNew(() =>
             {

@@ -20,7 +20,7 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
             _data = new byte[] { 0x01, 0x02 };
             _underlyingSender = new Mock<IZipkinSender>();
             _logger = new Mock<ILogger>();
-            TraceManager.Start(new Configuration { Logger = _logger.Object });
+            TraceManager.Start(_logger.Object);
         }
 
         [TearDown]

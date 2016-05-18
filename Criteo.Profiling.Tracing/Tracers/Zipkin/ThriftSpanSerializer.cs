@@ -13,7 +13,20 @@ namespace Criteo.Profiling.Tracing.Tracers.Zipkin
     internal class ThriftSpanSerializer : ISpanSerializer
     {
 
-        internal const string DefaultRpcMethod = "UnknownRpc";
+        /// <summary>
+        /// Name of the RPC method when none has been recorded
+        /// </summary>
+        public const string DefaultRpcMethodName = "UnknownRpc";
+
+        /// <summary>
+        /// Name of the service when none has been recorded
+        /// </summary>
+        public const string DefaultServiceName = "UnknownService";
+
+        /// <summary>
+        /// IpEndpoint to use when none has been recorded
+        /// </summary>
+        public static readonly IPEndPoint DefaultEndPoint = new IPEndPoint(IpUtils.GetLocalIpAddress() ?? IPAddress.Loopback, 0);
 
         public void SerializeTo(Stream stream, Span span)
         {
@@ -35,7 +48,7 @@ namespace Criteo.Profiling.Tracing.Tracers.Zipkin
             {
                 Id = span.SpanState.SpanId,
                 Trace_id = span.SpanState.TraceId,
-                Name = span.Name ?? DefaultRpcMethod,
+                Name = span.Name ?? DefaultRpcMethodName,
                 Debug = false
             };
 
@@ -45,8 +58,8 @@ namespace Criteo.Profiling.Tracing.Tracers.Zipkin
             }
 
             // Use default value if no information were recorded
-            var spanEndpoint = span.Endpoint ?? TraceManager.Configuration.DefaultEndPoint;
-            var spanServiceName = String.IsNullOrWhiteSpace(span.ServiceName) ? TraceManager.Configuration.DefaultServiceName : span.ServiceName;
+            var spanEndpoint = span.Endpoint ?? DefaultEndPoint;
+            var spanServiceName = String.IsNullOrWhiteSpace(span.ServiceName) ? DefaultServiceName : span.ServiceName;
             spanServiceName = spanServiceName.Replace(" ", "_"); // whitespaces cause issues with the query and ui
 
             var host = new Endpoint
