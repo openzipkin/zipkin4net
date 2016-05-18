@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.Eventing.Reader;
 using Criteo.Profiling.Tracing.Annotation;
 using Criteo.Profiling.Tracing.Utils;
 
@@ -21,7 +22,14 @@ namespace Criteo.Profiling.Tracing
             }
             set
             {
-                TraceContext.Set(value);
+                if (value == null)
+                {
+                    TraceContext.Clear();
+                }
+                else
+                {
+                    TraceContext.Set(value);
+                }
             }
         }
 
