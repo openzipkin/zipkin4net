@@ -12,12 +12,14 @@ namespace Criteo.Profiling.Tracing.Dispatcher
     {
         private const int MinimumTimeBetweenLogsMin = 1;
 
+        private readonly ILogger _logger;
         private readonly ActionBlock<Record> _actionBlock;
         private readonly TimeSpan _timeoutOnStop;
         private DateTime _lastLoggedMessage = default(DateTime);
 
-        public InOrderAsyncDispatcher(Action<Record> pushToTracers, int maxCapacity = 5000, int timeoutOnStopMs = 10000)
+        public InOrderAsyncDispatcher(Action<Record> pushToTracers, ILogger logger, int maxCapacity = 5000, int timeoutOnStopMs = 10000)
         {
+            _logger = logger;
             _actionBlock = new ActionBlock<Record>(pushToTracers,
                       new ExecutionDataflowBlockOptions
                       {
@@ -40,7 +42,7 @@ namespace Criteo.Profiling.Tracing.Dispatcher
                 var now = TimeUtils.UtcNow;
                 if (_lastLoggedMessage == default(DateTime) || now.Subtract(_lastLoggedMessage).TotalMinutes > MinimumTimeBetweenLogsMin)
                 {
-                    TraceManager.Configuration.Logger.LogWarning("Couldn't dispatch record, actor may be blocked by another operation");
+                    _logger.LogWarning("Couldn't dispatch record, actor may be blocked by another operation");
                     _lastLoggedMessage = now;
                 }
             }

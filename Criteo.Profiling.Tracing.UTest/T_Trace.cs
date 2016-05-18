@@ -1,5 +1,6 @@
 ﻿using System;
 using Criteo.Profiling.Tracing.Dispatcher;
+using Criteo.Profiling.Tracing.Logger;
 using Moq;
 using NUnit.Framework;
 
@@ -23,7 +24,7 @@ namespace Criteo.Profiling.Tracing.UTest
             var tracer = new Mock<ITracer>();
             TraceManager.RegisterTracer(tracer.Object);
 
-            TraceManager.Start(new Configuration());
+            TraceManager.Start(new VoidLogger());
             Assert.IsTrue(TraceManager.Started);
 
             trace.Record(Annotations.ServerSend());
@@ -73,7 +74,7 @@ namespace Criteo.Profiling.Tracing.UTest
             var trace = Trace.Create();
 
             var dispatcher = new Mock<IRecordDispatcher>();
-            TraceManager.Start(new Configuration(), dispatcher.Object);
+            TraceManager.Start(new VoidLogger(), dispatcher.Object);
 
             var someAnnotation = Annotations.ClientRecv();
             trace.Record(someAnnotation);
@@ -87,7 +88,7 @@ namespace Criteo.Profiling.Tracing.UTest
             var trace = Trace.Create();
 
             var dispatcher = new Mock<IRecordDispatcher>();
-            TraceManager.Start(new Configuration(), dispatcher.Object);
+            TraceManager.Start(new VoidLogger(), dispatcher.Object);
 
             var someAnnotation = Annotations.ClientRecv();
             var recordTime = new DateTime(2010, 2, 3, 14, 3, 1, DateTimeKind.Utc);

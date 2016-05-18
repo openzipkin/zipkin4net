@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading;
 using Criteo.Profiling.Tracing.Dispatcher;
+using Criteo.Profiling.Tracing.Logger;
 using Criteo.Profiling.Tracing.Sampling;
 using Criteo.Profiling.Tracing.Utils;
 
@@ -12,8 +13,8 @@ namespace Criteo.Profiling.Tracing
         private static int _status = (int)Status.Stopped;
 
         internal static readonly ISampler Sampler = new DefaultSampler(salt: RandomUtils.NextLong(), samplingRate: 0f);
-        internal static Configuration Configuration = new Configuration();
         internal static IRecordDispatcher Dispatcher = new VoidDispatcher();
+        internal static ILogger Logger = new VoidLogger();
 
         /// <summary>
         /// Global list of registred tracers.
@@ -47,20 +48,20 @@ namespace Criteo.Profiling.Tracing
         /// Start tracing, records will be forwarded to the registered tracers.
         /// </summary>
         /// <returns>True if successfully started, false if error or the service was already running.</returns>
-        public static bool Start(Configuration configuration)
+        public static bool Start(ILogger logger)
         {
-            return Start(configuration, new InOrderAsyncDispatcher(Push));
+            return Start(logger, new InOrderAsyncDispatcher(Push, logger));
         }
 
-        internal static bool Start(Configuration configuration, IRecordDispatcher dispatcher)
+        internal static bool Start(ILogger logger, IRecordDispatcher dispatcher)
         {
             if (Interlocked.CompareExchange(ref _status, (int)Status.Started, (int)Status.Stopped) ==
                       (int)Status.Stopped)
             {
-                Configuration = configuration;
+                Logger = logger;
                 Dispatcher = dispatcher;
-                Configuration.Logger.LogInformation("Tracing dispatcher started");
-                Configuration.Logger.LogInformation("HighResolutionDateTime is " + (HighResolutionDateTime.IsAvailable ? "available" : "not available"));
+                Logger.LogInformation("Tracing dispatcher started");
+                Logger.LogInformation("HighResolutionDateTime is " + (HighResolutionDateTime.IsAvailable ? "available" : "not available"));
                 return true;
             }
 
@@ -78,7 +79,7 @@ namespace Criteo.Profiling.Tracing
             {
                 Dispatcher.Stop();
                 Dispatcher = new VoidDispatcher();
-                Configuration.Logger.LogInformation("Tracing dispatcher stopped");
+                Logger.LogInformation("Tracing dispatcher stopped");
                 return true;
             }
 
@@ -91,7 +92,7 @@ namespace Criteo.Profiling.Tracing
         /// <param name="tracer"></param>
         public static void RegisterTracer(ITracer tracer)
         {
-            var tracers = new List<ITracer>(_tracers) {tracer};
+            var tracers = new List<ITracer>(_tracers) { tracer };
 
             _tracers = tracers;
         }
@@ -119,7 +120,7 @@ namespace Criteo.Profiling.Tracing
                 catch (Exception ex)
                 {
                     // No exception coming for traces should disrupt the main application as tracing is optional.
-                    Configuration.Logger.LogWarning("An error occured while recording the annotation. Msg: " + ex.Message);
+                    Logger.LogWarning("An error occured while recording the annotation. Msg: " + ex.Message);
                 }
             }
         }

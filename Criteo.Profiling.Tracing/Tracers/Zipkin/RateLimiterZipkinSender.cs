@@ -101,7 +101,7 @@ namespace Criteo.Profiling.Tracing.Tracers.Zipkin
         private void LogThrottling()
         {
             var logMsg = string.Format("{0}/{1} traces throttled in {2} ms", _throttledRequests, _requestsReceived, _currentLogPeriod.ElapsedMilliseconds);
-            TraceManager.Configuration.Logger.LogWarning(logMsg);
+            TraceManager.Logger.LogWarning(logMsg);
         }
 
         private void ResetLogCountersAndTimer()
