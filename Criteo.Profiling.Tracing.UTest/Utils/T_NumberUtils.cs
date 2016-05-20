@@ -4,7 +4,7 @@ using NUnit.Framework;
 namespace Criteo.Profiling.Tracing.UTest.Utils
 {
     [TestFixture]
-    class T_NumberUtils
+    internal class T_NumberUtils
     {
 
         [Test]

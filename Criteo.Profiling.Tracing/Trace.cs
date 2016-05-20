@@ -138,7 +138,7 @@ namespace Criteo.Profiling.Tracing
 
         public override string ToString()
         {
-            return String.Format("Trace [{0}] (CorrelationId {1})", CurrentSpan, CorrelationId.ToString("D"));
+            return string.Format("Trace [{0}] (CorrelationId {1})", CurrentSpan, CorrelationId.ToString("D"));
         }
     }
 

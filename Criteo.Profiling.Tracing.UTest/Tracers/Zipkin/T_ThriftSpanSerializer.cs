@@ -12,7 +12,7 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
 {
 
     [TestFixture]
-    class T_ThriftSpanSerializer
+    internal class T_ThriftSpanSerializer
     {
         private const string SomeRandomAnnotation = "SomethingHappenedHere";
 

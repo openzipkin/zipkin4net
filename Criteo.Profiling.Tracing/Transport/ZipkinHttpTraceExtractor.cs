@@ -37,8 +37,8 @@ namespace Criteo.Profiling.Tracing.Transport
 
         internal static bool TryParseTrace(string encodedTraceId, string encodedSpanId, string encodedParentSpanId, string sampledStr, string flagsStr, out Trace trace)
         {
-            if (String.IsNullOrWhiteSpace(encodedTraceId)
-                || String.IsNullOrWhiteSpace(encodedSpanId))
+            if (string.IsNullOrWhiteSpace(encodedTraceId)
+                || string.IsNullOrWhiteSpace(encodedSpanId))
             {
                 trace = default(Trace);
                 return false;
@@ -48,7 +48,7 @@ namespace Criteo.Profiling.Tracing.Transport
             {
                 var traceId = ZipkinHttpHeaders.DecodeHexString(encodedTraceId);
                 var spanId = ZipkinHttpHeaders.DecodeHexString(encodedSpanId);
-                var parentSpanId = String.IsNullOrWhiteSpace(encodedParentSpanId) ? null : (long?)ZipkinHttpHeaders.DecodeHexString(encodedParentSpanId);
+                var parentSpanId = string.IsNullOrWhiteSpace(encodedParentSpanId) ? null : (long?)ZipkinHttpHeaders.DecodeHexString(encodedParentSpanId);
                 var flags = ZipkinHttpHeaders.ParseFlagsHeader(flagsStr);
                 var sampled = ZipkinHttpHeaders.ParseSampledHeader(sampledStr);
 

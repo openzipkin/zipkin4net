@@ -6,7 +6,7 @@ namespace Criteo.Profiling.Tracing.UTest.Utils
 {
 
     [TestFixture]
-    class T_TimeUtils
+    internal class T_TimeUtils
     {
         [Test]
         public void TimestampGenerationIsCorrect()

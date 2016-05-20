@@ -17,7 +17,7 @@ namespace Criteo.Profiling.Tracing.Tracers.Zipkin
 
         public override string ToString()
         {
-            return String.Format("ZipkinAnn: ts={0} val={1}", TimeUtils.ToUnixTimestamp(Timestamp), Value);
+            return string.Format("ZipkinAnn: ts={0} val={1}", TimeUtils.ToUnixTimestamp(Timestamp), Value);
         }
 
     }

@@ -8,7 +8,7 @@ using Moq;
 namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
 {
     [TestFixture]
-    class T_RateLimiter
+    internal class T_RateLimiter
     {
         private byte[] _data;
         private Mock<IZipkinSender> _underlyingSender;
@@ -72,7 +72,7 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
 
             var tolerance =  1.5 / numberOfSpan + 1.05;
             var trueSendExpect = numberOfSpan * maxSendRequest;
-            var sendExpectationWithBurstTolerance = (int) Math.Ceiling((trueSendExpect * tolerance));
+            var sendExpectationWithBurstTolerance = (int) Math.Ceiling(trueSendExpect * tolerance);
             _underlyingSender.Verify(zipkinSender => zipkinSender.Send(It.Is<byte[]>(bytes => bytes == _data)), Times.AtMost(sendExpectationWithBurstTolerance));
         }
 

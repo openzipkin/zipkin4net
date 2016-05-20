@@ -21,7 +21,7 @@ namespace Criteo.Profiling.Tracing.Utils
 
             return
                 host.AddressList.FirstOrDefault(
-                    ip => (ip.AddressFamily == AddressFamily.InterNetwork && !IPAddress.IsLoopback(ip)));
+                    ip => ip.AddressFamily == AddressFamily.InterNetwork && !IPAddress.IsLoopback(ip));
         }
 
     }

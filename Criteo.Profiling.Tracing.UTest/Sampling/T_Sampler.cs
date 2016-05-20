@@ -5,7 +5,7 @@ using NUnit.Framework;
 namespace Criteo.Profiling.Tracing.UTest.Sampling
 {
     [TestFixture]
-    class T_Sampler
+    internal class T_Sampler
     {
         private const long NoSalt = 0;
 

@@ -7,7 +7,7 @@ using NUnit.Framework;
 namespace Criteo.Profiling.Tracing.UTest.Transport
 {
     [TestFixture]
-    class T_ZipkinHttpTraceExtractor
+    internal class T_ZipkinHttpTraceExtractor
     {
 
         private readonly ZipkinHttpTraceExtractor _extractor = new ZipkinHttpTraceExtractor();

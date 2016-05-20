@@ -4,7 +4,7 @@ using NUnit.Framework;
 namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
 {
     [TestFixture]
-    class T_BinaryAnnotationValueEncoder
+    internal class T_BinaryAnnotationValueEncoder
     {
 
         [Test]

@@ -7,7 +7,7 @@ using NUnit.Framework;
 namespace Criteo.Profiling.Tracing.UTest.Tracers
 {
     [TestFixture]
-    class T_InMemoryTracer
+    internal class T_InMemoryTracer
     {
 
         [Test]

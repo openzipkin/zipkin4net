@@ -59,7 +59,7 @@ namespace Criteo.Profiling.Tracing.Tracers.Zipkin
 
             // Use default value if no information were recorded
             var spanEndpoint = span.Endpoint ?? DefaultEndPoint;
-            var spanServiceName = String.IsNullOrWhiteSpace(span.ServiceName) ? DefaultServiceName : span.ServiceName;
+            var spanServiceName = string.IsNullOrWhiteSpace(span.ServiceName) ? DefaultServiceName : span.ServiceName;
             spanServiceName = spanServiceName.Replace(" ", "_"); // whitespaces cause issues with the query and ui
 
             var host = new Endpoint
@@ -121,14 +121,14 @@ namespace Criteo.Profiling.Tracing.Tracers.Zipkin
                 }
             }
 
-            return (startTime.HasValue && endTime.HasValue) ? (TimeSpan?)endTime.Value.Subtract(startTime.Value) : null;
+            return startTime.HasValue && endTime.HasValue ? (TimeSpan?)endTime.Value.Subtract(startTime.Value) : null;
         }
 
         /// <summary>
         /// Convert this annotation object to its Thrift equivalent.
         /// </summary>
         /// <returns></returns>
-        public static Thrift.Annotation ConvertToThrift(ZipkinAnnotation zipkinAnnotation, Thrift.Endpoint host)
+        public static Thrift.Annotation ConvertToThrift(ZipkinAnnotation zipkinAnnotation, Endpoint host)
         {
             var thriftAnn = new Thrift.Annotation
             {
@@ -144,7 +144,7 @@ namespace Criteo.Profiling.Tracing.Tracers.Zipkin
         /// Convert this span binary annotation object to its Thrift equivalent.
         /// </summary>
         /// <returns></returns>
-        public static Thrift.BinaryAnnotation ConvertToThrift(BinaryAnnotation binaryAnnotation, Thrift.Endpoint host)
+        public static Thrift.BinaryAnnotation ConvertToThrift(BinaryAnnotation binaryAnnotation, Endpoint host)
         {
             return new Thrift.BinaryAnnotation
             {

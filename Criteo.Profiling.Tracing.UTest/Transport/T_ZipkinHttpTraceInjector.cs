@@ -6,7 +6,7 @@ using NUnit.Framework;
 namespace Criteo.Profiling.Tracing.UTest.Transport
 {
     [TestFixture]
-    class T_ZipkinHttpTraceInjector
+    internal class T_ZipkinHttpTraceInjector
     {
         private readonly ZipkinHttpTraceInjector _injector = new ZipkinHttpTraceInjector();
 

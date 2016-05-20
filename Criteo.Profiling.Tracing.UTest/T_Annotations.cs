@@ -4,7 +4,7 @@ using NUnit.Framework;
 namespace Criteo.Profiling.Tracing.UTest
 {
     [TestFixture]
-    class T_Annotations
+    internal class T_Annotations
     {
 
         [Test]

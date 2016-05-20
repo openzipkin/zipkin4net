@@ -29,10 +29,10 @@ namespace Criteo.Profiling.Tracing
 
         public SpanState(long traceId, long? parentSpanId, long spanId, SpanFlags flags)
         {
-            this.TraceId = traceId;
-            this.ParentSpanId = parentSpanId;
-            this.SpanId = spanId;
-            this.Flags = flags;
+            TraceId = traceId;
+            ParentSpanId = parentSpanId;
+            SpanId = spanId;
+            Flags = flags;
         }
 
         /// <summary>
@@ -40,7 +40,7 @@ namespace Criteo.Profiling.Tracing
         /// </summary>
         internal void SetSampled()
         {
-            this.Flags = Flags | SpanFlags.SamplingKnown | SpanFlags.Sampled;
+            Flags = Flags | SpanFlags.SamplingKnown | SpanFlags.Sampled;
         }
 
         public bool Equals(SpanState other)
@@ -54,7 +54,7 @@ namespace Criteo.Profiling.Tracing
         {
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
+            if (obj.GetType() != GetType()) return false;
             return Equals((SpanState)obj);
         }
 
@@ -62,7 +62,7 @@ namespace Criteo.Profiling.Tracing
         {
             unchecked
             {
-                int hashCode = TraceId.GetHashCode();
+                var hashCode = TraceId.GetHashCode();
                 hashCode = (hashCode * 397) ^ SpanId.GetHashCode();
                 return hashCode;
             }
@@ -70,7 +70,7 @@ namespace Criteo.Profiling.Tracing
 
         public override string ToString()
         {
-            return String.Format("{0}.{1}<:{2}", TraceId, SpanId, (ParentSpanId.HasValue) ? ParentSpanId.Value.ToString(CultureInfo.InvariantCulture) : "_");
+            return string.Format("{0}.{1}<:{2}", TraceId, SpanId, ParentSpanId.HasValue ? ParentSpanId.Value.ToString(CultureInfo.InvariantCulture) : "_");
         }
 
     }

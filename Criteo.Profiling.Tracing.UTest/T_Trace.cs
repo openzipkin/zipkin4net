@@ -7,7 +7,7 @@ using NUnit.Framework;
 namespace Criteo.Profiling.Tracing.UTest
 {
     [TestFixture]
-    class T_Trace
+    internal class T_Trace
     {
         [SetUp]
         public void SetUp()

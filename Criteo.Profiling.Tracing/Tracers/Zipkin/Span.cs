@@ -78,12 +78,12 @@ namespace Criteo.Profiling.Tracing.Tracers.Zipkin
 
         public override string ToString()
         {
-            return String.Format("Span: {0} name={1} Annotations={2} BinAnnotations={3}", SpanState, Name, ToString(Annotations, ","), ToString(BinaryAnnotations, ","));
+            return string.Format("Span: {0} name={1} Annotations={2} BinAnnotations={3}", SpanState, Name, ToString(Annotations, ","), ToString(BinaryAnnotations, ","));
         }
 
         private static string ToString<T>(IEnumerable<T> l, string separator)
         {
-            return "[" + String.Join(separator, l.Select(i => i.ToString()).ToArray()) + "]";
+            return "[" + string.Join(separator, l.Select(i => i.ToString()).ToArray()) + "]";
         }
 
     }
