@@ -9,7 +9,7 @@ using NUnit.Framework;
 namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
 {
     [TestFixture]
-    class T_ZipkinTracer
+    internal class T_ZipkinTracer
     {
         private Mock<ISpanSerializer> _spanSerializer;
         private Mock<IZipkinSender> _spanSender;

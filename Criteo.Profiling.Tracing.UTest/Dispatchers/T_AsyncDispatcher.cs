@@ -11,7 +11,7 @@ using NUnit.Framework;
 namespace Criteo.Profiling.Tracing.UTest.Dispatchers
 {
     [TestFixture]
-    class T_AsyncDispatcher
+    internal class T_AsyncDispatcher
     {
 
         [Test]

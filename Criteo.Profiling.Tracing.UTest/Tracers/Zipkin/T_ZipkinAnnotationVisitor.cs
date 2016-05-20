@@ -11,7 +11,7 @@ using Span = Criteo.Profiling.Tracing.Tracers.Zipkin.Span;
 namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
 {
     [TestFixture]
-    class T_ZipkinAnnotationVisitor
+    internal class T_ZipkinAnnotationVisitor
     {
 
         private static readonly SpanState SpanState = new SpanState(1, 0, 2, SpanFlags.None);
@@ -117,7 +117,7 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
         }
 
 
-        private static void AnnotationCorrectlyAdded(IAnnotation ann, String expectedValue)
+        private static void AnnotationCorrectlyAdded(IAnnotation ann, string expectedValue)
         {
             var span = new Span(SpanState, started: TimeUtils.UtcNow);
 

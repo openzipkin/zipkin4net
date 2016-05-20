@@ -6,8 +6,8 @@ namespace Criteo.Profiling.Tracing.Annotation
     {
         internal TagAnnotation(string key, object value)
         {
-            this.Key = key;
-            this.Value = value;
+            Key = key;
+            Value = value;
         }
 
         public string Key { get; private set; }
@@ -15,7 +15,7 @@ namespace Criteo.Profiling.Tracing.Annotation
 
         public override string ToString()
         {
-            return String.Format("{0}: {1} [{2}]", GetType().Name, Key, Value.GetType());
+            return string.Format("{0}: {1} [{2}]", GetType().Name, Key, Value.GetType());
         }
 
         public void Accept(IAnnotationVisitor visitor)
@@ -27,13 +27,13 @@ namespace Criteo.Profiling.Tracing.Annotation
         {
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
+            if (obj.GetType() != GetType()) return false;
             return string.Equals(Key, ((TagAnnotation)obj).Key);
         }
 
         public override int GetHashCode()
         {
-            return (Key != null ? Key.GetHashCode() : 0);
+            return Key != null ? Key.GetHashCode() : 0;
         }
     }
 }

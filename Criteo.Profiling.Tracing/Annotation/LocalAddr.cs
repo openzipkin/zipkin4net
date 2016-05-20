@@ -7,27 +7,27 @@ namespace Criteo.Profiling.Tracing.Annotation
     {
         internal LocalAddr(IPEndPoint endPoint)
         {
-            this.EndPoint = endPoint;
+            EndPoint = endPoint;
         }
 
         public IPEndPoint EndPoint { get; private set; }
 
         public override string ToString()
         {
-            return String.Format("{0} {1}:{2}", GetType().Name, EndPoint.Address, EndPoint.Port);
+            return string.Format("{0} {1}:{2}", GetType().Name, EndPoint.Address, EndPoint.Port);
         }
 
         public override bool Equals(object obj)
         {
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
+            if (obj.GetType() != GetType()) return false;
             return ((LocalAddr)obj).EndPoint.Equals(EndPoint);
         }
 
         public override int GetHashCode()
         {
-            return (EndPoint != null ? EndPoint.GetHashCode() : 0);
+            return EndPoint != null ? EndPoint.GetHashCode() : 0;
         }
 
         public void Accept(IAnnotationVisitor visitor)

@@ -13,14 +13,14 @@ namespace Criteo.Profiling.Tracing.Tracers.Zipkin
 
         public BinaryAnnotation(string key, byte[] value, AnnotationType annotationType)
         {
-            this.Key = key;
-            this.Value = value;
-            this.AnnotationType = annotationType;
+            Key = key;
+            Value = value;
+            AnnotationType = annotationType;
         }
 
         public override string ToString()
         {
-            return String.Format("BinAnn: type={0} key={1}", AnnotationType, Key);
+            return string.Format("BinAnn: type={0} key={1}", AnnotationType, Key);
         }
 
     }

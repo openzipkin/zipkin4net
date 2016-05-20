@@ -4,7 +4,7 @@ using NUnit.Framework;
 namespace Criteo.Profiling.Tracing.UTest
 {
     [TestFixture]
-    class T_TraceContext
+    internal class T_TraceContext
     {
         [Test]
         public void ContextCanBeSetThenGetAndCleared()

@@ -19,16 +19,16 @@ namespace Criteo.Profiling.Tracing.Transport
             return value.ToString("X16");
         }
 
-        public static long DecodeHexString(String longAsHexString)
+        public static long DecodeHexString(string longAsHexString)
         {
             return Convert.ToInt64(longAsHexString, 16);
         }
 
-        public static SpanFlags ParseFlagsHeader(String header)
+        public static SpanFlags ParseFlagsHeader(string header)
         {
             long flagsLong;
 
-            if (!String.IsNullOrEmpty(header) && Int64.TryParse(header, out flagsLong))
+            if (!string.IsNullOrEmpty(header) && long.TryParse(header, out flagsLong))
             {
                 return (SpanFlags)flagsLong;
             }
@@ -36,7 +36,7 @@ namespace Criteo.Profiling.Tracing.Transport
             return SpanFlags.None;
         }
 
-        public static bool? ParseSampledHeader(String header)
+        public static bool? ParseSampledHeader(string header)
         {
             if (header == null) return null;
 

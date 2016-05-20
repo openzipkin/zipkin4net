@@ -35,7 +35,7 @@ namespace Criteo.Profiling.Tracing
 
         public override string ToString()
         {
-            return String.Format("{0} {1}] {2}", Timestamp.ToString(DatetimeFormat), SpanState, Annotation);
+            return string.Format("{0} {1}] {2}", Timestamp.ToString(DatetimeFormat), SpanState, Annotation);
         }
 
     }

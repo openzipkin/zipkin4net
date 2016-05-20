@@ -4,7 +4,7 @@ using NUnit.Framework;
 namespace Criteo.Profiling.Tracing.UTest.Transport
 {
     [TestFixture]
-    class T_ZipkinHttpHeaders
+    internal class T_ZipkinHttpHeaders
     {
         [Test]
         public void LongIdEncodingIsCorrect()

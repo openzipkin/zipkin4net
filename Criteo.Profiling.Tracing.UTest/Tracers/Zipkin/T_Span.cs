@@ -7,7 +7,7 @@ using Span = Criteo.Profiling.Tracing.Tracers.Zipkin.Span;
 namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
 {
     [TestFixture]
-    class T_Span
+    internal class T_Span
     {
 
         [Test]

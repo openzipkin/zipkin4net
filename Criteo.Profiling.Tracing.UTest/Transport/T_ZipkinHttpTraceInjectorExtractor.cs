@@ -6,7 +6,7 @@ using NUnit.Framework;
 namespace Criteo.Profiling.Tracing.UTest.Transport
 {
     [TestFixture]
-    class T_ZipkinHttpTraceInjectorExtractor
+    internal class T_ZipkinHttpTraceInjectorExtractor
     {
 
         [TestCase("0000000000000001", "0000000000000000", "00000000000000FA", "0", null, 4)]

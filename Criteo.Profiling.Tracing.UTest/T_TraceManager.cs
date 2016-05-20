@@ -7,7 +7,7 @@ using NUnit.Framework;
 namespace Criteo.Profiling.Tracing.UTest
 {
     [TestFixture]
-    class T_TraceManager
+    internal class T_TraceManager
     {
         private Mock<ILogger> _mockLogger;
         private Mock<ITracer> _mockTracer;
