@@ -62,6 +62,8 @@
     <Compile Include="Annotation\ServerSend.cs" />
     <Compile Include="Annotation\ServiceName.cs" />
     <Compile Include="Annotation\CommonTags.cs" />
+    <Compile Include="Annotation\WireRecv.cs" />
+    <Compile Include="Annotation\WireSend.cs" />
     <Compile Include="Dispatcher\InOrderAsyncDispatcher.cs" />
     <Compile Include="Dispatcher\IRecordDispatcher.cs" />
     <Compile Include="Dispatcher\VoidDispatcher.cs" />

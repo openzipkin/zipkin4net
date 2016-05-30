@@ -13,6 +13,8 @@ namespace Criteo.Profiling.Tracing
         private static readonly IAnnotation AnnClientSend = new ClientSend();
         private static readonly IAnnotation AnnServerReceive = new ServerRecv();
         private static readonly IAnnotation AnnServerSend = new ServerSend();
+        private static readonly IAnnotation AnnWireSend = new WireSend();
+        private static readonly IAnnotation AnnWireRecv = new WireRecv();
 
         public static IAnnotation ClientRecv()
         {
@@ -32,6 +34,16 @@ namespace Criteo.Profiling.Tracing
         public static IAnnotation ServerSend()
         {
             return AnnServerSend;
+        }
+
+        public static IAnnotation WireSend()
+        {
+            return AnnWireSend;
+        }
+
+        public static IAnnotation WireRecv()
+        {
+            return AnnWireRecv;
         }
 
         public static IAnnotation Rpc(string name)
