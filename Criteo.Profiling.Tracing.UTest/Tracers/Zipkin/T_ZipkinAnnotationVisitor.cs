@@ -114,6 +114,8 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
             AnnotationCorrectlyAdded(Annotations.ClientRecv(), zipkinCoreConstants.CLIENT_RECV);
             AnnotationCorrectlyAdded(Annotations.ServerRecv(), zipkinCoreConstants.SERVER_RECV);
             AnnotationCorrectlyAdded(Annotations.ServerSend(), zipkinCoreConstants.SERVER_SEND);
+            AnnotationCorrectlyAdded(Annotations.WireRecv(), zipkinCoreConstants.WIRE_RECV);
+            AnnotationCorrectlyAdded(Annotations.WireSend(), zipkinCoreConstants.WIRE_SEND);
         }
 
 

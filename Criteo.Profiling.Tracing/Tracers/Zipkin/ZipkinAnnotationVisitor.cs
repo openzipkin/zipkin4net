@@ -35,6 +35,16 @@ namespace Criteo.Profiling.Tracing.Tracers.Zipkin
             AddTimestampedAnnotation(zipkinCoreConstants.SERVER_SEND);
         }
 
+        public void Visit(WireSend wireSend)
+        {
+            AddTimestampedAnnotation(zipkinCoreConstants.WIRE_SEND);
+        }
+
+        public void Visit(WireRecv wireRecv)
+        {
+            AddTimestampedAnnotation(zipkinCoreConstants.WIRE_RECV);
+        }
+
         public void Visit(Event ev)
         {
             AddTimestampedAnnotation(ev.EventName);
