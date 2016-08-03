@@ -3,7 +3,7 @@ using System.Globalization;
 
 namespace Criteo.Profiling.Tracing
 {
-
+    [Serializable]
     public sealed class SpanState : IEquatable<SpanState>
     {
         public long TraceId { get; private set; }

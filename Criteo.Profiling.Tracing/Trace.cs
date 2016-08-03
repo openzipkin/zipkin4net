@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics.Eventing.Reader;
 using Criteo.Profiling.Tracing.Annotation;
 using Criteo.Profiling.Tracing.Utils;
 
@@ -9,6 +8,7 @@ namespace Criteo.Profiling.Tracing
     /// <summary>
     /// Represents a trace. It records the annotations to the globally registered tracers.
     /// </summary>
+    [Serializable]
     public sealed class Trace : IEquatable<Trace>
     {
         /// <summary>
