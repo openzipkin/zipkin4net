@@ -7,7 +7,7 @@ namespace Criteo.Profiling.Tracing
     {
         private const string TraceCallContextKey = "crto_trace";
 
-        private static readonly bool IsRunningOnMono = (Type.GetType("Mono.Runtime") != null);
+        private static readonly bool IsRunningOnMono = Type.GetType("Mono.Runtime") != null;
 
         public static Trace Get()
         {
