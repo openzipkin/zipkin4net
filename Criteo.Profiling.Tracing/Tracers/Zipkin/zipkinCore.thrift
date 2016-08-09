@@ -12,8 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 namespace java com.twitter.zipkin.thriftjava
-namespace csharp Criteo.Profiling.Tracing.Tracers.Zipkin.Thrift
 #@namespace scala com.twitter.zipkin.thriftscala
+namespace csharp Criteo.Profiling.Tracing.Tracers.Zipkin.Thrift
 namespace rb Zipkin
 
 #************** Annotation.value **************
@@ -127,6 +127,14 @@ const string HTTP_METHOD = "http.method"
  * The absolute http path, without any query parameters. Ex. "/objects/abcd-ff"
  *
  * Used to filter against an http route, portably with zipkin v1.
+ *
+ * In zipkin v1, only equals filters are supported. Dropping query parameters makes the number
+ * of distinct URIs less. For example, one can query for the same resource, regardless of signing
+ * parameters encoded in the query line. This does not reduce cardinality to a HTTP single route.
+ * For example, it is common to express a route as an http URI template like
+ * "/resource/{resource_id}". In systems where only equals queries are available, searching for
+ * http/path=/resource won't match if the actual request was /resource/abcd-ff.
+ *
  * Historical note: This was commonly expressed as "http.uri" in zipkin, eventhough it was most
  * often just a path.
  */
@@ -163,7 +171,6 @@ const string HTTP_REQUEST_SIZE = "http.request.size"
  */
 const string HTTP_RESPONSE_SIZE = "http.response.size"
 
-
 /**
  * The value of "lc" is the component or namespace of a local span.
  *
@@ -190,6 +197,26 @@ const string HTTP_RESPONSE_SIZE = "http.response.size"
  * "bootstrap" where "lc=finch"
  */
 const string LOCAL_COMPONENT = "lc"
+
+#***** Annotation.value or BinaryAnnotation.key ******
+/**
+ * When an annotation value, this indicates when an error occurred. When a
+ * binary annotation key, the value is a human readable message associated
+ * with an error.
+ *
+ * Due to transient errors, an ERROR annotation should not be interpreted
+ * as a span failure, even the annotation might explain additional latency.
+ * Instrumentation should add the ERROR binary annotation when the operation
+ * failed and couldn't be recovered.
+ *
+ * Here's an example: A span has an ERROR annotation, added when a WIRE_SEND
+ * failed. Another WIRE_SEND succeeded, so there's no ERROR binary annotation
+ * on the span because the overall operation succeeded.
+ *
+ * Note that RPC spans often include both client and server hosts: It is
+ * possible that only one side perceived the error.
+ */
+const string ERROR = "error"
 
 #***** BinaryAnnotation.key where value = [1] and annotation_type = BOOL ******
 /**
@@ -244,6 +271,10 @@ struct Endpoint {
    * better label based on binary annotations, such as user agent.
    */
   3: string service_name
+  /**
+   * IPv6 host address packed into 16 bytes. Ex Inet6Address.getBytes()
+   */
+  4: optional binary ipv6
 }
 
 /**
@@ -406,7 +437,8 @@ struct Span {
    */
   10: optional i64 timestamp,
   /**
-   * Measurement in microseconds of the critical path, if known.
+   * Measurement in microseconds of the critical path, if known. Durations of
+   * less than one microsecond must be rounded up to 1 microsecond.
    *
    * This value should be set directly, as opposed to implicitly via annotation
    * timestamps. Doing so encourages precision decoupled from problems of
