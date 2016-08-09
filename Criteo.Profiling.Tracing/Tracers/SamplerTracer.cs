@@ -27,7 +27,7 @@
         /// </summary>
         /// <param name="spanState"></param>
         /// <returns></returns>
-        private bool Sample(SpanState spanState)
+        private static bool Sample(SpanState spanState)
         {
             if (spanState.Flags.HasFlag(SpanFlags.SamplingKnown))
             {
