@@ -1,6 +1,8 @@
 ﻿using System;
 using System.IO;
+#if !NET_CORE
 using System.Runtime.Serialization.Formatters.Binary;
+#endif
 using Criteo.Profiling.Tracing.Dispatcher;
 using Criteo.Profiling.Tracing.Logger;
 using Moq;
@@ -112,6 +114,7 @@ namespace Criteo.Profiling.Tracing.UTest
             Assert.AreEqual(SamplingStatus.Sampled, trace.CurrentSpan.SamplingStatus);
         }
 
+#if !NET_CORE
         [Test]
         [Description("Trace should be serializable since we are using LogicalCallContext. " +
                      "See Deserialization of Objects Across App Domains: https://msdn.microsoft.com/en-us/library/dn458353(v=vs.110).aspx")]
@@ -132,6 +135,7 @@ namespace Criteo.Profiling.Tracing.UTest
 
             Assert.AreEqual(trace, deserializedTrace);
         }
+#endif
 
     }
 }

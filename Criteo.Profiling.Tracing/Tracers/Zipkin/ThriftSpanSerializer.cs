@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if !NET_CORE
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -163,3 +164,16 @@ namespace Criteo.Profiling.Tracing.Tracers.Zipkin
 
     }
 }
+#else
+using System.IO;
+
+namespace Criteo.Profiling.Tracing.Tracers.Zipkin
+{
+    internal class ThriftSpanSerializer : ISpanSerializer
+    {
+        public void SerializeTo(Stream stream, Span span)
+        {
+        }
+    }
+}
+#endif

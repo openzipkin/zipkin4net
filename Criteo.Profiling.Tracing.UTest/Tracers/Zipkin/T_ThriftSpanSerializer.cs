@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if !NET_CORE
+using System;
 using System.Net;
 using System.Text;
 using Criteo.Profiling.Tracing.Tracers.Zipkin;
@@ -322,3 +323,4 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
 
     }
 }
+#endif
