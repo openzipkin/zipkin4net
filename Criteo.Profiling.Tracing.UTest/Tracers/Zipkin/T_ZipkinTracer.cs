@@ -26,10 +26,9 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
         }
 
         [Test]
-        [ExpectedException(typeof(ArgumentNullException))]
         public void ShouldThrowWithNullSender()
         {
-            var tracer = new ZipkinTracer(null);
+            Assert.Throws<ArgumentNullException>(() => { var tracer = new ZipkinTracer(null);});
         }
 
         [Test]

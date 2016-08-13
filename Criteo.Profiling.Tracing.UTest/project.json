@@ -1,0 +1,32 @@
+{
+  "buildOptions": {},
+  "dependencies": {
+    "dotnet-test-nunit": "3.4.0-beta-2",
+    "Criteo.Profiling.Tracing": {
+      "version": "*",
+      "target": "project"
+    },
+    "nunit": "3.4.1",
+    "moq": "4.6.36-alpha"
+  },
+  "testRunner": "nunit",
+  "frameworks": {
+    "netcoreapp1.0": {
+      "imports": [
+        "dnxcore50"
+      ],
+      "buildOptions": {
+        "define": [
+          "NET_CORE"
+        ]
+      },
+      "dependencies": {
+        "NETStandard.Library": "1.6.0"
+      }
+    }
+  },
+  "runtimes": {
+    "win7-x64": {},
+    "win81-x64": {}
+  }
+}
