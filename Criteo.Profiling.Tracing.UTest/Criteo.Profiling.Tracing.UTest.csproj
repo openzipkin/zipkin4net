@@ -80,7 +80,9 @@
       <Name>Criteo.Profiling.Tracing</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <None Include="Criteo.Profiling.Tracing.UTest.project.json" />
+  </ItemGroup>
   <Import Project="$(SolutionDir)\.cbs\moab.targets" Condition="Exists('$(SolutionDir)\.cbs\moab.targets')" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.cbs\Checks.targets" Condition="Exists('$(SolutionDir)\.cbs\Checks.targets')" />
