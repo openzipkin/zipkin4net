@@ -117,6 +117,7 @@
     <CompileThrift Include="Tracers\Zipkin\zipkinCore.thrift" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Criteo.Profiling.Tracing.project.json" />
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(SolutionDir)\.cbs\moab.targets" Condition="Exists('$(SolutionDir)\.cbs\moab.targets')" />
