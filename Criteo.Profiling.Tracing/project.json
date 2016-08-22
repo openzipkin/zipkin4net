@@ -1,5 +1,17 @@
 {
-  "buildOptions": {},
+  "configurations": {
+    "Debug": {
+      "buildOptions": {
+        "define": [ "DEBUG" ]
+      }
+    },
+    "Release": {
+      "buildOptions": {
+        "define": [ "RELEASE" ],
+        "optimize": true
+      }
+    }
+  },
   "frameworks": {
     "netstandard1.5": {
       "buildOptions": {
@@ -10,11 +22,11 @@
       "dependencies": {
         "NETStandard.Library": "1.6.0",
         "System.Threading": "4.0.11",
-        "System.Threading.Tasks.Dataflow" : "4.6.0",
+        "System.Threading.Tasks.Dataflow": "4.6.0",
         "System.Collections.Specialized": "4.0.1",
-        "System.Net.NameResolution" : "4.0.0",
+        "System.Net.NameResolution": "4.0.0",
         "System.Net.NetworkInformation": "4.1.0",
-        "System.Runtime.Serialization.Formatters": "4.0.0-rc3-24212-01",
+        "System.Runtime.Serialization.Formatters": "4.0.0-rc3-24212-01"
       }
     }
   }
