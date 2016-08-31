@@ -10,3 +10,5 @@ _ReSharper.*/
 .cbs/
 cbs.log
 logs/
+
+*project.lock.json
