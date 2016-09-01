@@ -2,12 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Resources;
 using Criteo.Profiling.Tracing.Tracers.Zipkin.Thrift;
 
 namespace Criteo.Profiling.Tracing.Tracers.Zipkin
 {
     /// <summary>
-    /// Represent the creation and handling of a single RPC request.
+    /// Represent the creation and handling of a single RPC request
+    /// or of a single local component.
     /// </summary>
     internal class Span
     {
@@ -50,6 +52,11 @@ namespace Criteo.Profiling.Tracing.Tracers.Zipkin
         /// </summary>
         public DateTime Started { get; private set; }
 
+        /// <summary>
+        /// Duration of the span. It is computed when a span is completed.
+        /// </summary>
+        public TimeSpan? Duration { get; private set; }
+
 
         public Span(SpanState spanState, DateTime started)
         {
@@ -62,18 +69,51 @@ namespace Criteo.Profiling.Tracing.Tracers.Zipkin
 
         public void AddAnnotation(ZipkinAnnotation annotation)
         {
-            if (annotation.Value == zipkinCoreConstants.CLIENT_RECV ||
-                annotation.Value == zipkinCoreConstants.SERVER_SEND)
-            {
-                Complete = true;
-            }
-
             Annotations.Add(annotation);
         }
 
         public void AddBinaryAnnotation(BinaryAnnotation binaryAnnotation)
         {
             BinaryAnnotations.Add(binaryAnnotation);
+        }
+
+        public void MarkAsComplete(DateTime timestamp)
+        {
+            Complete = true;
+            Duration = ComputeSpanDuration(timestamp);
+        }
+
+        private TimeSpan? ComputeSpanDuration(DateTime endTime)
+        {
+            DateTime? startTime = null;
+
+            // Priority  is for local component duration
+            var localComponentAnn = BinaryAnnotations.FirstOrDefault(a => a.Key.Equals(zipkinCoreConstants.LOCAL_COMPONENT));
+            if (localComponentAnn != default(BinaryAnnotation))
+            {
+                startTime = localComponentAnn.Timestamp;
+            }
+            else
+            {
+                // Else for the client duration
+                var clientSendAnn = Annotations.FirstOrDefault(a => a.Value.Equals(zipkinCoreConstants.CLIENT_SEND));
+                if (clientSendAnn != default(ZipkinAnnotation))
+                {
+                    startTime = clientSendAnn.Timestamp;
+                }
+                else
+                {
+                    // Else look for server annotations
+                    var serverRecvAnn = Annotations.FirstOrDefault(a => a.Value.Equals(zipkinCoreConstants.SERVER_RECV));
+                    if (serverRecvAnn!= default(ZipkinAnnotation))
+                    {
+                        startTime = serverRecvAnn.Timestamp;
+                    }
+                }
+            }
+
+            var duration = startTime.HasValue ? endTime.Subtract(startTime.Value) : (TimeSpan?)null;
+            return duration.HasValue && duration.Value.TotalMilliseconds > 0 ? duration.Value : (TimeSpan?) null;
         }
 
         public override string ToString()

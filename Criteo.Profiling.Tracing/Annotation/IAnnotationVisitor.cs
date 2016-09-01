@@ -13,5 +13,7 @@
         void Visit(LocalAddr localAddr);
         void Visit(TagAnnotation tagAnnotation);
         void Visit(Event ev);
+        void Visit(LocalOperationStart localOperation);
+        void Visit(LocalOperationStop operation);
     }
 }

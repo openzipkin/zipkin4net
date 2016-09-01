@@ -1,5 +1,6 @@
 ﻿#if !NET_CORE
 using System;
+using System.Linq;
 using System.Net;
 using System.Text;
 using Criteo.Profiling.Tracing.Tracers.Zipkin;
@@ -85,7 +86,8 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
             var span = new Span(spanState, timestamp) { Endpoint = new IPEndPoint(hostIp, hostPort), ServiceName = serviceName, Name = methodName };
 
             var zipkinAnnDateTime = TimeUtils.UtcNow;
-            AddClientSendReceiveAnnotations(span, zipkinAnnDateTime);
+            var timeOffset = TimeSpan.FromMilliseconds(500);
+            AddClientSendReceiveAnnotations(span, zipkinAnnDateTime, timeOffset);
             span.AddAnnotation(new ZipkinAnnotation(zipkinAnnDateTime, SomeRandomAnnotation));
 
             const string binAnnKey = "http.uri";
@@ -124,8 +126,11 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
             thriftSpan.Annotations.ForEach(ann =>
             {
                 Assert.AreEqual(expectedHost, ann.Host);
-                Assert.AreEqual(TimeUtils.ToUnixTimestamp(zipkinAnnDateTime), ann.Timestamp);
             });
+
+            Assert.AreEqual(thriftSpan.Annotations.FirstOrDefault(a => a.Value.Equals(zipkinCoreConstants.CLIENT_SEND)).Timestamp, TimeUtils.ToUnixTimestamp(zipkinAnnDateTime));
+            Assert.AreEqual(thriftSpan.Annotations.FirstOrDefault(a => a.Value.Equals(zipkinCoreConstants.CLIENT_RECV)).Timestamp, TimeUtils.ToUnixTimestamp(zipkinAnnDateTime + timeOffset));
+            Assert.AreEqual(thriftSpan.Annotations.FirstOrDefault(a => a.Value.Equals(SomeRandomAnnotation)).Timestamp, TimeUtils.ToUnixTimestamp(zipkinAnnDateTime));
 
             Assert.AreEqual(1, thriftSpan.Binary_annotations.Count);
 
@@ -137,8 +142,7 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
                 Assert.AreEqual(binAnnType, ann.Annotation_type);
             });
 
-
-            Assert.IsNull(thriftSpan.Duration);
+            Assert.AreEqual(thriftSpan.Duration, timeOffset.TotalMilliseconds * 1000);
         }
 
         [Test]
@@ -166,6 +170,7 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
             });
 
             Assert.AreEqual(defaultName, thriftSpan.Name);
+            Assert.IsNull(thriftSpan.Duration);
         }
 
         [Test]
@@ -221,75 +226,17 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
             Assert.AreEqual("my_Criteo_Service", thriftSpan.Annotations[0].Host.Service_name);
         }
 
-
-        [TestCase(-200, false)]
-        [TestCase(-1, false)]
-        [TestCase(0, false)]
-        [TestCase(1, true)]
-        [TestCase(200, true)]
-        public void SpanHasDurationOnlyIfValueIsPositive(int offset, bool shouldHaveDuration)
-        {
-            var duration = GetSpanDuration(offset, zipkinCoreConstants.CLIENT_SEND, zipkinCoreConstants.CLIENT_RECV);
-            if (shouldHaveDuration)
-            {
-                Assert.AreEqual(offset * 1000, duration);
-            }
-            else
-            {
-                Assert.IsNull(duration);
-            }
-        }
-
-        [Test]
-        public void SpanDoesntHaveDurationIfIncomplete()
-        {
-            const int offset = 10;
-
-            Assert.IsNull(GetSpanDuration(offset, zipkinCoreConstants.SERVER_RECV));
-            Assert.IsNull(GetSpanDuration(offset, zipkinCoreConstants.SERVER_SEND));
-            Assert.IsNull(GetSpanDuration(offset, zipkinCoreConstants.CLIENT_RECV));
-            Assert.IsNull(GetSpanDuration(offset, zipkinCoreConstants.CLIENT_SEND));
-        }
-
-        [Test]
-        public void ClientDurationIsPreferredOverServer()
-        {
-            var spanState = new SpanState(1, 0, 2, SpanFlags.None);
-            var span = new Span(spanState, TimeUtils.UtcNow);
-            const int offset = 10;
-
-            var annotationTime = TimeUtils.UtcNow;
-            span.AddAnnotation(new ZipkinAnnotation(annotationTime, zipkinCoreConstants.SERVER_RECV));
-            span.AddAnnotation(new ZipkinAnnotation(annotationTime.AddMilliseconds(offset), zipkinCoreConstants.SERVER_SEND));
-            span.AddAnnotation(new ZipkinAnnotation(annotationTime.AddMilliseconds(-offset), zipkinCoreConstants.CLIENT_SEND));
-            span.AddAnnotation(new ZipkinAnnotation(annotationTime.AddMilliseconds(2 * offset), zipkinCoreConstants.CLIENT_RECV));
-
-            var duration = ThriftSpanSerializer.ConvertToThrift(span).Duration;
-
-            Assert.AreEqual(3 * offset * 1000 /* microseconds */, duration);
-        }
-
-        private static long? GetSpanDuration(int offset, string firstAnnValue, string secondAnnValue = null)
-        {
-            var spanState = new SpanState(1, 0, 2, SpanFlags.None);
-            var span = new Span(spanState, TimeUtils.UtcNow);
-
-            var annotationTime = TimeUtils.UtcNow;
-            span.AddAnnotation(new ZipkinAnnotation(annotationTime, firstAnnValue));
-            if (secondAnnValue != null) span.AddAnnotation(new ZipkinAnnotation(annotationTime.AddMilliseconds(offset), secondAnnValue));
-
-            return ThriftSpanSerializer.ConvertToThrift(span).Duration;
-        }
-
         private static void AddClientSendReceiveAnnotations(Span span)
         {
-            AddClientSendReceiveAnnotations(span, TimeUtils.UtcNow);
+            AddClientSendReceiveAnnotations(span, TimeUtils.UtcNow, new TimeSpan(0));
         }
 
-        private static void AddClientSendReceiveAnnotations(Span span, DateTime dateTime)
+        private static void AddClientSendReceiveAnnotations(Span span, DateTime startTime, TimeSpan timeOffset )
         {
-            span.AddAnnotation(new ZipkinAnnotation(dateTime, zipkinCoreConstants.CLIENT_SEND));
-            span.AddAnnotation(new ZipkinAnnotation(dateTime, zipkinCoreConstants.CLIENT_RECV));
+            var endtime = startTime + timeOffset;
+            span.AddAnnotation(new ZipkinAnnotation(startTime, zipkinCoreConstants.CLIENT_SEND));
+            span.AddAnnotation(new ZipkinAnnotation(endtime, zipkinCoreConstants.CLIENT_RECV));
+            span.MarkAsComplete(endtime);
         }
 
         private static void AssertSpanHasRequiredFields(Tracing.Tracers.Zipkin.Thrift.Span thriftSpan)

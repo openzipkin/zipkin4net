@@ -108,18 +108,20 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
         }
 
         [Test]
+        [Description("Span should only be marked as complete when either ClientRecv, ServerSend or LocalOperationStop are present.")]
         public void SimpleAnnotationsCorrectlyAdded()
         {
-            AnnotationCorrectlyAdded(Annotations.ClientSend(), zipkinCoreConstants.CLIENT_SEND);
-            AnnotationCorrectlyAdded(Annotations.ClientRecv(), zipkinCoreConstants.CLIENT_RECV);
-            AnnotationCorrectlyAdded(Annotations.ServerRecv(), zipkinCoreConstants.SERVER_RECV);
-            AnnotationCorrectlyAdded(Annotations.ServerSend(), zipkinCoreConstants.SERVER_SEND);
-            AnnotationCorrectlyAdded(Annotations.WireRecv(), zipkinCoreConstants.WIRE_RECV);
-            AnnotationCorrectlyAdded(Annotations.WireSend(), zipkinCoreConstants.WIRE_SEND);
+            AnnotationCorrectlyAdded(Annotations.ClientSend(), zipkinCoreConstants.CLIENT_SEND, false, false);
+            AnnotationCorrectlyAdded(Annotations.ClientRecv(), zipkinCoreConstants.CLIENT_RECV, false, true);
+            AnnotationCorrectlyAdded(Annotations.ServerRecv(), zipkinCoreConstants.SERVER_RECV, false, false);
+            AnnotationCorrectlyAdded(Annotations.ServerSend(), zipkinCoreConstants.SERVER_SEND, false, true);
+            AnnotationCorrectlyAdded(Annotations.WireRecv(), zipkinCoreConstants.WIRE_RECV, false, false);
+            AnnotationCorrectlyAdded(Annotations.WireSend(), zipkinCoreConstants.WIRE_SEND, false, false);
+            AnnotationCorrectlyAdded(Annotations.LocalOperationStart("Operation"), zipkinCoreConstants.LOCAL_COMPONENT, true, false);
         }
 
 
-        private static void AnnotationCorrectlyAdded(IAnnotation ann, string expectedValue)
+        private static void AnnotationCorrectlyAdded(IAnnotation ann, string expectedValue, bool isBinaryAnnotation, bool spanCompleted)
         {
             var span = new Span(SpanState, started: TimeUtils.UtcNow);
 
@@ -131,11 +133,20 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
 
             record.Annotation.Accept(visitor);
 
-            Assert.AreEqual(1, span.Annotations.Count);
-            Assert.AreEqual(expectedValue, span.Annotations.First(_ => true).Value);
+            if (isBinaryAnnotation)
+            {
+                Assert.AreEqual(0, span.Annotations.Count);
+                Assert.AreEqual(1, span.BinaryAnnotations.Count);
+                Assert.AreEqual(expectedValue, span.BinaryAnnotations.First(_ => true).Key);
+            }
+            else
+            {
+                Assert.AreEqual(1, span.Annotations.Count);
+                Assert.AreEqual(0, span.BinaryAnnotations.Count);
+                Assert.AreEqual(expectedValue, span.Annotations.First(_ => true).Value);
+            }
 
-            Assert.AreEqual(0, span.BinaryAnnotations.Count);
+            Assert.AreEqual(spanCompleted, span.Complete);
         }
-
     }
 }

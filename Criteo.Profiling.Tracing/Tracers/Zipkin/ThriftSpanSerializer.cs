@@ -84,46 +84,12 @@ namespace Criteo.Profiling.Tracing.Tracers.Zipkin
             }
 
             // Duration should now be specified
-            var duration = span.Complete ? ComputeSpanDuration(span.Annotations) : null;
-            if (duration.HasValue && duration.Value.TotalMilliseconds > 0)
+            if (span.Duration.HasValue && span.Duration.Value.TotalMilliseconds > 0)
             {
-                thriftSpan.Duration = (long)(duration.Value.TotalMilliseconds * 1000); // microseconds
+                thriftSpan.Duration = (long)(span.Duration.Value.TotalMilliseconds * 1000); // microseconds
             }
 
             return thriftSpan;
-        }
-
-        private static TimeSpan? ComputeSpanDuration(ICollection<ZipkinAnnotation> annotations)
-        {
-            DateTime? startTime = null;
-            DateTime? endTime = null;
-
-            // Priority is for the client duration
-            var clientSendAnn = annotations.FirstOrDefault(a => a.Value.Equals(zipkinCoreConstants.CLIENT_SEND));
-            if (clientSendAnn != default(ZipkinAnnotation))
-            {
-                startTime = clientSendAnn.Timestamp;
-
-                var clientRcvAnn = annotations.FirstOrDefault(a => a.Value.Equals(zipkinCoreConstants.CLIENT_RECV));
-                if (clientRcvAnn != null) endTime = clientRcvAnn.Timestamp;
-            }
-            else
-            {
-                // Else look for server annotations
-                foreach (var ann in annotations)
-                {
-                    if (ann.Value.Equals(zipkinCoreConstants.SERVER_RECV))
-                    {
-                        startTime = ann.Timestamp;
-                    }
-                    else if (ann.Value.Equals(zipkinCoreConstants.SERVER_SEND))
-                    {
-                        endTime = ann.Timestamp;
-                    }
-                }
-            }
-
-            return startTime.HasValue && endTime.HasValue ? (TimeSpan?)endTime.Value.Subtract(startTime.Value) : null;
         }
 
         /// <summary>
