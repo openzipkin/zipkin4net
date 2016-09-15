@@ -42,6 +42,7 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
             Assert.AreEqual(expectedDuration, span.Duration);
         }
 
+#if !NET_CORE
         [Test]
         public void ClientDurationIsPreferredOverServer()
         {
@@ -63,6 +64,7 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
 
             Assert.AreEqual(3 * offset * 1000 /* microseconds */, duration);
         }
+#endif
 
         [TestCase(-200, false)]
         [TestCase(-1, false)]
