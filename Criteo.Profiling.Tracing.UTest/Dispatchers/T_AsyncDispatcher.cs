@@ -142,7 +142,7 @@ namespace Criteo.Profiling.Tracing.UTest.Dispatchers
             {
                 return new InOrderAsyncQueueDispatcher(pushToTracers, maxCapacity);
             }
-            return new InOrderAsyncActionBlockDispatcher(pushToTracers, maxCapacity, timeoutOnStopMs: 100);
+            return new InOrderAsyncActionBlockDispatcher(pushToTracers, maxCapacity);
         }
     }
 
