@@ -12,8 +12,11 @@ namespace Criteo.Profiling.Tracing
     {
         private static int _status = (int)Status.Stopped;
 
+        private static readonly TimeSpan MinimumTimeBetweenDispatchFailureLogs = TimeSpan.FromMinutes(1);
+        private static IRecordDispatcher _dispatcher = new VoidDispatcher();
+        private static DateTime _lastLoggedDispatchFailureMessage = default(DateTime);
+
         internal static readonly ISampler Sampler = new DefaultSampler(salt: RandomUtils.NextLong(), samplingRate: 0f);
-        internal static IRecordDispatcher Dispatcher = new VoidDispatcher();
         internal static ILogger Logger = new VoidLogger();
 
         /// <summary>
@@ -50,7 +53,7 @@ namespace Criteo.Profiling.Tracing
         /// <returns>True if successfully started, false if error or the service was already running.</returns>
         public static bool Start(ILogger logger)
         {
-            return Start(logger, new InOrderAsyncDispatcher(Push, logger));
+            return Start(logger, new InOrderAsyncActionBlockDispatcher(Push));
         }
 
         internal static bool Start(ILogger logger, IRecordDispatcher dispatcher)
@@ -59,7 +62,7 @@ namespace Criteo.Profiling.Tracing
                       (int)Status.Stopped)
             {
                 Logger = logger;
-                Dispatcher = dispatcher;
+                _dispatcher = dispatcher;
                 Logger.LogInformation("Tracing dispatcher started");
                 Logger.LogInformation("HighResolutionDateTime is " + (HighResolutionDateTime.IsAvailable ? "available" : "not available"));
                 return true;
@@ -77,8 +80,8 @@ namespace Criteo.Profiling.Tracing
             if (Interlocked.CompareExchange(ref _status, (int)Status.Stopped, (int)Status.Started) ==
                    (int)Status.Started)
             {
-                Dispatcher.Stop();
-                Dispatcher = new VoidDispatcher();
+                _dispatcher.Stop();
+                _dispatcher = new VoidDispatcher();
                 Logger.LogInformation("Tracing dispatcher stopped");
                 return true;
             }
@@ -105,10 +108,24 @@ namespace Criteo.Profiling.Tracing
             _tracers = new List<ITracer>();
         }
 
-        /// <summary>
-        /// Send a record to all the registered tracers
-        /// </summary>
-        /// <param name="record"></param>
+        internal static void Dispatch(Record record)
+        {
+            if (!_dispatcher.Dispatch(record))
+            {
+                var utcNow = TimeUtils.UtcNow;
+                if (ShouldLogDispatchFailure(utcNow)) // not thread safe we can possibly log multiples warn at the same instant
+                {
+                    Logger.LogWarning("Couldn't dispatch record, actor may be blocked by another operation");
+                    _lastLoggedDispatchFailureMessage = utcNow;
+                }
+            }
+        }
+
+        private static bool ShouldLogDispatchFailure(DateTime now)
+        {
+            return _lastLoggedDispatchFailureMessage == default(DateTime) || now.Subtract(_lastLoggedDispatchFailureMessage) > MinimumTimeBetweenDispatchFailureLogs;
+        }
+
         internal static void Push(Record record)
         {
             foreach (var tracer in _tracers)
@@ -120,7 +137,7 @@ namespace Criteo.Profiling.Tracing
                 catch (Exception ex)
                 {
                     // No exception coming for traces should disrupt the main application as tracing is optional.
-                    Logger.LogWarning("An error occured while recording the annotation. Msg: " + ex.Message);
+                    Logger.LogWarning("An error occured while recording the annotation: " + ex);
                 }
             }
         }

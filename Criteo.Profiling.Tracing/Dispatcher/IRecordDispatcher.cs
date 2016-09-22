@@ -5,7 +5,7 @@
 
         void Stop();
 
-        void Dispatch(Record record);
+        bool Dispatch(Record record);
 
     }
 }

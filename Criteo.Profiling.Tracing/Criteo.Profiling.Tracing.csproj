@@ -66,7 +66,8 @@
     <Compile Include="Annotation\CommonTags.cs" />
     <Compile Include="Annotation\WireRecv.cs" />
     <Compile Include="Annotation\WireSend.cs" />
-    <Compile Include="Dispatcher\InOrderAsyncDispatcher.cs" />
+    <Compile Include="Dispatcher\InOrderAsyncActionBlockDispatcher.cs" />
+    <Compile Include="Dispatcher\InOrderAsyncQueueDispatcher.cs" />
     <Compile Include="Dispatcher\IRecordDispatcher.cs" />
     <Compile Include="Dispatcher\VoidDispatcher.cs" />
     <Compile Include="ILogger.cs" />

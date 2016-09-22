@@ -110,8 +110,7 @@ namespace Criteo.Profiling.Tracing
 
         internal void RecordAnnotation(IAnnotation annotation, DateTime recordTime)
         {
-            var record = new Record(CurrentSpan, recordTime, annotation);
-            TraceManager.Dispatcher.Dispatch(record);
+            TraceManager.Dispatch(new Record(CurrentSpan, recordTime, annotation));
         }
 
         public bool Equals(Trace other)

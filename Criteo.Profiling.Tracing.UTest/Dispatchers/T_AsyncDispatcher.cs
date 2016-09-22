@@ -10,20 +10,29 @@ using NUnit.Framework;
 
 namespace Criteo.Profiling.Tracing.UTest.Dispatchers
 {
-    [TestFixture]
+    [TestFixture(true)]
+    [TestFixture(false)]
     internal class T_AsyncDispatcher
     {
+        private readonly bool _useConcurrentQueueDispatcher;
+
+        public T_AsyncDispatcher(bool useConcurrentQueueDispatcher)
+        {
+            _useConcurrentQueueDispatcher = useConcurrentQueueDispatcher;
+        }
 
         [Test]
         public void RecordShouldBeDispatched()
         {
-            var sync = new AutoResetEvent(false);
+            var sync = new ManualResetEvent(false);
 
             var record = new Record(new SpanState(1, 0, 1, SpanFlags.None), TimeUtils.UtcNow, Annotations.ClientRecv());
 
-            var dispatcher = new InOrderAsyncDispatcher(r =>
+            Record dispatchedRecord = null;
+
+            var dispatcher = GetRecordDispatcher(r =>
             {
-                Assert.AreEqual(record, r);
+                dispatchedRecord = r;
                 sync.Set();
             }, new VoidLogger());
 
@@ -31,6 +40,36 @@ namespace Criteo.Profiling.Tracing.UTest.Dispatchers
             sync.WaitOne();
 
             dispatcher.Stop();
+
+            Assert.AreEqual(record, dispatchedRecord);
+        }
+
+        [Test]
+        public void RecordShouldnotBeDispatchedIfStopped()
+        {
+            var sync = new ManualResetEvent(false);
+
+            var record = new Record(new SpanState(1, 0, 1, SpanFlags.None), TimeUtils.UtcNow, Annotations.ClientRecv());
+
+            int recordsDispatched = 0;
+
+            var dispatcher = GetRecordDispatcher(r =>
+            {
+                Interlocked.Increment(ref recordsDispatched);
+                sync.Set();
+            }, new VoidLogger());
+
+            dispatcher.Dispatch(record);
+            sync.WaitOne();
+
+            dispatcher.Stop();
+
+            dispatcher.Dispatch(record);
+
+            // wait to see if the message eventually gets dispatched
+            Thread.Sleep(500);
+
+            Assert.AreEqual(1, recordsDispatched);
         }
 
         [Test]
@@ -41,10 +80,9 @@ namespace Criteo.Profiling.Tracing.UTest.Dispatchers
             var firstRecord = new Record(new SpanState(1, 0, 1, SpanFlags.None), TimeUtils.UtcNow, Annotations.ClientRecv());
             var secondRecord = new Record(new SpanState(1, 0, 1, SpanFlags.None), TimeUtils.UtcNow, Annotations.ClientRecv());
 
-
             var queue = new ConcurrentQueue<Record>();
 
-            var dispatcher = new InOrderAsyncDispatcher(r =>
+            var dispatcher = GetRecordDispatcher(r =>
             {
                 queue.Enqueue(r);
                 sync.Signal();
@@ -75,23 +113,35 @@ namespace Criteo.Profiling.Tracing.UTest.Dispatchers
 
             const int maxCapacity = 10;
 
-            var dispatcher = new InOrderAsyncDispatcher(r =>
+            var dispatcher = GetRecordDispatcher(r =>
             {
-                Thread.Sleep(TimeSpan.FromDays(1));
-            }, logger.Object, maxCapacity, 100);
+                Thread.Sleep(TimeSpan.FromDays(1)); // long running operation
+            }, logger.Object, maxCapacity);
+
+            bool dispatchSuccess = true;
 
             var task = Task.Factory.StartNew(() =>
             {
-                for (var i = 0; i < maxCapacity + 1; ++i)
+                for (var i = 0; i < maxCapacity; ++i)
                 {
                     dispatcher.Dispatch(record);
                 }
-            }, TaskCreationOptions.LongRunning);
+                dispatchSuccess = dispatcher.Dispatch(record); // maxCapacity + 1
+            });
 
             task.Wait();
             dispatcher.Stop();
 
-            logger.Verify(l => l.LogWarning(It.IsAny<string>()), Times.Once());
+            Assert.IsFalse(dispatchSuccess);
+        }
+
+        public IRecordDispatcher GetRecordDispatcher(Action<Record> pushToTracers, ILogger logger, int maxCapacity = 5000)
+        {
+            if (_useConcurrentQueueDispatcher)
+            {
+                return new InOrderAsyncQueueDispatcher(pushToTracers, maxCapacity);
+            }
+            return new InOrderAsyncActionBlockDispatcher(pushToTracers, maxCapacity, timeoutOnStopMs: 100);
         }
     }
 
