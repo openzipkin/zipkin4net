@@ -21,38 +21,6 @@ namespace Criteo.Profiling.Tracing.UTest
         }
 
         [Test]
-        public void TracerRecordShouldBeCalledIfTracingIsStarted()
-        {
-            var trace = Trace.Create();
-
-            var tracer = new Mock<ITracer>();
-            TraceManager.RegisterTracer(tracer.Object);
-
-            TraceManager.Start(new VoidLogger());
-            Assert.IsTrue(TraceManager.Started);
-
-            trace.Record(Annotations.ServerSend());
-            TraceManager.Stop();
-
-            tracer.Verify(t => t.Record(It.IsAny<Record>()), Times.Once());
-        }
-
-        [Test]
-        public void RecordsShouldntBeSentToTracersIfTracingIsStopped()
-        {
-            var trace = Trace.Create();
-
-            var tracer = new Mock<ITracer>();
-            TraceManager.RegisterTracer(tracer.Object);
-
-            Assert.IsFalse(TraceManager.Started);
-
-            trace.Record(Annotations.ServerSend());
-
-            tracer.Verify(t => t.Record(It.IsAny<Record>()), Times.Never());
-        }
-
-        [Test]
         public void ChildTraceIsCorrectlyCreated()
         {
             var parentTrace = Trace.Create();
