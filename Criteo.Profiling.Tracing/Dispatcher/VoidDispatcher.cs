@@ -6,9 +6,10 @@
         {
         }
 
-        public void Dispatch(Record record)
+        public bool Dispatch(Record record)
         {
             // Throw away
+            return true;
         }
     }
 }
