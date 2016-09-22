@@ -106,7 +106,8 @@ namespace Criteo.Profiling.Tracing.UTest.Dispatchers
         }
 
         [Test]
-        public void DispactherShouldNotEnqueueMessagesInfinitely()
+        [Ignore("Flaky on loaded jenkins slaves")]
+        public void DispatcherShouldNotEnqueueMessagesInfinitely()
         {
             var record = new Record(new SpanState(1, 0, 1, SpanFlags.None), TimeUtils.UtcNow, Annotations.ClientRecv());
             var logger = new Mock<ILogger>();
