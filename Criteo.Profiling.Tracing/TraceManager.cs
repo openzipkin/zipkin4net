@@ -53,7 +53,7 @@ namespace Criteo.Profiling.Tracing
         /// <returns>True if successfully started, false if error or the service was already running.</returns>
         public static bool Start(ILogger logger)
         {
-            return Start(logger, new InOrderAsyncActionBlockDispatcher(Push));
+            return Start(logger, new InOrderAsyncQueueDispatcher(Push));
         }
 
         internal static bool Start(ILogger logger, IRecordDispatcher dispatcher)
