@@ -107,7 +107,6 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
 
             Assert.AreEqual(1, thriftSpan.Trace_id);
             Assert.AreEqual(2, thriftSpan.Id);
-            Assert.AreEqual(TimeUtils.ToUnixTimestamp(timestamp), thriftSpan.Timestamp);
 
             if (span.IsRoot)
             {

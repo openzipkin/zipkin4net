@@ -49,7 +49,6 @@ namespace Criteo.Profiling.Tracing.Tracers.Zipkin
             {
                 Id = span.SpanState.SpanId,
                 Trace_id = span.SpanState.TraceId,
-                Timestamp = TimeUtils.ToUnixTimestamp(span.Started),
                 Name = span.Name ?? DefaultRpcMethodName,
                 Debug = false
             };
