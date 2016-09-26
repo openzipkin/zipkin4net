@@ -10,50 +10,80 @@ namespace Criteo.Profiling.Tracing.Dispatcher
     /// </summary>
     internal class InOrderAsyncQueueDispatcher : IRecordDispatcher
     {
-        private const int WaitSleepTimeMs = 500;
-
+        private readonly Action<Record> _pushToTracers;
+        private readonly int _maxCapacity;
         private readonly int _timeoutOnStopMs;
-        private readonly BlockingCollection<Record> _queue;
+        private readonly ConcurrentQueue<Record> _queue;
         private readonly CancellationTokenSource _cancellationTokenSource;
+        private readonly ManualResetEventSlim _eventSlim;
+        private readonly Task _processQueueTask;
 
         public InOrderAsyncQueueDispatcher(Action<Record> pushToTracers, int maxCapacity = 5000, int timeoutOnStopMs = 10000)
         {
+            _pushToTracers = pushToTracers;
+            _maxCapacity = maxCapacity;
             _timeoutOnStopMs = timeoutOnStopMs;
-            _queue = new BlockingCollection<Record>(maxCapacity);
+            _queue = new ConcurrentQueue<Record>();
             _cancellationTokenSource = new CancellationTokenSource();
+            _eventSlim = new ManualResetEventSlim(false, spinCount: 1);
 
-            Task.Factory.StartNew(() =>
-            {
-                while (!_queue.IsCompleted && !_cancellationTokenSource.IsCancellationRequested)
-                {
-                    var record = _queue.Take(_cancellationTokenSource.Token);
-                    pushToTracers(record);
-                }
-            }, _cancellationTokenSource.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
+            _processQueueTask = Task.Factory.StartNew(Consumer, _cancellationTokenSource.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
         }
 
         public void Stop()
         {
-            _queue.CompleteAdding();
-
-            int maxWaitLoop = _timeoutOnStopMs / WaitSleepTimeMs;
-
-            while (maxWaitLoop > 0 && !_queue.IsCompleted)
-            {
-                Thread.Sleep(WaitSleepTimeMs);
-                maxWaitLoop--;
-            }
-
             _cancellationTokenSource.Cancel(throwOnFirstException: false);
+            _processQueueTask.Wait(_timeoutOnStopMs);
         }
 
         public bool Dispatch(Record record)
         {
-            if (!_queue.IsAddingCompleted)
+            if (ShouldEnqueueRecord())
             {
-                return _queue.TryAdd(record);
+                _queue.Enqueue(record);
+                if (!_eventSlim.IsSet)
+                {
+                    _eventSlim.Set();
+                }
+                return true;
             }
+
             return false;
+        }
+
+        private bool ShouldEnqueueRecord()
+        {
+            return !_cancellationTokenSource.IsCancellationRequested && _queue.Count < _maxCapacity;
+        }
+
+        private void Consumer()
+        {
+            while (!_cancellationTokenSource.IsCancellationRequested)
+            {
+                ProcessQueue();
+
+                try
+                {
+                    _eventSlim.Wait(_cancellationTokenSource.Token);
+                    _eventSlim.Reset();
+                }
+                catch (OperationCanceledException)
+                {
+                    // expected
+                    break;
+                }
+            }
+
+            ProcessQueue(); // one last time for the remaining messages
+        }
+
+        private void ProcessQueue()
+        {
+            Record record;
+            while (_queue.TryDequeue(out record))
+            {
+                _pushToTracers(record);
+            }
         }
     }
 }
