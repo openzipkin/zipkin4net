@@ -110,7 +110,10 @@ namespace Criteo.Profiling.Tracing
 
         internal void RecordAnnotation(IAnnotation annotation, DateTime recordTime)
         {
-            TraceManager.Dispatch(new Record(CurrentSpan, recordTime, annotation));
+            if (ShouldBeRecorded())
+            {
+                TraceManager.Dispatch(new Record(CurrentSpan, recordTime, annotation));
+            }
         }
 
         public bool Equals(Trace other)
@@ -138,6 +141,17 @@ namespace Criteo.Profiling.Tracing
         public override string ToString()
         {
             return string.Format("Trace [{0}] (CorrelationId {1})", CurrentSpan, CorrelationId.ToString("D"));
+        }
+
+        private bool ShouldBeRecorded()
+        {
+            if (CurrentSpan.Flags.HasFlag(SpanFlags.SamplingKnown))
+            {
+                return CurrentSpan.Flags.HasFlag(SpanFlags.Sampled);
+            }
+            //Backward compatibility mode. If sample flag is not set,
+            //the fact that the trace exists means that it is sampled
+            return true;
         }
     }
 

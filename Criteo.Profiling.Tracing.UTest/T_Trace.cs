@@ -5,6 +5,7 @@ using System.Runtime.Serialization.Formatters.Binary;
 #endif
 using Criteo.Profiling.Tracing.Dispatcher;
 using Criteo.Profiling.Tracing.Logger;
+using Criteo.Profiling.Tracing.Utils;
 using Moq;
 using NUnit.Framework;
 
@@ -44,6 +45,7 @@ namespace Criteo.Profiling.Tracing.UTest
         public void TraceCreatesCorrectRecord()
         {
             var trace = Trace.Create();
+            trace.ForceSampled();
 
             var dispatcher = new Mock<IRecordDispatcher>();
             TraceManager.Start(new VoidLogger(), dispatcher.Object);
@@ -58,6 +60,7 @@ namespace Criteo.Profiling.Tracing.UTest
         public void TraceCreatesCorrectRecordWithTimeSpecified()
         {
             var trace = Trace.Create();
+            trace.ForceSampled();
 
             var dispatcher = new Mock<IRecordDispatcher>();
             TraceManager.Start(new VoidLogger(), dispatcher.Object);
@@ -77,9 +80,51 @@ namespace Criteo.Profiling.Tracing.UTest
         {
             var spanState = new SpanState(1, 0, 1, initialFlags);
             var trace = Trace.CreateFromId(spanState);
-
             trace.ForceSampled();
+
             Assert.AreEqual(SamplingStatus.Sampled, trace.CurrentSpan.SamplingStatus);
+        }
+
+        [Test]
+        public void FlagSampledShouldForward()
+        {
+            var dispatcher = new Mock<IRecordDispatcher>();
+            TraceManager.Start(new VoidLogger(), dispatcher.Object);
+
+            var spanState = new SpanState(1, 0, 1, SpanFlags.SamplingKnown | SpanFlags.Sampled);
+            var trace = Trace.CreateFromId(spanState);
+
+            trace.Record(Annotations.ClientRecv());
+
+            dispatcher.Verify(d => d.Dispatch(It.IsAny<Record>()), Times.Once());
+        }
+
+        [Test]
+        public void FlagNotSampledShouldNotForward()
+        {
+            var dispatcher = new Mock<IRecordDispatcher>();
+            TraceManager.Start(new VoidLogger(), dispatcher.Object);
+
+            var spanState = new SpanState(1, 0, 1, SpanFlags.SamplingKnown);
+            var trace = Trace.CreateFromId(spanState);
+
+            trace.Record(Annotations.ClientRecv());
+
+            dispatcher.Verify(d => d.Dispatch(It.IsAny<Record>()), Times.Never);
+        }
+
+        [Test]
+        public void FlagUnsetShouldForwardForBackwardCompatibility()
+        {
+            var dispatcher = new Mock<IRecordDispatcher>();
+            TraceManager.Start(new VoidLogger(), dispatcher.Object);
+
+            var spanState = new SpanState(1, 0, 1, SpanFlags.None);
+            var trace = Trace.CreateFromId(spanState);
+
+            trace.Record(Annotations.ClientRecv());
+
+            dispatcher.Verify(d => d.Dispatch(It.IsAny<Record>()), Times.Once());
         }
 
 #if !NET_CORE
