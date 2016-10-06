@@ -54,7 +54,6 @@
     <Compile Include="Dispatchers\T_AsyncDispatcher.cs" />
     <Compile Include="Sampling\T_Sampler.cs" />
     <Compile Include="Tracers\T_InMemoryTracer.cs" />
-    <Compile Include="Tracers\T_SampleTracer.cs" />
     <Compile Include="Tracers\Zipkin\T_BinaryAnnotationValueEncoder.cs" />
     <Compile Include="Tracers\Zipkin\T_RateLimiter.cs" />
     <Compile Include="Tracers\Zipkin\T_Span.cs" />
