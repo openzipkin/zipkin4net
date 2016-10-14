@@ -58,6 +58,11 @@ namespace Criteo.Profiling.Tracing.Tracers.Zipkin
                 thriftSpan.Parent_id = span.SpanState.ParentSpanId;
             }
 
+            if (span.SpanStarted.HasValue)
+            {
+                thriftSpan.Timestamp = TimeUtils.ToUnixTimestamp(span.SpanStarted.Value);
+            }
+
             // Use default value if no information were recorded
             var spanEndpoint = span.Endpoint ?? DefaultEndPoint;
             var spanServiceName = string.IsNullOrWhiteSpace(span.ServiceName) ? DefaultServiceName : span.ServiceName;
@@ -82,7 +87,6 @@ namespace Criteo.Profiling.Tracing.Tracers.Zipkin
                 thriftSpan.Binary_annotations = thriftBinaryAnnotations;
             }
 
-            // Duration should now be specified
             if (span.Duration.HasValue && span.Duration.Value.TotalMilliseconds > 0)
             {
                 thriftSpan.Duration = (long)(span.Duration.Value.TotalMilliseconds * 1000); // microseconds

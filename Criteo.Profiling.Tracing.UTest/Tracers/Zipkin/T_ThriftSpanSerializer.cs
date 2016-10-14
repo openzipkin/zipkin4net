@@ -27,7 +27,7 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
             var data = Encoding.ASCII.GetBytes("hello");
             const AnnotationType type = AnnotationType.STRING;
 
-            var binAnn = new BinaryAnnotation(key, data, type);
+            var binAnn = new BinaryAnnotation(key, data, type, TimeUtils.UtcNow);
 
             var thriftBinAnn = ThriftSpanSerializer.ConvertToThrift(binAnn, _someHost);
 
@@ -40,7 +40,7 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
         [Test]
         public void ThriftConversionLocalComponentWithoutHost()
         {
-            var binAnn = new BinaryAnnotation(zipkinCoreConstants.LOCAL_COMPONENT, Encoding.ASCII.GetBytes("hello"), AnnotationType.STRING);
+            var binAnn = new BinaryAnnotation(zipkinCoreConstants.LOCAL_COMPONENT, Encoding.ASCII.GetBytes("hello"), AnnotationType.STRING, TimeUtils.UtcNow);
             var thriftBinAnn = ThriftSpanSerializer.ConvertToThrift(binAnn, _someHost);
             Assert.IsNull(thriftBinAnn.Host);
         }
@@ -102,7 +102,7 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
             var binAnnVal = new byte[] { 0x00 };
             const AnnotationType binAnnType = AnnotationType.STRING;
 
-            span.AddBinaryAnnotation(new BinaryAnnotation(binAnnKey, binAnnVal, binAnnType));
+            span.AddBinaryAnnotation(new BinaryAnnotation(binAnnKey, binAnnVal, binAnnType, TimeUtils.UtcNow));
 
             var thriftSpan = ThriftSpanSerializer.ConvertToThrift(span);
 
@@ -115,6 +115,8 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
 
             Assert.AreEqual(1, thriftSpan.Trace_id);
             Assert.AreEqual(2, thriftSpan.Id);
+            // Timestamp must not be serialized except for Local Component. See TimestampSerializedForLocalComponent()
+            Assert.False(thriftSpan.Timestamp.HasValue);
 
             if (span.IsRoot)
             {
@@ -150,6 +152,24 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
             });
 
             Assert.AreEqual(thriftSpan.Duration, timeOffset.TotalMilliseconds * 1000);
+        }
+
+        [Test]
+        public void TimestampConvertedForLocalComponent()
+        {
+            var startTime = DateTime.Now;
+            var spanState = new SpanState(1, 0, 2, SpanFlags.None);
+            var span = new Span(spanState, TimeUtils.UtcNow);
+
+            var recordStart = new Record(spanState, startTime, Annotations.LocalOperationStart("Operation"));
+            var visitorStart = new ZipkinAnnotationVisitor(recordStart, span);
+            recordStart.Annotation.Accept(visitorStart);
+            var recordStop = new Record(spanState, startTime.AddHours(1), Annotations.LocalOperationStop());
+            var visitorStop = new ZipkinAnnotationVisitor(recordStop, span);
+            recordStop.Annotation.Accept(visitorStop);
+
+            var thriftSpan = ThriftSpanSerializer.ConvertToThrift(span);
+            Assert.AreEqual(TimeUtils.ToUnixTimestamp(startTime), thriftSpan.Timestamp);
         }
 
         [Test]
@@ -243,7 +263,7 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
             var endtime = startTime + timeOffset;
             span.AddAnnotation(new ZipkinAnnotation(startTime, zipkinCoreConstants.CLIENT_SEND));
             span.AddAnnotation(new ZipkinAnnotation(endtime, zipkinCoreConstants.CLIENT_RECV));
-            span.MarkAsComplete(endtime);
+            span.SetAsComplete(endtime);
         }
 
         private static void AssertSpanHasRequiredFields(Tracing.Tracers.Zipkin.Thrift.Span thriftSpan)

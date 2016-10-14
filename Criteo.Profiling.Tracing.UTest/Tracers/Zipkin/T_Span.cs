@@ -11,27 +11,29 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
     internal class T_Span
     {
         [Test]
-        public void SpanDurationComputedWhenSetAsComplete()
+        public void DurationAndSpanstartedSetWhenSetAsComplete()
         {
-            VerifySpanDurationComputedWhenSetAsComplete(Annotations.ClientSend(), Annotations.ClientRecv());
-            VerifySpanDurationComputedWhenSetAsComplete(Annotations.ServerRecv(), Annotations.ServerSend());
-            VerifySpanDurationComputedWhenSetAsComplete(Annotations.LocalOperationStart("Operation"), Annotations.LocalOperationStop());
+            VerifySpanDurationComputedWhenSetAsComplete(Annotations.ClientSend(), Annotations.ClientRecv(), false);
+            VerifySpanDurationComputedWhenSetAsComplete(Annotations.ServerRecv(), Annotations.ServerSend(), false);
+            VerifySpanDurationComputedWhenSetAsComplete(Annotations.LocalOperationStart("Operation"), Annotations.LocalOperationStop(), true);
         }
 
-        private static void VerifySpanDurationComputedWhenSetAsComplete(IAnnotation start, IAnnotation stop)
+        private static void VerifySpanDurationComputedWhenSetAsComplete(IAnnotation start, IAnnotation stop, bool isSpanStartedSet)
         {
             var startTime = DateTime.Now;
             var endTime = startTime.AddHours(1);
             var expectedDuration = endTime.Subtract(startTime);
 
-            var SpanState = new SpanState(1, 0, 2, SpanFlags.None);
-            var span = new Span(SpanState, started: TimeUtils.UtcNow);
+            var spanState = new SpanState(1, 0, 2, SpanFlags.None);
+            var spanCreatedTimestamp = TimeUtils.UtcNow;
+            var span = new Span(spanState, spanCreatedTimestamp);
 
-            var recordStart = new Record(SpanState, startTime, start);
+            var recordStart = new Record(spanState, startTime, start);
             var visitorStart = new ZipkinAnnotationVisitor(recordStart, span);
-            var recordStop  = new Record(SpanState, endTime, stop);
+            var recordStop  = new Record(spanState, endTime, stop);
             var visitorStop  = new ZipkinAnnotationVisitor(recordStop, span);
 
+            Assert.AreEqual(spanCreatedTimestamp, span.SpanCreated);
             Assert.False(span.Duration.HasValue);
             Assert.False(span.Complete);
             recordStart.Annotation.Accept(visitorStart);
@@ -40,6 +42,10 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
             recordStop.Annotation.Accept(visitorStop);
             Assert.True(span.Complete);
             Assert.AreEqual(expectedDuration, span.Duration);
+            if (isSpanStartedSet)
+                Assert.AreEqual(startTime, span.SpanStarted);
+            else
+                Assert.False(span.SpanStarted.HasValue);
         }
 
 #if !NET_CORE
@@ -80,7 +86,7 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
             }
             else
             {
-                Assert.IsNull(duration);
+                Assert.False(duration.HasValue);
             }
         }
 
@@ -89,12 +95,12 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
         {
             const int offset = 10;
 
-            Assert.IsNull(GetSpanDuration(offset, Annotations.ServerRecv()));
-            Assert.IsNull(GetSpanDuration(offset, Annotations.ServerSend()));
-            Assert.IsNull(GetSpanDuration(offset, Annotations.ClientRecv()));
-            Assert.IsNull(GetSpanDuration(offset, Annotations.ClientSend()));
-            Assert.IsNull(GetSpanDuration(offset, Annotations.LocalOperationStart("Operation")));
-            Assert.IsNull(GetSpanDuration(offset, Annotations.LocalOperationStop()));
+            Assert.False(GetSpanDuration(offset, Annotations.ServerRecv()).HasValue);
+            Assert.False(GetSpanDuration(offset, Annotations.ServerSend()).HasValue);
+            Assert.False(GetSpanDuration(offset, Annotations.ClientRecv()).HasValue);
+            Assert.False(GetSpanDuration(offset, Annotations.ClientSend()).HasValue);
+            Assert.False(GetSpanDuration(offset, Annotations.LocalOperationStart("Operation")).HasValue);
+            Assert.False(GetSpanDuration(offset, Annotations.LocalOperationStop()).HasValue);
         }
 
 
