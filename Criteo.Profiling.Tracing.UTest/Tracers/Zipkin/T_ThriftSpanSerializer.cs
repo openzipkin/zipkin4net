@@ -38,6 +38,14 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
         }
 
         [Test]
+        public void ThriftConversionLocalComponentWithoutHost()
+        {
+            var binAnn = new BinaryAnnotation(zipkinCoreConstants.LOCAL_COMPONENT, Encoding.ASCII.GetBytes("hello"), AnnotationType.STRING);
+            var thriftBinAnn = ThriftSpanSerializer.ConvertToThrift(binAnn, _someHost);
+            Assert.IsNull(thriftBinAnn.Host);
+        }
+
+        [Test]
         public void ThriftConversionZipkinAnnotationIsCorrect()
         {
             var now = TimeUtils.UtcNow;
