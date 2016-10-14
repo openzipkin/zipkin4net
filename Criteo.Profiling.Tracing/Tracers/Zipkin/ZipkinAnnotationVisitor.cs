@@ -18,7 +18,7 @@ namespace Criteo.Profiling.Tracing.Tracers.Zipkin
         public void Visit(ClientRecv clientRecv)
         {
             AddTimestampedAnnotation(zipkinCoreConstants.CLIENT_RECV);
-            _span.MarkAsComplete(_record.Timestamp);
+            _span.SetAsComplete(_record.Timestamp);
         }
 
         public void Visit(ClientSend clientSend)
@@ -34,7 +34,7 @@ namespace Criteo.Profiling.Tracing.Tracers.Zipkin
         public void Visit(ServerSend serverSend)
         {
             AddTimestampedAnnotation(zipkinCoreConstants.SERVER_SEND);
-            _span.MarkAsComplete(_record.Timestamp);
+            _span.SetAsComplete(_record.Timestamp);
         }
 
         public void Visit(WireSend wireSend)
@@ -74,7 +74,7 @@ namespace Criteo.Profiling.Tracing.Tracers.Zipkin
 
         public void Visit(LocalOperationStop operation)
         {
-            _span.MarkAsComplete(_record.Timestamp);
+            _span.SetAsComplete(_record.Timestamp);
         }
 
         public void Visit(LocalOperationStart localOperation)

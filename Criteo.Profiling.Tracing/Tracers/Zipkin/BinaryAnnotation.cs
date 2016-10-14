@@ -11,9 +11,9 @@ namespace Criteo.Profiling.Tracing.Tracers.Zipkin
 
         public string Key { get; private set; }
 
-        public DateTime? Timestamp { get; private set; }
+        public DateTime Timestamp { get; private set; }
 
-        internal BinaryAnnotation(string key, byte[] value, AnnotationType annotationType, DateTime? timestamp = null)
+        internal BinaryAnnotation(string key, byte[] value, AnnotationType annotationType, DateTime timestamp)
         {
             Key = key;
             Value = value;

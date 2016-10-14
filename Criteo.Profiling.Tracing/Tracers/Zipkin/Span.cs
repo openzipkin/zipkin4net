@@ -50,7 +50,13 @@ namespace Criteo.Profiling.Tracing.Tracers.Zipkin
         /// <summary>
         /// DateTime of the span creation. It is currently only use for flushing old spans.
         /// </summary>
-        public DateTime Started { get; private set; }
+        public DateTime SpanCreated { get; private set; }
+
+        /// <summary>
+        /// DateTime of the first operation of this span (ServerRecv, ClientSend, or LocalComponent).
+        /// It is computed when a span is completed.
+        /// </summary>
+        public DateTime? SpanStarted { get; private set; }
 
         /// <summary>
         /// Duration of the span. It is computed when a span is completed.
@@ -58,13 +64,13 @@ namespace Criteo.Profiling.Tracing.Tracers.Zipkin
         public TimeSpan? Duration { get; private set; }
 
 
-        public Span(SpanState spanState, DateTime started)
+        public Span(SpanState spanState, DateTime spanCreated)
         {
             Annotations = new List<ZipkinAnnotation>();
             BinaryAnnotations = new List<BinaryAnnotation>();
             Complete = false;
             SpanState = spanState;
-            Started = started;
+            SpanCreated = spanCreated;
         }
 
         public void AddAnnotation(ZipkinAnnotation annotation)
@@ -77,13 +83,13 @@ namespace Criteo.Profiling.Tracing.Tracers.Zipkin
             BinaryAnnotations.Add(binaryAnnotation);
         }
 
-        public void MarkAsComplete(DateTime timestamp)
+        public void SetAsComplete(DateTime timestamp)
         {
             Complete = true;
-            Duration = ComputeSpanDuration(timestamp);
+            SetSpanStartedAndDuration(timestamp);
         }
 
-        private TimeSpan? ComputeSpanDuration(DateTime endTime)
+        private void SetSpanStartedAndDuration(DateTime endTime)
         {
             DateTime? startTime = null;
 
@@ -91,7 +97,9 @@ namespace Criteo.Profiling.Tracing.Tracers.Zipkin
             var localComponentAnn = BinaryAnnotations.FirstOrDefault(a => a.Key.Equals(zipkinCoreConstants.LOCAL_COMPONENT));
             if (localComponentAnn != default(BinaryAnnotation))
             {
+                // LocalComponent needs a start timestamp
                 startTime = localComponentAnn.Timestamp;
+                SpanStarted = startTime;
             }
             else
             {
@@ -112,8 +120,14 @@ namespace Criteo.Profiling.Tracing.Tracers.Zipkin
                 }
             }
 
-            var duration = startTime.HasValue ? endTime.Subtract(startTime.Value) : (TimeSpan?)null;
-            return duration.HasValue && duration.Value.TotalMilliseconds > 0 ? duration.Value : (TimeSpan?) null;
+            if (! startTime.HasValue)
+                return;
+
+            var duration = endTime.Subtract(startTime.Value);
+            if (duration.TotalMilliseconds > 0)
+            {
+                Duration = duration;
+            }
         }
 
         public override string ToString()

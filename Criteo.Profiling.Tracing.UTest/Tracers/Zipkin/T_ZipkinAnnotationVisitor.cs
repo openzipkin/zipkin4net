@@ -19,7 +19,7 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
         [Test]
         public void RpcNameAnnotationChangesSpanName()
         {
-            var span = new Span(SpanState, started: TimeUtils.UtcNow);
+            var span = new Span(SpanState, spanCreated: TimeUtils.UtcNow);
 
             CreateAndVisitRecord(span, Annotations.Rpc("myRPCmethod"));
 
@@ -29,7 +29,7 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
         [Test]
         public void ServNameAnnotationChangesSpanServName()
         {
-            var span = new Span(SpanState, started: TimeUtils.UtcNow);
+            var span = new Span(SpanState, spanCreated: TimeUtils.UtcNow);
 
             CreateAndVisitRecord(span, Annotations.ServiceName("myService"));
 
@@ -39,7 +39,7 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
         [Test]
         public void LocalAddrAnnotationChangesSpanLocalAddr()
         {
-            var span = new Span(SpanState, started: TimeUtils.UtcNow);
+            var span = new Span(SpanState, spanCreated: TimeUtils.UtcNow);
 
             var ipEndpoint = new IPEndPoint(IPAddress.Loopback, 9987);
             CreateAndVisitRecord(span, Annotations.LocalAddr(ipEndpoint));
@@ -51,7 +51,7 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
         [Description("RPC, ServiceName and LocalAddr annotations override any previous recorded value.")]
         public void LastAnnotationValueIsKeptIfMultipleRecord()
         {
-            var span = new Span(SpanState, started: TimeUtils.UtcNow);
+            var span = new Span(SpanState, spanCreated: TimeUtils.UtcNow);
 
             CreateAndVisitRecord(span, Annotations.ServiceName("myService"));
             CreateAndVisitRecord(span, Annotations.ServiceName("someOtherName"));
@@ -76,7 +76,7 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
         [TestCase(9.3d, new byte[] { 0x40, 0x22, 0x99, 0x99, 0x99, 0x99, 0x99, 0x9A, }, AnnotationType.DOUBLE)]
         public void TagAnnotationCorrectlyAdded(object value, byte[] expectedBytes, AnnotationType expectedType)
         {
-            var span = new Span(SpanState, started: TimeUtils.UtcNow);
+            var span = new Span(SpanState, spanCreated: TimeUtils.UtcNow);
 
             var record = new Record(SpanState, TimeUtils.UtcNow, new TagAnnotation("magicKey", value));
             var visitor = new ZipkinAnnotationVisitor(record, span);
@@ -99,7 +99,7 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
         [Test]
         public void UnsupportedTagAnnotationShouldThrow()
         {
-            var span = new Span(SpanState, started: TimeUtils.UtcNow);
+            var span = new Span(SpanState, spanCreated: TimeUtils.UtcNow);
 
             var record = new Record(SpanState, TimeUtils.UtcNow, new TagAnnotation("magicKey", 1f));
             var visitor = new ZipkinAnnotationVisitor(record, span);
@@ -123,7 +123,7 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
 
         private static void AnnotationCorrectlyAdded(IAnnotation ann, string expectedValue, bool isBinaryAnnotation, bool spanCompleted)
         {
-            var span = new Span(SpanState, started: TimeUtils.UtcNow);
+            var span = new Span(SpanState, spanCreated: TimeUtils.UtcNow);
 
             var record = new Record(SpanState, TimeUtils.UtcNow, ann);
             var visitor = new ZipkinAnnotationVisitor(record, span);
