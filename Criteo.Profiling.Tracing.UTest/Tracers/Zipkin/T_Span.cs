@@ -66,9 +66,8 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
             var recordClientRecv = new Record(spanState, annotationTime.AddMilliseconds(2 * offset), Annotations.ClientRecv());
             recordClientRecv.Annotation.Accept(new ZipkinAnnotationVisitor(recordClientRecv, span));
 
-            var duration = ThriftSpanSerializer.ConvertToThrift(span).Duration;
-
-            Assert.AreEqual(3 * offset * 1000 /* microseconds */, duration);
+            Assert.True(span.Duration.HasValue);
+            Assert.AreEqual(3 * offset, span.Duration.Value.TotalMilliseconds);
         }
 #endif
 
