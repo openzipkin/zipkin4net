@@ -16,7 +16,7 @@ namespace Criteo.Profiling.Tracing.UTest.Utils
 
             var utcDateTime = new DateTime(1990, 3, 9, 11, 18, 36, DateTimeKind.Utc);
 
-            var timestamp = TimeUtils.ToUnixTimestamp(utcDateTime);
+            var timestamp = utcDateTime.ToUnixTimestamp();
 
             Assert.AreEqual(expectedTimestamp, timestamp);
         }

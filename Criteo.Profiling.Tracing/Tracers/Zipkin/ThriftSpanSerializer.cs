@@ -60,7 +60,7 @@ namespace Criteo.Profiling.Tracing.Tracers.Zipkin
 
             if (span.SpanStarted.HasValue)
             {
-                thriftSpan.Timestamp = TimeUtils.ToUnixTimestamp(span.SpanStarted.Value);
+                thriftSpan.Timestamp = span.SpanStarted.Value.ToUnixTimestamp();
             }
 
             // Use default value if no information were recorded
@@ -103,7 +103,7 @@ namespace Criteo.Profiling.Tracing.Tracers.Zipkin
         {
             var thriftAnn = new Thrift.Annotation
             {
-                Timestamp = TimeUtils.ToUnixTimestamp(zipkinAnnotation.Timestamp),
+                Timestamp = zipkinAnnotation.Timestamp.ToUnixTimestamp(),
                 Value = zipkinAnnotation.Value,
                 Host = host
             };
