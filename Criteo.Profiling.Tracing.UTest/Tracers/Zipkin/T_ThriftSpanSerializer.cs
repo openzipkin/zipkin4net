@@ -115,8 +115,7 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
 
             Assert.AreEqual(1, thriftSpan.Trace_id);
             Assert.AreEqual(2, thriftSpan.Id);
-            // Timestamp must not be serialized except for Local Component. See TimestampSerializedForLocalComponent()
-            Assert.False(thriftSpan.Timestamp.HasValue);
+            Assert.True(thriftSpan.Timestamp.HasValue);
 
             if (span.IsRoot)
             {

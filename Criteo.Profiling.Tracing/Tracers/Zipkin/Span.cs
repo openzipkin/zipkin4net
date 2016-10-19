@@ -86,48 +86,59 @@ namespace Criteo.Profiling.Tracing.Tracers.Zipkin
         public void SetAsComplete(DateTime timestamp)
         {
             Complete = true;
-            SetSpanStartedAndDuration(timestamp);
+            SetDurationAndSpanStarted(timestamp);
         }
 
-        private void SetSpanStartedAndDuration(DateTime endTime)
+        private void SetDurationAndSpanStarted(DateTime endTime)
         {
-            DateTime? startTime = null;
+            var startTime = default(DateTime);
+            BinaryAnnotation binaryAnnotation;
+            ZipkinAnnotation annotation;
 
-            // Priority  is for local component duration
-            var localComponentAnn = BinaryAnnotations.FirstOrDefault(a => a.Key.Equals(zipkinCoreConstants.LOCAL_COMPONENT));
-            if (localComponentAnn != default(BinaryAnnotation))
+            // Priority is for local component duration
+            if (TryGetLocalComponent(out binaryAnnotation))
             {
-                // LocalComponent needs a start timestamp
-                startTime = localComponentAnn.Timestamp;
-                SpanStarted = startTime;
+                startTime = binaryAnnotation.Timestamp;
             }
-            else
+            // Else for the client duration
+            else if (TryGetClientSend(out annotation))
             {
-                // Else for the client duration
-                var clientSendAnn = Annotations.FirstOrDefault(a => a.Value.Equals(zipkinCoreConstants.CLIENT_SEND));
-                if (clientSendAnn != default(ZipkinAnnotation))
-                {
-                    startTime = clientSendAnn.Timestamp;
-                }
-                else
-                {
-                    // Else look for server annotations
-                    var serverRecvAnn = Annotations.FirstOrDefault(a => a.Value.Equals(zipkinCoreConstants.SERVER_RECV));
-                    if (serverRecvAnn!= default(ZipkinAnnotation))
-                    {
-                        startTime = serverRecvAnn.Timestamp;
-                    }
-                }
+                startTime = annotation.Timestamp;
+            }
+            // Else look for server annotations
+            else if(IsRoot && TryGetServerRecv(out annotation))
+            {
+                startTime = annotation.Timestamp;
             }
 
-            if (! startTime.HasValue)
+            if (startTime == default(DateTime))
                 return;
 
-            var duration = endTime.Subtract(startTime.Value);
-            if (duration.TotalMilliseconds > 0)
-            {
-                Duration = duration;
-            }
+            SpanStarted = startTime;
+            TimeSpan? duration = endTime.Subtract(startTime);
+            Duration = duration.Value.TotalMilliseconds > 0 ? duration : null;
+        }
+
+        private bool TryGetLocalComponent(out BinaryAnnotation localComponentBinAnnotation)
+        {
+            localComponentBinAnnotation = BinaryAnnotations.FirstOrDefault(a => a.Key.Equals(zipkinCoreConstants.LOCAL_COMPONENT));
+            return localComponentBinAnnotation != default(BinaryAnnotation);
+        }
+
+        private bool TryGetClientSend(out ZipkinAnnotation clientSendAnnotation)
+        {
+            return TryGetAnnotation(zipkinCoreConstants.CLIENT_SEND, out clientSendAnnotation);
+        }
+
+        private bool TryGetServerRecv(out ZipkinAnnotation serverRecvAnnotation)
+        {
+            return TryGetAnnotation(zipkinCoreConstants.SERVER_RECV, out serverRecvAnnotation);
+        }
+
+        private bool TryGetAnnotation(string annotationType, out ZipkinAnnotation annotation)
+        {
+            annotation = Annotations.FirstOrDefault(a => a.Value.Equals(annotationType));
+            return annotation != default(ZipkinAnnotation);
         }
 
         public override string ToString()
