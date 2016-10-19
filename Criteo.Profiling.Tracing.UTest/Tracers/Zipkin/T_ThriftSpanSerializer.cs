@@ -55,7 +55,7 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
             var thriftAnn = ThriftSpanSerializer.ConvertToThrift(ann, _someHost);
 
             Assert.NotNull(thriftAnn);
-            Assert.AreEqual(TimeUtils.ToUnixTimestamp(now), thriftAnn.Timestamp);
+            Assert.AreEqual(now.ToUnixTimestamp(), thriftAnn.Timestamp);
             Assert.AreEqual(value, thriftAnn.Value);
             AssertEndpointIsCorrect(thriftAnn.Host);
         }
@@ -137,9 +137,9 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
                 Assert.AreEqual(expectedHost, ann.Host);
             });
 
-            Assert.AreEqual(thriftSpan.Annotations.FirstOrDefault(a => a.Value.Equals(zipkinCoreConstants.CLIENT_SEND)).Timestamp, TimeUtils.ToUnixTimestamp(zipkinAnnDateTime));
-            Assert.AreEqual(thriftSpan.Annotations.FirstOrDefault(a => a.Value.Equals(zipkinCoreConstants.CLIENT_RECV)).Timestamp, TimeUtils.ToUnixTimestamp(zipkinAnnDateTime + timeOffset));
-            Assert.AreEqual(thriftSpan.Annotations.FirstOrDefault(a => a.Value.Equals(SomeRandomAnnotation)).Timestamp, TimeUtils.ToUnixTimestamp(zipkinAnnDateTime));
+            Assert.AreEqual(thriftSpan.Annotations.FirstOrDefault(a => a.Value.Equals(zipkinCoreConstants.CLIENT_SEND)).Timestamp, zipkinAnnDateTime.ToUnixTimestamp());
+            Assert.AreEqual(thriftSpan.Annotations.FirstOrDefault(a => a.Value.Equals(zipkinCoreConstants.CLIENT_RECV)).Timestamp, (zipkinAnnDateTime + timeOffset).ToUnixTimestamp());
+            Assert.AreEqual(thriftSpan.Annotations.FirstOrDefault(a => a.Value.Equals(SomeRandomAnnotation)).Timestamp, zipkinAnnDateTime.ToUnixTimestamp());
 
             Assert.AreEqual(1, thriftSpan.Binary_annotations.Count);
 
@@ -169,7 +169,7 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
             recordStop.Annotation.Accept(visitorStop);
 
             var thriftSpan = ThriftSpanSerializer.ConvertToThrift(span);
-            Assert.AreEqual(TimeUtils.ToUnixTimestamp(startTime), thriftSpan.Timestamp);
+            Assert.AreEqual(startTime.ToUnixTimestamp(), thriftSpan.Timestamp);
         }
 
         [Test]
