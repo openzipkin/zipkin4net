@@ -121,6 +121,7 @@
   <ItemGroup>
     <None Include="Criteo.Profiling.Tracing.project.json" />
     <None Include="packages.config" />
+    <Compile Include="Trace.netfw.cs" />
   </ItemGroup>
   <Import Project="$(SolutionDir)\.cbs\moab.targets" Condition="Exists('$(SolutionDir)\.cbs\moab.targets')" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

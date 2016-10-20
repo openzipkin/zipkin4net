@@ -8,11 +8,7 @@ namespace Criteo.Profiling.Tracing
     /// <summary>
     /// Represents a trace. It records the annotations to the globally registered tracers.
     /// </summary>
-#if NET_CORE
-    public sealed class Trace : IEquatable<Trace>
-#else
-    public sealed class Trace : MarshalByRefObject, IEquatable<Trace>
-#endif
+    public sealed partial class Trace : IEquatable<Trace>
     {
         /// <summary>
         /// Experimental feature, do not use.
