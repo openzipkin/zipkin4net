@@ -127,28 +127,5 @@ namespace Criteo.Profiling.Tracing.UTest
             dispatcher.Verify(d => d.Dispatch(It.IsAny<Record>()), Times.Once());
         }
 
-#if !NET_CORE
-        [Test]
-        [Description("Trace should be serializable since we are using LogicalCallContext. " +
-                     "See Deserialization of Objects Across App Domains: https://msdn.microsoft.com/en-us/library/dn458353(v=vs.110).aspx")]
-        public void TraceIsSerializable()
-        {
-            var spanState = new SpanState(1, 0, 1, SpanFlags.SamplingKnown | SpanFlags.Sampled);
-            var trace = Trace.CreateFromId(spanState);
-            Trace deserializedTrace;
-
-            using (var memorystream = new MemoryStream())
-            {
-                var binaryFormatter = new BinaryFormatter();
-                binaryFormatter.Serialize(memorystream, trace);
-                memorystream.Position = 0;
-
-                deserializedTrace = (Trace)binaryFormatter.Deserialize(memorystream);
-            }
-
-            Assert.AreEqual(trace, deserializedTrace);
-        }
-#endif
-
     }
 }
