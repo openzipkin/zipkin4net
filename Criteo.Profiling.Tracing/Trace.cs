@@ -144,10 +144,11 @@ namespace Criteo.Profiling.Tracing
 
         private bool ShouldBeRecorded()
         {
-            if (CurrentSpan.Flags.HasFlag(SpanFlags.SamplingKnown))
+            if ((CurrentSpan.Flags & SpanFlags.SamplingKnown) == SpanFlags.SamplingKnown)
             {
-                return CurrentSpan.Flags.HasFlag(SpanFlags.Sampled);
+                return (CurrentSpan.Flags & SpanFlags.Sampled) == SpanFlags.Sampled;
             }
+
             //Backward compatibility mode. If sample flag is not set,
             //the fact that the trace exists means that it is sampled
             return true;
