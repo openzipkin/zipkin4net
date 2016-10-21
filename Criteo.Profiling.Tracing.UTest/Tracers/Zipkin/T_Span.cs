@@ -11,20 +11,24 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
     internal class T_Span
     {
         [Test]
-        public void DurationAndSpanstartedSetWhenSetAsComplete()
+        public void DurationAndSpanStartedSetWhenSetAsComplete()
         {
-            VerifySpanDurationComputedWhenSetAsComplete(Annotations.ClientSend(), Annotations.ClientRecv(), false);
-            VerifySpanDurationComputedWhenSetAsComplete(Annotations.ServerRecv(), Annotations.ServerSend(), false);
-            VerifySpanDurationComputedWhenSetAsComplete(Annotations.LocalOperationStart("Operation"), Annotations.LocalOperationStop(), true);
+            VerifySpanDurationComputedWhenSetAsComplete(Annotations.ClientSend(), Annotations.ClientRecv(), isRootSpan: false, isSpanStartedAndDurationSet:true);
+            VerifySpanDurationComputedWhenSetAsComplete(Annotations.ServerRecv(), Annotations.ServerSend(), isRootSpan: true, isSpanStartedAndDurationSet: true);
+            VerifySpanDurationComputedWhenSetAsComplete(Annotations.ServerRecv(), Annotations.ServerSend(), isRootSpan: false, isSpanStartedAndDurationSet: false);
+            VerifySpanDurationComputedWhenSetAsComplete(Annotations.LocalOperationStart("Operation"), Annotations.LocalOperationStop(), isRootSpan: false, isSpanStartedAndDurationSet: true);
         }
 
-        private static void VerifySpanDurationComputedWhenSetAsComplete(IAnnotation start, IAnnotation stop, bool isSpanStartedSet)
+        private static void VerifySpanDurationComputedWhenSetAsComplete(IAnnotation start, IAnnotation stop, bool isRootSpan, bool isSpanStartedAndDurationSet)
         {
             var startTime = DateTime.Now;
             var endTime = startTime.AddHours(1);
             var expectedDuration = endTime.Subtract(startTime);
 
-            var spanState = new SpanState(1, 0, 2, SpanFlags.None);
+            long? parentId = 0;
+            if (isRootSpan)
+                parentId = null;
+            var spanState = new SpanState(1, parentId, 2, SpanFlags.None);
             var spanCreatedTimestamp = TimeUtils.UtcNow;
             var span = new Span(spanState, spanCreatedTimestamp);
 
@@ -41,11 +45,16 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
             Assert.False(span.Complete);
             recordStop.Annotation.Accept(visitorStop);
             Assert.True(span.Complete);
-            Assert.AreEqual(expectedDuration, span.Duration);
-            if (isSpanStartedSet)
+            if (isSpanStartedAndDurationSet)
+            {
+                Assert.AreEqual(expectedDuration, span.Duration);
                 Assert.AreEqual(startTime, span.SpanStarted);
+            }
             else
+            {
+                Assert.False(span.Duration.HasValue);
                 Assert.False(span.SpanStarted.HasValue);
+            }
         }
 
 #if !NET_CORE
