@@ -38,11 +38,11 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
         }
 
         [Test]
-        public void ThriftConversionLocalComponentWithoutHost()
+        public void ThriftConversionLocalComponentWithHostAndEmptyServiceName()
         {
             var binAnn = new BinaryAnnotation(zipkinCoreConstants.LOCAL_COMPONENT, Encoding.ASCII.GetBytes("hello"), AnnotationType.STRING, TimeUtils.UtcNow);
             var thriftBinAnn = ThriftSpanSerializer.ConvertToThrift(binAnn, _someHost);
-            Assert.IsNull(thriftBinAnn.Host);
+            AssertEndpointIsCorrect(thriftBinAnn.Host);
         }
 
         [Test]
@@ -169,6 +169,11 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
 
             var thriftSpan = ThriftSpanSerializer.ConvertToThrift(span);
             Assert.AreEqual(startTime.ToUnixTimestamp(), thriftSpan.Timestamp);
+            Assert.AreEqual(1, thriftSpan.Binary_annotations.Count);
+            var endpoint = thriftSpan.Binary_annotations[0].Host;
+            Assert.NotNull(endpoint);
+            Assert.IsEmpty(endpoint.Service_name);
+            Assert.IsNotNull(endpoint.Ipv4);
         }
 
         [Test]

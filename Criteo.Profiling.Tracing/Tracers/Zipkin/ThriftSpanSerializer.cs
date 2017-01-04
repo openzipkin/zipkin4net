@@ -65,7 +65,7 @@ namespace Criteo.Profiling.Tracing.Tracers.Zipkin
 
             // Use default value if no information were recorded
             var spanEndpoint = span.Endpoint ?? DefaultEndPoint;
-            var spanServiceName = string.IsNullOrWhiteSpace(span.ServiceName) ? DefaultServiceName : span.ServiceName;
+            var spanServiceName = GetServiceName(span);
             spanServiceName = spanServiceName.Replace(" ", "_"); // whitespaces cause issues with the query and ui
 
             var host = new Endpoint
@@ -95,6 +95,24 @@ namespace Criteo.Profiling.Tracing.Tracers.Zipkin
             return thriftSpan;
         }
 
+        private static string GetServiceName(Span span)
+        {
+            if (string.IsNullOrWhiteSpace(span.ServiceName))
+            {
+                // Since we don't have the app name yet, we need to hack a bit by providing
+                // an empty service name. This will add the endpoint attribute, and thus enable
+                // clock skew correction on the server.
+                return IsLocalSpan(span) ? string.Empty : DefaultServiceName;
+            }
+            return span.ServiceName;
+        }
+
+        private static bool IsLocalSpan(Span span)
+        {
+            return !span.Annotations.Any() &&
+                span.BinaryAnnotations.Any(ba => ba.Key == zipkinCoreConstants.LOCAL_COMPONENT);
+        }
+
         /// <summary>
         /// Convert this annotation object to its Thrift equivalent.
         /// </summary>
@@ -122,8 +140,7 @@ namespace Criteo.Profiling.Tracing.Tracers.Zipkin
                 Annotation_type = binaryAnnotation.AnnotationType,
                 Key = binaryAnnotation.Key,
                 Value = binaryAnnotation.Value,
-                // Endpoint is omitted for Local component because we don't want its ServiceName in the dependency graph
-                Host = binaryAnnotation.Key == zipkinCoreConstants.LOCAL_COMPONENT ? null : host
+                Host = host
             };
         }
 
