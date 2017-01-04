@@ -120,7 +120,6 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
             AnnotationCorrectlyAdded(Annotations.LocalOperationStart("Operation"), zipkinCoreConstants.LOCAL_COMPONENT, true, false);
         }
 
-
         private static void AnnotationCorrectlyAdded(IAnnotation ann, string expectedValue, bool isBinaryAnnotation, bool spanCompleted)
         {
             var span = new Span(SpanState, spanCreated: TimeUtils.UtcNow);
