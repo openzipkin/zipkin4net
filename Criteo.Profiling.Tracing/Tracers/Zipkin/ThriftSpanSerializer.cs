@@ -65,7 +65,7 @@ namespace Criteo.Profiling.Tracing.Tracers.Zipkin
 
             // Use default value if no information were recorded
             var spanEndpoint = span.Endpoint ?? DefaultEndPoint;
-            var spanServiceName = GetServiceName(span);
+            var spanServiceName = GetServiceNameOrDefault(span);
             spanServiceName = spanServiceName.Replace(" ", "_"); // whitespaces cause issues with the query and ui
 
             var host = new Endpoint
@@ -95,7 +95,7 @@ namespace Criteo.Profiling.Tracing.Tracers.Zipkin
             return thriftSpan;
         }
 
-        private static string GetServiceName(Span span)
+        private static string GetServiceNameOrDefault(Span span)
         {
             if (string.IsNullOrWhiteSpace(span.ServiceName))
             {
