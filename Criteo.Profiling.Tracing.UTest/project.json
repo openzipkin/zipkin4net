@@ -13,12 +13,12 @@
     }
   },
   "dependencies": {
-    "dotnet-test-nunit": "3.4.0-beta-2",
+    "dotnet-test-nunit": "3.4.0-beta-3",
     "Criteo.Profiling.Tracing": {
       "target": "project"
     },
-    "nunit": "3.4.1",
-    "moq": "4.6.36-alpha"
+    "nunit": "3.6.0",
+    "moq": "4.6.38-alpha"
   },
   "testRunner": "nunit",
   "frameworks": {
