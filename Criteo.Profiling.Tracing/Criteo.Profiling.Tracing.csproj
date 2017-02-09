@@ -10,7 +10,6 @@
     <RootNamespace>Criteo.Profiling.Tracing</RootNamespace>
     <AssemblyName>Criteo.Profiling.Tracing</AssemblyName>
     <FileAlignment>512</FileAlignment>
-    <EnableThrift>true</EnableThrift>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -113,20 +112,11 @@
     <Compile Include="Utils\TimeUtils.cs" />
   </ItemGroup>
   <ItemGroup>
-    <WCFMetadata Include="Service References\" />
-  </ItemGroup>
-  <ItemGroup>
-    <CompileThrift Include="Tracers\Zipkin\zipkinCore.thrift" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Criteo.Profiling.Tracing.project.json" />
     <None Include="packages.config" />
     <Compile Include="Trace.netfw.cs" />
   </ItemGroup>
-  <Import Project="$(SolutionDir)\.cbs\moab.targets" Condition="Exists('$(SolutionDir)\.cbs\moab.targets')" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Import Project="$(SolutionDir)\.cbs\Checks.targets" Condition="Exists('$(SolutionDir)\.cbs\Checks.targets')" />
-  <Import Project="$(CBS_DIR)\MSBuild\targets\Criteo.CSharp.targets" Condition="Exists('$(CBS_DIR)\MSBuild\targets\Criteo.CSharp.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
