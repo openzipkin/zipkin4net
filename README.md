@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.org/criteo/zipkin4net.svg?branch=master)](https://travis-ci.org/criteo/zipkin4net)
 # Criteo.Profiling.Tracing
 
 A .NET client library for [Zipkin](http://zipkin.io).
