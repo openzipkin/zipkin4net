@@ -17,11 +17,7 @@
       "buildOptions": {
         "define": [
           "NET_CORE"
-        ],
-        "compile" : {
-          "exclude" : [ "./Tracers/Zipkin/obj/**.cs" ]
-        }
-
+        ]
       },
       "dependencies": {
         "NETStandard.Library": "1.6.1",
@@ -31,7 +27,8 @@
         "System.Collections.Specialized": "4.3.0",
         "System.Net.NameResolution": "4.3.0",
         "System.Net.NetworkInformation": "4.3.0",
-        "System.Runtime.Serialization.Formatters": "4.3.0"
+        "System.Runtime.Serialization.Formatters": "4.3.0",
+        "apache-thrift-netcore": "0.9.3"
       }
     }
   }
