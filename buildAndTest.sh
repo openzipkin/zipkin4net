@@ -15,7 +15,7 @@ tests="Criteo.Profiling.Tracing.UTest"
 
 check_availability "dotnet"
 
-dotnet restore
-dotnet build $src
-dotnet build $tests
-dotnet test $tests
+dotnet restore         \
+&& dotnet build $src   \
+&& dotnet build $tests \
+&& dotnet test $tests  \
