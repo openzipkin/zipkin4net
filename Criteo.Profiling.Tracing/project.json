@@ -1,4 +1,8 @@
 {
+  "version": "0.1",
+  "authors": ["Criteo"],
+  "description": "A .NET client library for Zipkin",
+
   "configurations": {
     "Debug": {
       "buildOptions": {
