@@ -1,7 +1,8 @@
 {
   "version": "0.1",
   "authors": ["Criteo"],
-  "description": "A .NET client library for Zipkin",
+  "description": "A .NET client library for Zipkin. Unit tests",
+  "copyright": "Copyright 2017, Criteo",
   "configurations": {
     "Debug": {
       "buildOptions": {

@@ -3,7 +3,8 @@ env:
   - CLI_VERSION=latest
 sudo: required
 dist: trusty
-mono: none
+mono:
+  - latest
 dotnet: 1.0.0-preview2-003131
 os:  
   - linux
