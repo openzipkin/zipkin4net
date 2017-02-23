@@ -1,4 +1,3 @@
-﻿#if !NET_CORE
 using System;
 using System.Linq;
 using System.Net;
@@ -274,24 +273,24 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
         {
             Assert.IsNotNull(thriftSpan.Id);
             Assert.IsNotNull(thriftSpan.Trace_id);
-            Assert.IsNotNullOrEmpty(thriftSpan.Name);
+            Assert.False(string.IsNullOrEmpty(thriftSpan.Name));
 
             thriftSpan.Annotations.ForEach(annotation =>
             {
-                Assert.IsNotNullOrEmpty(annotation.Host.Service_name);
+                Assert.False(string.IsNullOrEmpty(annotation.Host.Service_name));
                 Assert.IsNotNull(annotation.Host.Ipv4);
                 Assert.IsNotNull(annotation.Host.Port);
 
                 Assert.IsNotNull(annotation.Timestamp);
                 Assert.That(annotation.Timestamp, Is.GreaterThan(0));
-                Assert.IsNotNullOrEmpty(annotation.Value);
+                Assert.False(string.IsNullOrEmpty(annotation.Value));
             });
 
             if (thriftSpan.Binary_annotations != null)
             {
                 thriftSpan.Binary_annotations.ForEach(annotation =>
                 {
-                    Assert.IsNotNullOrEmpty(annotation.Host.Service_name);
+                    Assert.False(string.IsNullOrEmpty(annotation.Host.Service_name));
                     Assert.IsNotNull(annotation.Host.Ipv4);
                     Assert.IsNotNull(annotation.Host.Port);
 
@@ -303,4 +302,3 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
 
     }
 }
-#endif
