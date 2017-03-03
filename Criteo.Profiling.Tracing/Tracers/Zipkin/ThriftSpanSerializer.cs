@@ -35,7 +35,9 @@ namespace Criteo.Profiling.Tracing.Tracers.Zipkin
             var transport = new TStreamTransport(null, stream);
             var protocol = new TBinaryProtocol(transport);
 
+            protocol.WriteListBegin(new TList(TType.Struct, 1));
             thriftSpan.Write(protocol);
+            protocol.WriteListEnd();
         }
 
         /// <summary>
@@ -90,7 +92,6 @@ namespace Criteo.Profiling.Tracing.Tracers.Zipkin
             {
                 thriftSpan.Duration = (long)(span.Duration.Value.TotalMilliseconds * 1000); // microseconds
             }
-
             return thriftSpan;
         }
 
