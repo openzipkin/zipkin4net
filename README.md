@@ -55,7 +55,15 @@ trace.Record(Annotations.ServerSend());
 
 ### Transport
 
-The transport is responsible to send traces to a zipkin collector. The implementation is really easy to do. All you have to do is to implement a Send(byte[]) method.
+The transport is responsible to send traces to a zipkin collector.
+
+#### HTTP transport
+
+We provide you with an [HTTP transport](Criteo.Profiling.Tracing/Transport/Http/HttpZipkinSender.cs). Just create it with the zipkin collector url (i.e. if you test locally, you'll probably end up with something like 'http://localhost:9411') and pass it to the creation of the [ZipkinTracer](Criteo.Profiling.Tracing/Tracers/Zipkin/ZipkinTracer.cs) and you're set.
+
+#### Custom transport implementation
+
+The implementation is really easy to do. All you have to do is to implement a Send(byte[]) method.
 For example, if you want to send traces through Kafka and assuming you have a kafka producer, you should write
 
 ```csharp
