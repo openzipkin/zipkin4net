@@ -8,7 +8,7 @@ namespace Criteo.Profiling.Tracing.Middleware
     {
         public static void UseTracing(this IApplicationBuilder app, string serviceName)
         {
-            var extractor = new ZipkinHttpTraceExtractor();
+            var extractor = new Middleware.ZipkinHttpTraceExtractor();
             app.Use(async (context, next) => {
                 Trace trace;
                 if (!extractor.TryExtract(context.Request.Headers, out trace))
