@@ -36,6 +36,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="TracingMiddleware.cs" />
+    <Compile Include="TracingHandler.cs" />
+    <Compile Include="TracingLogger.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Criteo.Profiling.Tracing.Middleware.project.json" />
