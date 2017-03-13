@@ -7,14 +7,14 @@ namespace Criteo.Profiling.Tracing.Middleware
 {
     public class TracingHandler : DelegatingHandler
     {
-        private readonly ZipkinHttpTraceInjector _injector;
+        private readonly ITraceInjector<HttpHeaders> _injector;
         private readonly string _serviceName;
 
         public TracingHandler(string serviceName)
-        : this(new ZipkinHttpTraceInjector(), serviceName)
+        : this(new Middleware.ZipkinHttpTraceInjector(), serviceName)
         {}
 
-        internal TracingHandler(ZipkinHttpTraceInjector injector, string serviceName)
+        internal TracingHandler(ITraceInjector<HttpHeaders> injector, string serviceName)
         {
             _injector = injector;
             _serviceName = serviceName;
