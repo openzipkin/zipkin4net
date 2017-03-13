@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Net.Http.Headers;
 
 namespace Criteo.Profiling.Tracing.Transport
 {
@@ -33,6 +34,40 @@ namespace Criteo.Profiling.Tracing.Transport
 
             trace = default(Trace);
             return false;
+        }
+
+        public bool TryExtract(HttpHeaders carrier, out Trace trace)
+        {
+            string encodedTraceId, encodedSpanId;
+
+
+            if (TryGetSingleValue(carrier, ZipkinHttpHeaders.TraceId, out encodedTraceId)
+                && TryGetSingleValue(carrier, ZipkinHttpHeaders.SpanId, out encodedSpanId))
+            {
+                string flagsStr, sampledStr, encodedParentSpanId;
+                TryGetSingleValue(carrier, ZipkinHttpHeaders.Flags, out flagsStr);
+                TryGetSingleValue(carrier, ZipkinHttpHeaders.Sampled, out sampledStr);
+                TryGetSingleValue(carrier, ZipkinHttpHeaders.ParentSpanId, out encodedParentSpanId);
+
+                return TryParseTrace(encodedTraceId, encodedSpanId, encodedParentSpanId, sampledStr, flagsStr, out trace);
+            }
+
+            trace = default(Trace);
+            return false;
+        }
+
+        private static bool TryGetSingleValue(HttpHeaders headers, string header, out string value)
+        {
+            IEnumerable<string> values;
+            bool success = headers.TryGetValues(header, out values);
+            var enumerator = values.GetEnumerator();
+            if (!enumerator.MoveNext())
+            {
+                value = default(string);
+                return false;
+            }
+            value = enumerator.Current;
+            return success;
         }
 
         internal static bool TryParseTrace(string encodedTraceId, string encodedSpanId, string encodedParentSpanId, string sampledStr, string flagsStr, out Trace trace)
