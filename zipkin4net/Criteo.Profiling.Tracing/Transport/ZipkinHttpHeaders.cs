@@ -2,7 +2,7 @@
 
 namespace Criteo.Profiling.Tracing.Transport
 {
-    internal static class ZipkinHttpHeaders
+    public static class ZipkinHttpHeaders
     {
         /// <summary>
         /// See https://twitter.github.io/zipkin/Instrumenting.html#communicating-trace-information

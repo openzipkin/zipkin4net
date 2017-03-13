@@ -25,7 +25,7 @@ namespace Criteo.Profiling.Tracing
         /// <summary>
         /// Allows for several options (e.g. debug mode, sampling)
         /// </summary>
-        internal SpanFlags Flags { get; private set; }
+        public SpanFlags Flags { get; private set; }
 
         public SpanState(long traceId, long? parentSpanId, long spanId, SpanFlags flags)
         {
