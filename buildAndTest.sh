@@ -1,8 +1,8 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-repositories=("zipkin4net")
+declare -a repositories=("zipkin4net" "zipkin4net-aspnetcore")
 
-for i in $repositories; do
+for i in "${repositories[@]}"; do
     if [ -d $i ]; then
 	pushd $i
 	./buildAndTest.sh
