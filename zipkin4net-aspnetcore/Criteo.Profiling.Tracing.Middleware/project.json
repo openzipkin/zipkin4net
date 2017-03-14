@@ -32,7 +32,7 @@
     "Microsoft.AspNetCore.Hosting": "1.1.1",
     "Microsoft.Extensions.Logging": "1.1.1",
     "System.Net.Http": "4.3.0",
-    "Criteo.Profiling.Tracing": "0.3"
+    "Criteo.Profiling.Tracing": "0.3.1"
   },
   "frameworks": {
     "net451": {},
