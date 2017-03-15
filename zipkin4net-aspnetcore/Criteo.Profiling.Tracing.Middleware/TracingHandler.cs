@@ -2,6 +2,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using Criteo.Profiling.Tracing.Transport;
+using Criteo.Profiling.Tracing.Utils;
 
 namespace Criteo.Profiling.Tracing.Middleware
 {
@@ -12,7 +13,7 @@ namespace Criteo.Profiling.Tracing.Middleware
 
         public TracingHandler(string serviceName, HttpMessageHandler httpMessageHandler = null)
         : this(new Middleware.ZipkinHttpTraceInjector(), serviceName, httpMessageHandler)
-        {}
+        { }
 
         internal TracingHandler(ITraceInjector<HttpHeaders> injector, string serviceName, HttpMessageHandler httpMessageHandler = null)
         {
@@ -20,7 +21,7 @@ namespace Criteo.Profiling.Tracing.Middleware
             _serviceName = serviceName;
             InnerHandler = httpMessageHandler ?? new HttpClientHandler();
         }
-        protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, System.Threading.CancellationToken cancellationToken)
+        protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, System.Threading.CancellationToken cancellationToken)
         {
             var trace = Trace.Current;
             if (trace != null)
@@ -28,14 +29,11 @@ namespace Criteo.Profiling.Tracing.Middleware
                 trace = trace.Child();
                 _injector.Inject(trace, request.Headers);
             }
-            trace.Record(Annotations.ClientSend());
-            trace.Record(Annotations.ServiceName(_serviceName));
-            trace.Record(Annotations.Rpc(request.Method.ToString()));
-            return base.SendAsync(request, cancellationToken)
-                .ContinueWith(t => {
-                    trace.Record(Annotations.ClientRecv());
-                    return t.Result;
-                });
+
+            using (new ClientTrace(_serviceName, request.Method.ToString()))
+            {
+                return await TraceHelper.TracedActionAsync(base.SendAsync(request, cancellationToken));
+            }
         }
     }
 }

@@ -17,11 +17,6 @@ namespace Criteo.Profiling.Tracing.Middleware
                 {
                     trace = Trace.Create();
                 }
-                else
-                {
-                    // make the server trace a child of the passed in trace
-                    trace = trace.Child();
-                }
 
                 Trace.Current = trace;
 
