@@ -1,0 +1,47 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <Description>Basic example of zipkin4net</Description>
+    <Copyright>Copyright 2017, Criteo</Copyright>
+    <VersionPrefix>0.1</VersionPrefix>
+    <Authors>Criteo</Authors>
+    <TargetFramework>netcoreapp1.0</TargetFramework>
+    <AssemblyName>frontend</AssemblyName>
+    <PackageId>frontend</PackageId>
+    <PackageTargetFallback>$(PackageTargetFallback);portable-net45+win8</PackageTargetFallback>
+    <RuntimeFrameworkVersion>1.0.4</RuntimeFrameworkVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\zipkin4net\Criteo.Profiling.Tracing\Criteo.Profiling.Tracing.csproj" />
+    <ProjectReference Include="..\..\zipkin4net-aspnetcore\Criteo.Profiling.Tracing.Middleware\Criteo.Profiling.Tracing.Middleware.csproj" />
+    <ProjectReference Include="..\common\common.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore" Version="1.1.1" />
+    <PackageReference Include="System.Net.Http" Version="4.3.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="1.1.1" />
+  </ItemGroup>
+
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'netcoreapp1.0' ">
+    <DefineConstants>$(DefineConstants);NET_CORE</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <OutputType>Exe</OutputType>
+  </PropertyGroup>
+
+  <ItemGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <None Update="appSettings.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(Configuration)' == 'Release' ">
+    <None Update="appSettings.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+</Project>
