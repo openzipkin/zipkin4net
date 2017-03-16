@@ -23,15 +23,13 @@ namespace Criteo.Profiling.Tracing.Middleware
         }
         protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, System.Threading.CancellationToken cancellationToken)
         {
-            var trace = Trace.Current;
-            if (trace != null)
+            using (var clientTrace = new ClientTrace(_serviceName, request.Method.ToString()))
             {
-                trace = trace.Child();
-                _injector.Inject(trace, request.Headers);
-            }
+                if (clientTrace.Trace != null)
+                {
+                    _injector.Inject(clientTrace.Trace, request.Headers);
+                }
 
-            using (new ClientTrace(_serviceName, request.Method.ToString()))
-            {
                 return await TraceHelper.TracedActionAsync(base.SendAsync(request, cancellationToken));
             }
         }

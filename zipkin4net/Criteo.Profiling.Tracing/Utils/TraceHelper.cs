@@ -20,7 +20,10 @@ namespace Criteo.Profiling.Tracing.Utils
             }
             catch (Exception ex)
             {
-                Trace.Current?.Record(Annotations.Tag("error", ex.Message));
+                if (Trace.Current != null)
+                {
+                    Trace.Current.Record(Annotations.Tag("error", ex.Message));
+                }
 
                 throw;
             }
@@ -38,7 +41,10 @@ namespace Criteo.Profiling.Tracing.Utils
             }
             catch (Exception ex)
             {
-                Trace.Current?.Record(Annotations.Tag("error", ex.Message));
+                if (Trace.Current != null)
+                {
+                    Trace.Current.Record(Annotations.Tag("error", ex.Message));
+                }
 
                 throw;
             }
@@ -56,7 +62,10 @@ namespace Criteo.Profiling.Tracing.Utils
             }
             catch (Exception ex)
             {
-                Trace.Current?.Record(Annotations.Tag("error", ex.Message));
+                if (Trace.Current != null)
+                {
+                    Trace.Current.Record(Annotations.Tag("error", ex.Message));
+                }
 
                 throw;
             }
