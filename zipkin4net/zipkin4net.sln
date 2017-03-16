@@ -8,6 +8,14 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Criteo.Profiling.Tracing.UT
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Criteo.Profiling.Tracing.Middleware", "..\zipkin4net-aspnetcore\Criteo.Profiling.Tracing.Middleware\Criteo.Profiling.Tracing.Middleware.csproj", "{EDFFC2F3-CABD-4922-8672-2AB05F316883}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "example", "example", "{ED15D9B1-56F5-4CF3-B491-C23CEBDF95AB}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "frontend", "..\zipkin4net-example\frontend\frontend.csproj", "{0858C84E-A164-4736-B3EE-FFF4A9EDC30C}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "common", "..\zipkin4net-example\common\common.csproj", "{8FBE3944-0E22-4848-8731-A5F33E889B70}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "backend", "..\zipkin4net-example\backend\backend.csproj", "{AC3F995C-199E-4433-8DB1-7A113027EE3B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -40,8 +48,37 @@ Global
 		{EDFFC2F3-CABD-4922-8672-2AB05F316883}.Release|Any CPU.Build.0 = Release|Any CPU
 		{EDFFC2F3-CABD-4922-8672-2AB05F316883}.Release|x86.ActiveCfg = Release|Any CPU
 		{EDFFC2F3-CABD-4922-8672-2AB05F316883}.Release|x86.Build.0 = Release|Any CPU
+		{0858C84E-A164-4736-B3EE-FFF4A9EDC30C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0858C84E-A164-4736-B3EE-FFF4A9EDC30C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0858C84E-A164-4736-B3EE-FFF4A9EDC30C}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{0858C84E-A164-4736-B3EE-FFF4A9EDC30C}.Debug|x86.Build.0 = Debug|Any CPU
+		{0858C84E-A164-4736-B3EE-FFF4A9EDC30C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0858C84E-A164-4736-B3EE-FFF4A9EDC30C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0858C84E-A164-4736-B3EE-FFF4A9EDC30C}.Release|x86.ActiveCfg = Release|Any CPU
+		{0858C84E-A164-4736-B3EE-FFF4A9EDC30C}.Release|x86.Build.0 = Release|Any CPU
+		{8FBE3944-0E22-4848-8731-A5F33E889B70}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8FBE3944-0E22-4848-8731-A5F33E889B70}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8FBE3944-0E22-4848-8731-A5F33E889B70}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{8FBE3944-0E22-4848-8731-A5F33E889B70}.Debug|x86.Build.0 = Debug|Any CPU
+		{8FBE3944-0E22-4848-8731-A5F33E889B70}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8FBE3944-0E22-4848-8731-A5F33E889B70}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8FBE3944-0E22-4848-8731-A5F33E889B70}.Release|x86.ActiveCfg = Release|Any CPU
+		{8FBE3944-0E22-4848-8731-A5F33E889B70}.Release|x86.Build.0 = Release|Any CPU
+		{AC3F995C-199E-4433-8DB1-7A113027EE3B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AC3F995C-199E-4433-8DB1-7A113027EE3B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AC3F995C-199E-4433-8DB1-7A113027EE3B}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{AC3F995C-199E-4433-8DB1-7A113027EE3B}.Debug|x86.Build.0 = Debug|Any CPU
+		{AC3F995C-199E-4433-8DB1-7A113027EE3B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AC3F995C-199E-4433-8DB1-7A113027EE3B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AC3F995C-199E-4433-8DB1-7A113027EE3B}.Release|x86.ActiveCfg = Release|Any CPU
+		{AC3F995C-199E-4433-8DB1-7A113027EE3B}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{0858C84E-A164-4736-B3EE-FFF4A9EDC30C} = {ED15D9B1-56F5-4CF3-B491-C23CEBDF95AB}
+		{8FBE3944-0E22-4848-8731-A5F33E889B70} = {ED15D9B1-56F5-4CF3-B491-C23CEBDF95AB}
+		{AC3F995C-199E-4433-8DB1-7A113027EE3B} = {ED15D9B1-56F5-4CF3-B491-C23CEBDF95AB}
 	EndGlobalSection
 EndGlobal

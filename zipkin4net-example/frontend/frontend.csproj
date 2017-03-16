@@ -13,8 +13,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\zipkin4net\Criteo.Profiling.Tracing\Criteo.Profiling.Tracing.csproj" />
-    <ProjectReference Include="..\..\zipkin4net-aspnetcore\Criteo.Profiling.Tracing.Middleware\Criteo.Profiling.Tracing.Middleware.csproj" />
     <ProjectReference Include="..\common\common.csproj" />
   </ItemGroup>
 
