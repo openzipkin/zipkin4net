@@ -16,6 +16,6 @@ check_availability "dotnet"
 
 dotnet restore         \
 && dotnet build -f netstandard1.6 $src   \
-&& dotnet build -f netstandard1.6 $tests \
+&& dotnet build -f netcoreapp1.0 $tests \
 && cd $tests   \
-&& dotnet test \
+&& dotnet test -f netcoreapp1.0 \

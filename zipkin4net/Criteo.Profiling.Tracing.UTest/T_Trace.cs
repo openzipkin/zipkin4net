@@ -1,6 +1,6 @@
 ﻿using System;
 using System.IO;
-#if !NETSTANDARD1_6
+#if !NETCOREAPP1_0
 using System.Runtime.Serialization.Formatters.Binary;
 #endif
 using Criteo.Profiling.Tracing.Dispatcher;
