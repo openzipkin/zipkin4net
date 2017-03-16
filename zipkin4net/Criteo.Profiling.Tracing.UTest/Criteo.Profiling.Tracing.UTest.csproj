@@ -27,7 +27,6 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.0.0" />
-    <PackageReference Include="MSTest.TestFramework" Version="1.1.13" />
     <PackageReference Include="nunit" Version="3.6.1" />
     <PackageReference Include="moq" Version="4.7.1" />
     <PackageReference Include="NUnit3TestAdapter" Version="3.7.0" />
