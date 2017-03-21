@@ -1,0 +1,81 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "zipkin4net", "zipkin4net", "{652341D3-8D15-4191-BF73-9F6D0CBE7857}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "zipkin4net-aspnetcore", "zipkin4net-aspnetcore", "{D3DC223E-87ED-4072-82BB-6630C35EBC36}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "zipkin4net-example", "zipkin4net-example", "{9AF0EAFA-9B48-49F6-BEC7-8A1DC32C4152}"
+EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Criteo.Profiling.Tracing", "zipkin4net\Criteo.Profiling.Tracing\Criteo.Profiling.Tracing.xproj", "{D730A21F-FCA6-4E3C-AFFE-AE3AEBE40D86}"
+EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Criteo.Profiling.Tracing.UTest", "zipkin4net\Criteo.Profiling.Tracing.UTest\Criteo.Profiling.Tracing.UTest.xproj", "{B2A357A9-7706-4B14-BAE6-824FEDFF1ABA}"
+EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Criteo.Profiling.Tracing.Middleware", "zipkin4net-aspnetcore\Criteo.Profiling.Tracing.Middleware\Criteo.Profiling.Tracing.Middleware.xproj", "{A037F7DB-99A0-49AF-8061-81FC4C9A19D9}"
+EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "backend", "zipkin4net-example\backend\backend.xproj", "{58A77A6F-F966-4748-A611-3C9E27D85229}"
+EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "common", "zipkin4net-example\common\common.xproj", "{C9C5479F-A788-4698-9593-0F9DEA058783}"
+EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "frontend", "zipkin4net-example\frontend\frontend.xproj", "{C1C5715B-14E9-428B-8EAD-0690EA994A45}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "zipkin4net-classic", "zipkin4net-classic", "{C0DC1615-7C37-4731-A71B-EF84F1CC53CC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Criteo.Profiling.Tracing.Classic", "zipkin4net-classic\Criteo.Profiling.Tracing.Classic\Criteo.Profiling.Tracing.Classic.csproj", "{01BDC51A-BA6E-4FAB-8200-84252BDF63C8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Criteo.Profiling.Tracing.Middleware.Classic", "zipkin4net-classic\Criteo.Profiling.Tracing.Middleware.Classic\Criteo.Profiling.Tracing.Middleware.Classic.csproj", "{ED95FA93-D467-4B2C-A3DB-01F2F0D16812}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D730A21F-FCA6-4E3C-AFFE-AE3AEBE40D86}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D730A21F-FCA6-4E3C-AFFE-AE3AEBE40D86}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D730A21F-FCA6-4E3C-AFFE-AE3AEBE40D86}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D730A21F-FCA6-4E3C-AFFE-AE3AEBE40D86}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B2A357A9-7706-4B14-BAE6-824FEDFF1ABA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B2A357A9-7706-4B14-BAE6-824FEDFF1ABA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B2A357A9-7706-4B14-BAE6-824FEDFF1ABA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B2A357A9-7706-4B14-BAE6-824FEDFF1ABA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A037F7DB-99A0-49AF-8061-81FC4C9A19D9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A037F7DB-99A0-49AF-8061-81FC4C9A19D9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A037F7DB-99A0-49AF-8061-81FC4C9A19D9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A037F7DB-99A0-49AF-8061-81FC4C9A19D9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{58A77A6F-F966-4748-A611-3C9E27D85229}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{58A77A6F-F966-4748-A611-3C9E27D85229}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{58A77A6F-F966-4748-A611-3C9E27D85229}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{58A77A6F-F966-4748-A611-3C9E27D85229}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C9C5479F-A788-4698-9593-0F9DEA058783}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C9C5479F-A788-4698-9593-0F9DEA058783}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C9C5479F-A788-4698-9593-0F9DEA058783}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C9C5479F-A788-4698-9593-0F9DEA058783}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C1C5715B-14E9-428B-8EAD-0690EA994A45}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C1C5715B-14E9-428B-8EAD-0690EA994A45}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C1C5715B-14E9-428B-8EAD-0690EA994A45}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C1C5715B-14E9-428B-8EAD-0690EA994A45}.Release|Any CPU.Build.0 = Release|Any CPU
+		{01BDC51A-BA6E-4FAB-8200-84252BDF63C8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{01BDC51A-BA6E-4FAB-8200-84252BDF63C8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{01BDC51A-BA6E-4FAB-8200-84252BDF63C8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{01BDC51A-BA6E-4FAB-8200-84252BDF63C8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ED95FA93-D467-4B2C-A3DB-01F2F0D16812}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ED95FA93-D467-4B2C-A3DB-01F2F0D16812}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ED95FA93-D467-4B2C-A3DB-01F2F0D16812}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ED95FA93-D467-4B2C-A3DB-01F2F0D16812}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{D730A21F-FCA6-4E3C-AFFE-AE3AEBE40D86} = {652341D3-8D15-4191-BF73-9F6D0CBE7857}
+		{B2A357A9-7706-4B14-BAE6-824FEDFF1ABA} = {652341D3-8D15-4191-BF73-9F6D0CBE7857}
+		{A037F7DB-99A0-49AF-8061-81FC4C9A19D9} = {D3DC223E-87ED-4072-82BB-6630C35EBC36}
+		{58A77A6F-F966-4748-A611-3C9E27D85229} = {9AF0EAFA-9B48-49F6-BEC7-8A1DC32C4152}
+		{C9C5479F-A788-4698-9593-0F9DEA058783} = {9AF0EAFA-9B48-49F6-BEC7-8A1DC32C4152}
+		{C1C5715B-14E9-428B-8EAD-0690EA994A45} = {9AF0EAFA-9B48-49F6-BEC7-8A1DC32C4152}
+		{01BDC51A-BA6E-4FAB-8200-84252BDF63C8} = {C0DC1615-7C37-4731-A71B-EF84F1CC53CC}
+		{ED95FA93-D467-4B2C-A3DB-01F2F0D16812} = {C0DC1615-7C37-4731-A71B-EF84F1CC53CC}
+	EndGlobalSection
+EndGlobal

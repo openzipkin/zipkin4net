@@ -19,19 +19,8 @@ namespace Criteo.Profiling.Tracing.Middleware
                 trace.Record(Annotations.ServerRecv());
                 trace.Record(Annotations.ServiceName(serviceName));
                 trace.Record(Annotations.Rpc(context.Request.Method));
-                try
-                {
-                    await next.Invoke();
-                }
-                catch (System.Exception e)
-                {
-                    trace.Record(Annotations.Tag("error", e.Message));
-                    throw;
-                }
-                finally
-                {
-                    trace.Record(Annotations.ServerSend());
-                }
+                await next.Invoke();
+                trace.Record(Annotations.ServerSend());
             });
         }
     }
