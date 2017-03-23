@@ -1,6 +1,6 @@
 ﻿using System;
 using System.IO;
-#if !NET_CORE
+#if !NETCOREAPP1_0
 using System.Runtime.Serialization.Formatters.Binary;
 #endif
 using Criteo.Profiling.Tracing.Dispatcher;

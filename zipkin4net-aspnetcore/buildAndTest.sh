@@ -14,4 +14,4 @@ src="Criteo.Profiling.Tracing.Middleware"
 check_availability "dotnet"
 
 dotnet restore         \
-&& dotnet build $src   \
+&& dotnet build -f netstandard1.6 $src   \
