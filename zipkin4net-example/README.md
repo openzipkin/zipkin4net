@@ -10,6 +10,12 @@ This example was ported from similar examples, such as [Spring Boot](https://git
 
 Web requests are served by Kestrel, and tracing is automatically performed by [zipkin4net](https://github.com/criteo/zipkin4net), more specifically by the library [Criteo.Profiling.Tracing](https://github.com/criteo/zipkin4net/tree/master/zipkin4net/Criteo.Profiling.Tracing).
 
+# Pre-requisites
+
+In order to build the example, you need to install a two things:
+- [dotnet 1.0.0 preview2 3131](https://github.com/dotnet/core/blob/master/release-notes/download-archives/1.0.1-preview2-download.md)
+- [mono](http://www.mono-project.com/download/) if you're on linux or OS X
+
 # Running the example
 This example has two services: frontend and backend. They both report trace data to zipkin. To setup the demo, you need to start Frontend, Backend and Zipkin.
 
