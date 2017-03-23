@@ -1,5 +1,5 @@
 {
-  "version": "0.3.2",
+ "version": "0.3.2",
   "authors": ["Criteo"],
   "description": "A .NET client library for Zipkin",
   "copyright": "Copyright 2017, Criteo",
@@ -30,11 +30,14 @@
 
   "dependencies": {
     "System.Threading.Tasks.Dataflow": "4.7.0",
-    "System.Net.Http": "4.3.0",
     "apache-thrift-netcore": "0.9.3"
   },
   "frameworks": {
-    "net45": {},
+    "net45": {
+      "dependencies": {
+        "System.Net.Http": "4.3.1"
+      }
+    },
     "netstandard1.6": {
       "buildOptions": {
         "define": [

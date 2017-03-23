@@ -1,0 +1,253 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{01BDC51A-BA6E-4FAB-8200-84252BDF63C8}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Criteo.Profiling.Tracing.Classic</RootNamespace>
+    <AssemblyName>Criteo.Profiling.Tracing.Classic</AssemblyName>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Threading.Tasks.Dataflow, Version=4.6.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>C:\Users\andrii.gu\.nuget\packages\System.Threading.Tasks.Dataflow\4.7.0\lib\netstandard1.1\System.Threading.Tasks.Dataflow.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+    <Reference Include="Thrift, Version=0.9.3.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\ApacheThrift.0.9.3\lib\Thrift.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\..\zipkin4net\Criteo.Profiling.Tracing\Annotations.cs">
+      <Link>Annotations.cs</Link>
+    </Compile>
+    <Compile Include="..\..\zipkin4net\Criteo.Profiling.Tracing\Annotation\ClientRecv.cs">
+      <Link>Annotation\ClientRecv.cs</Link>
+    </Compile>
+    <Compile Include="..\..\zipkin4net\Criteo.Profiling.Tracing\Annotation\ClientSend.cs">
+      <Link>Annotation\ClientSend.cs</Link>
+    </Compile>
+    <Compile Include="..\..\zipkin4net\Criteo.Profiling.Tracing\Annotation\CommonTags.cs">
+      <Link>Annotation\CommonTags.cs</Link>
+    </Compile>
+    <Compile Include="..\..\zipkin4net\Criteo.Profiling.Tracing\Annotation\Event.cs">
+      <Link>Annotation\Event.cs</Link>
+    </Compile>
+    <Compile Include="..\..\zipkin4net\Criteo.Profiling.Tracing\Annotation\IAnnotation.cs">
+      <Link>Annotation\IAnnotation.cs</Link>
+    </Compile>
+    <Compile Include="..\..\zipkin4net\Criteo.Profiling.Tracing\Annotation\IAnnotationVisitor.cs">
+      <Link>Annotation\IAnnotationVisitor.cs</Link>
+    </Compile>
+    <Compile Include="..\..\zipkin4net\Criteo.Profiling.Tracing\Annotation\LocalAddr.cs">
+      <Link>Annotation\LocalAddr.cs</Link>
+    </Compile>
+    <Compile Include="..\..\zipkin4net\Criteo.Profiling.Tracing\Annotation\LocalOperationStart.cs">
+      <Link>Annotation\LocalOperationStart.cs</Link>
+    </Compile>
+    <Compile Include="..\..\zipkin4net\Criteo.Profiling.Tracing\Annotation\LocalOperationStop.cs">
+      <Link>Annotation\LocalOperationStop.cs</Link>
+    </Compile>
+    <Compile Include="..\..\zipkin4net\Criteo.Profiling.Tracing\Annotation\Rpc.cs">
+      <Link>Annotation\Rpc.cs</Link>
+    </Compile>
+    <Compile Include="..\..\zipkin4net\Criteo.Profiling.Tracing\Annotation\ServerRecv.cs">
+      <Link>Annotation\ServerRecv.cs</Link>
+    </Compile>
+    <Compile Include="..\..\zipkin4net\Criteo.Profiling.Tracing\Annotation\ServerSend.cs">
+      <Link>Annotation\ServerSend.cs</Link>
+    </Compile>
+    <Compile Include="..\..\zipkin4net\Criteo.Profiling.Tracing\Annotation\ServiceName.cs">
+      <Link>Annotation\ServiceName.cs</Link>
+    </Compile>
+    <Compile Include="..\..\zipkin4net\Criteo.Profiling.Tracing\Annotation\TagAnnotation.cs">
+      <Link>Annotation\TagAnnotation.cs</Link>
+    </Compile>
+    <Compile Include="..\..\zipkin4net\Criteo.Profiling.Tracing\Annotation\WireRecv.cs">
+      <Link>Annotation\WireRecv.cs</Link>
+    </Compile>
+    <Compile Include="..\..\zipkin4net\Criteo.Profiling.Tracing\Annotation\WireSend.cs">
+      <Link>Annotation\WireSend.cs</Link>
+    </Compile>
+    <Compile Include="..\..\zipkin4net\Criteo.Profiling.Tracing\Dispatcher\InOrderAsyncActionBlockDispatcher.cs">
+      <Link>Dispatcher\InOrderAsyncActionBlockDispatcher.cs</Link>
+    </Compile>
+    <Compile Include="..\..\zipkin4net\Criteo.Profiling.Tracing\Dispatcher\InOrderAsyncQueueDispatcher.cs">
+      <Link>Dispatcher\InOrderAsyncQueueDispatcher.cs</Link>
+    </Compile>
+    <Compile Include="..\..\zipkin4net\Criteo.Profiling.Tracing\Dispatcher\IRecordDispatcher.cs">
+      <Link>Dispatcher\IRecordDispatcher.cs</Link>
+    </Compile>
+    <Compile Include="..\..\zipkin4net\Criteo.Profiling.Tracing\Dispatcher\VoidDispatcher.cs">
+      <Link>Dispatcher\VoidDispatcher.cs</Link>
+    </Compile>
+    <Compile Include="..\..\zipkin4net\Criteo.Profiling.Tracing\ILogger.cs">
+      <Link>ILogger.cs</Link>
+    </Compile>
+    <Compile Include="..\..\zipkin4net\Criteo.Profiling.Tracing\ITracer.cs">
+      <Link>ITracer.cs</Link>
+    </Compile>
+    <Compile Include="..\..\zipkin4net\Criteo.Profiling.Tracing\Logger\VoidLogger.cs">
+      <Link>Logger\VoidLogger.cs</Link>
+    </Compile>
+    <Compile Include="..\..\zipkin4net\Criteo.Profiling.Tracing\Record.cs">
+      <Link>Record.cs</Link>
+    </Compile>
+    <Compile Include="..\..\zipkin4net\Criteo.Profiling.Tracing\Sampling\DefaultSampler.cs">
+      <Link>Sampling\DefaultSampler.cs</Link>
+    </Compile>
+    <Compile Include="..\..\zipkin4net\Criteo.Profiling.Tracing\Sampling\ISampler.cs">
+      <Link>Sampling\ISampler.cs</Link>
+    </Compile>
+    <Compile Include="..\..\zipkin4net\Criteo.Profiling.Tracing\SpanState.cs">
+      <Link>SpanState.cs</Link>
+    </Compile>
+    <Compile Include="..\..\zipkin4net\Criteo.Profiling.Tracing\Trace.cs">
+      <Link>Trace.cs</Link>
+    </Compile>
+    <Compile Include="..\..\zipkin4net\Criteo.Profiling.Tracing\Trace.netfw.cs">
+      <Link>Trace.netfw.cs</Link>
+    </Compile>
+    <Compile Include="..\..\zipkin4net\Criteo.Profiling.Tracing\TraceContext.cs">
+      <Link>TraceContext.cs</Link>
+    </Compile>
+    <Compile Include="..\..\zipkin4net\Criteo.Profiling.Tracing\TraceManager.cs">
+      <Link>TraceManager.cs</Link>
+    </Compile>
+    <Compile Include="..\..\zipkin4net\Criteo.Profiling.Tracing\Tracers\ConsoleTracer.cs">
+      <Link>Tracers\ConsoleTracer.cs</Link>
+    </Compile>
+    <Compile Include="..\..\zipkin4net\Criteo.Profiling.Tracing\Tracers\InMemoryTracer.cs">
+      <Link>Tracers\InMemoryTracer.cs</Link>
+    </Compile>
+    <Compile Include="..\..\zipkin4net\Criteo.Profiling.Tracing\Tracers\VoidTracer.cs">
+      <Link>Tracers\VoidTracer.cs</Link>
+    </Compile>
+    <Compile Include="..\..\zipkin4net\Criteo.Profiling.Tracing\Tracers\Zipkin\BinaryAnnotation.cs">
+      <Link>Tracers\Zipkin\BinaryAnnotation.cs</Link>
+    </Compile>
+    <Compile Include="..\..\zipkin4net\Criteo.Profiling.Tracing\Tracers\Zipkin\BinaryAnnotationValueEncoder.cs">
+      <Link>Tracers\Zipkin\BinaryAnnotationValueEncoder.cs</Link>
+    </Compile>
+    <Compile Include="..\..\zipkin4net\Criteo.Profiling.Tracing\Tracers\Zipkin\ISpanSerializer.cs">
+      <Link>Tracers\Zipkin\ISpanSerializer.cs</Link>
+    </Compile>
+    <Compile Include="..\..\zipkin4net\Criteo.Profiling.Tracing\Tracers\Zipkin\IZipkinSender.cs">
+      <Link>Tracers\Zipkin\IZipkinSender.cs</Link>
+    </Compile>
+    <Compile Include="..\..\zipkin4net\Criteo.Profiling.Tracing\Tracers\Zipkin\RateLimiterZipkinSender.cs">
+      <Link>Tracers\Zipkin\RateLimiterZipkinSender.cs</Link>
+    </Compile>
+    <Compile Include="..\..\zipkin4net\Criteo.Profiling.Tracing\Tracers\Zipkin\Span.cs">
+      <Link>Tracers\Zipkin\Span.cs</Link>
+    </Compile>
+    <Compile Include="..\..\zipkin4net\Criteo.Profiling.Tracing\Tracers\Zipkin\Statistics.cs">
+      <Link>Tracers\Zipkin\Statistics.cs</Link>
+    </Compile>
+    <Compile Include="..\..\zipkin4net\Criteo.Profiling.Tracing\Tracers\Zipkin\ThriftSpanSerializer.cs">
+      <Link>Tracers\Zipkin\ThriftSpanSerializer.cs</Link>
+    </Compile>
+    <Compile Include="..\..\zipkin4net\Criteo.Profiling.Tracing\Tracers\Zipkin\thrift_gen\gen-csharp\Criteo\Profiling\Tracing\Tracers\Zipkin\Thrift\Annotation.cs">
+      <Link>Tracers\Zipkin\thrift_gen\gen-csharp\Criteo\Profiling\Tracing\Tracers\Zipkin\Thrift\Annotation.cs</Link>
+    </Compile>
+    <Compile Include="..\..\zipkin4net\Criteo.Profiling.Tracing\Tracers\Zipkin\thrift_gen\gen-csharp\Criteo\Profiling\Tracing\Tracers\Zipkin\Thrift\AnnotationType.cs">
+      <Link>Tracers\Zipkin\thrift_gen\gen-csharp\Criteo\Profiling\Tracing\Tracers\Zipkin\Thrift\AnnotationType.cs</Link>
+    </Compile>
+    <Compile Include="..\..\zipkin4net\Criteo.Profiling.Tracing\Tracers\Zipkin\thrift_gen\gen-csharp\Criteo\Profiling\Tracing\Tracers\Zipkin\Thrift\BinaryAnnotation.cs">
+      <Link>Tracers\Zipkin\thrift_gen\gen-csharp\Criteo\Profiling\Tracing\Tracers\Zipkin\Thrift\BinaryAnnotation.cs</Link>
+    </Compile>
+    <Compile Include="..\..\zipkin4net\Criteo.Profiling.Tracing\Tracers\Zipkin\thrift_gen\gen-csharp\Criteo\Profiling\Tracing\Tracers\Zipkin\Thrift\Endpoint.cs">
+      <Link>Tracers\Zipkin\thrift_gen\gen-csharp\Criteo\Profiling\Tracing\Tracers\Zipkin\Thrift\Endpoint.cs</Link>
+    </Compile>
+    <Compile Include="..\..\zipkin4net\Criteo.Profiling.Tracing\Tracers\Zipkin\thrift_gen\gen-csharp\Criteo\Profiling\Tracing\Tracers\Zipkin\Thrift\Span.cs">
+      <Link>Tracers\Zipkin\thrift_gen\gen-csharp\Criteo\Profiling\Tracing\Tracers\Zipkin\Thrift\Span.cs</Link>
+    </Compile>
+    <Compile Include="..\..\zipkin4net\Criteo.Profiling.Tracing\Tracers\Zipkin\thrift_gen\gen-csharp\Criteo\Profiling\Tracing\Tracers\Zipkin\Thrift\zipkinCore.Constants.cs">
+      <Link>Tracers\Zipkin\thrift_gen\gen-csharp\Criteo\Profiling\Tracing\Tracers\Zipkin\Thrift\zipkinCore.Constants.cs</Link>
+    </Compile>
+    <Compile Include="..\..\zipkin4net\Criteo.Profiling.Tracing\Tracers\Zipkin\ZipkinAnnotation.cs">
+      <Link>Tracers\Zipkin\ZipkinAnnotation.cs</Link>
+    </Compile>
+    <Compile Include="..\..\zipkin4net\Criteo.Profiling.Tracing\Tracers\Zipkin\ZipkinAnnotationVisitor.cs">
+      <Link>Tracers\Zipkin\ZipkinAnnotationVisitor.cs</Link>
+    </Compile>
+    <Compile Include="..\..\zipkin4net\Criteo.Profiling.Tracing\Tracers\Zipkin\ZipkinTracer.cs">
+      <Link>Tracers\Zipkin\ZipkinTracer.cs</Link>
+    </Compile>
+    <Compile Include="..\..\zipkin4net\Criteo.Profiling.Tracing\Transport\Http\HttpZipkinSender.cs">
+      <Link>Transport\Http\HttpZipkinSender.cs</Link>
+    </Compile>
+    <Compile Include="..\..\zipkin4net\Criteo.Profiling.Tracing\Transport\ITraceExtractor.cs">
+      <Link>Transport\ITraceExtractor.cs</Link>
+    </Compile>
+    <Compile Include="..\..\zipkin4net\Criteo.Profiling.Tracing\Transport\ITraceInjector.cs">
+      <Link>Transport\ITraceInjector.cs</Link>
+    </Compile>
+    <Compile Include="..\..\zipkin4net\Criteo.Profiling.Tracing\Transport\ZipkinHttpHeaders.cs">
+      <Link>Transport\ZipkinHttpHeaders.cs</Link>
+    </Compile>
+    <Compile Include="..\..\zipkin4net\Criteo.Profiling.Tracing\Transport\ZipkinHttpTraceExtractor.cs">
+      <Link>Transport\ZipkinHttpTraceExtractor.cs</Link>
+    </Compile>
+    <Compile Include="..\..\zipkin4net\Criteo.Profiling.Tracing\Transport\ZipkinHttpTraceInjector.cs">
+      <Link>Transport\ZipkinHttpTraceInjector.cs</Link>
+    </Compile>
+    <Compile Include="..\..\zipkin4net\Criteo.Profiling.Tracing\Utils\HighResolutionDateTime.cs">
+      <Link>Utils\HighResolutionDateTime.cs</Link>
+    </Compile>
+    <Compile Include="..\..\zipkin4net\Criteo.Profiling.Tracing\Utils\IpUtils.cs">
+      <Link>Utils\IpUtils.cs</Link>
+    </Compile>
+    <Compile Include="..\..\zipkin4net\Criteo.Profiling.Tracing\Utils\NumberUtils.cs">
+      <Link>Utils\NumberUtils.cs</Link>
+    </Compile>
+    <Compile Include="..\..\zipkin4net\Criteo.Profiling.Tracing\Utils\RandomUtils.cs">
+      <Link>Utils\RandomUtils.cs</Link>
+    </Compile>
+    <Compile Include="..\..\zipkin4net\Criteo.Profiling.Tracing\Utils\TimeUtils.cs">
+      <Link>Utils\TimeUtils.cs</Link>
+    </Compile>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

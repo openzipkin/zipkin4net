@@ -31,11 +31,14 @@
   "dependencies": {
     "Microsoft.AspNetCore.Hosting": "1.1.1",
     "Microsoft.Extensions.Logging": "1.1.1",
-    "System.Net.Http": "4.3.0",
-    "Criteo.Profiling.Tracing": "0.3.1"
+    "Criteo.Profiling.Tracing": "0.3"
   },
   "frameworks": {
-    "net451": {},
+    "net451": {
+      "dependencies": {
+        "System.Net.Http": "4.3.1"
+      }
+    },
     "netstandard1.6": {
       "buildOptions": {
         "define": [
