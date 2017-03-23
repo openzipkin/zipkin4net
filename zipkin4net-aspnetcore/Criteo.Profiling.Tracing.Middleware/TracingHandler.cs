@@ -2,6 +2,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using Criteo.Profiling.Tracing.Transport;
+using Criteo.Profiling.Tracing.Utils;
 
 namespace Criteo.Profiling.Tracing.Middleware
 {
@@ -20,22 +21,16 @@ namespace Criteo.Profiling.Tracing.Middleware
             _serviceName = serviceName;
             InnerHandler = httpMessageHandler ?? new HttpClientHandler();
         }
-        protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, System.Threading.CancellationToken cancellationToken)
+        protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, System.Threading.CancellationToken cancellationToken)
         {
-            var trace = Trace.Current;
-            if (trace != null)
+            using (var clientTrace = new ClientTrace(_serviceName, request.Method.ToString()))
             {
-                trace = trace.Child();
-                _injector.Inject(trace, request.Headers);
+                if (clientTrace.Trace != null)
+                {
+                    _injector.Inject(clientTrace.Trace, request.Headers);
+                }
+                return await TraceHelper.TracedActionAsync(base.SendAsync(request, cancellationToken));
             }
-            trace.Record(Annotations.ClientSend());
-            trace.Record(Annotations.ServiceName(_serviceName));
-            trace.Record(Annotations.Rpc(request.Method.ToString()));
-            return base.SendAsync(request, cancellationToken)
-                .ContinueWith(t => {
-                    trace.Record(Annotations.ClientRecv());
-                    return t.Result;
-                });
         }
     }
 }
