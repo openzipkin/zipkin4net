@@ -13,13 +13,15 @@ namespace Criteo.Profiling.Tracing.Middleware
             app.Use(async (context, next) =>
             {
                 Trace trace;
-                if (!extractor.TryExtract(context.Request.Headers, out trace))
+                var request = context.Request;
+                if (!extractor.TryExtract(request.Headers, out trace))
                 {
                     trace = Trace.Create();
                 }
                 Trace.Current = trace;
-                using (new ServerTrace(serviceName, context.Request.Method))
+                using (new ServerTrace(serviceName, request.Method))
                 {
+                    trace.Record(Annotations.Tag("http.uri", request.Path));
                     await TraceHelper.TracedActionAsync(next());
                 }
             });
