@@ -19,8 +19,8 @@ In order to build the example, you need to install a two things:
 # Running the example
 This example has two services: frontend and backend. They both report trace data to zipkin. To setup the demo, you need to start Frontend, Backend and Zipkin.
 
-Once the services are started, open http://localhost:5000/
-* This will call the backend (http://localhost:5001) and show the result, which defaults to a simple "Hello".
+Once the services are started, open http://localhost:8081/
+* This will call the backend (http://localhost:9000/api) and show the result, which defaults to printing the current date.
 
 Next, you can view traces that went through the backend via http://localhost:9411/?serviceName=backend
 * This is a locally run zipkin service which keeps traces in memory
@@ -37,13 +37,13 @@ In separate tabs or windows, start each of frontend and backend:
 ```bash
 $ pwd
 ~/zipkin4net/zipkin-example/frontend
-$ dotnet run http://*:5000
+$ dotnet run http://*:8081
 ```
 and
 ```bash
 $ pwd
 ~/zipkin4net/zipkin-example/backend
-$ dotnet run http://*:5001
+$ dotnet run http://*:9000
 ```
 
 
@@ -56,6 +56,6 @@ java -jar zipkin.jar
 
 ## Advanced setup
 
-If you want to use different ports that 5000 and 5001 for frontend and backend, you have to do two things:
+If you want to use different ports that 8081 and 9000 for frontend and backend, you have to do two things:
 * Edit the [configuration](https://github.com/criteo/zipkin4net/blob/master/zipkin4net-example/frontend/appSettings.json) and change the callServiceUrl to the desired backend url
 * Launch frontend and backend with the ports you want (the parameter just after dotnet run)

@@ -16,8 +16,7 @@ namespace backend
         {
             app.Run(async (context) =>
             {
-                await Task.Delay(200);
-                await context.Response.WriteAsync("Hello");
+                await context.Response.WriteAsync(DateTime.Now.ToString());
             });
         }
     }
