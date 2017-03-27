@@ -1,5 +1,5 @@
 
-Microsoft Visual Studio Solution File, Format Version 15.00
+Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Criteo.Profiling.Tracing", "Criteo.Profiling.Tracing\Criteo.Profiling.Tracing.csproj", "{48712463-66FF-4C76-B63D-097B57A1477F}"
 EndProject
