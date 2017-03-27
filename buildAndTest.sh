@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-declare -a repositories=("zipkin4net" "zipkin4net-aspnetcore")
+declare -a repositories=("zipkin4net" "zipkin4net-aspnetcore" "zipkin4net-example")
 
 for i in "${repositories[@]}"; do
     if [ -d $i ]; then
