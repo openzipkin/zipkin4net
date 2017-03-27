@@ -101,19 +101,18 @@
     <Compile Include="Transport\ITraceInjector.cs" />
     <Compile Include="Utils\NumberUtils.cs" />
     <Compile Include="Utils\RandomUtils.cs" />
-    <Compile Include="Tracers\Zipkin\thrift_gen\gen_csharp\Criteo\Profiling\Tracing\Tracers\Zipkin\Thrift\Annotation.cs" />
-    <Compile Include="Tracers\Zipkin\thrift_gen\gen_csharp\Criteo\Profiling\Tracing\Tracers\Zipkin\Thrift\AnnotationType.cs" />
-    <Compile Include="Tracers\Zipkin\thrift_gen\gen_csharp\Criteo\Profiling\Tracing\Tracers\Zipkin\Thrift\BinaryAnnotation.cs" />
-    <Compile Include="Tracers\Zipkin\thrift_gen\gen_csharp\Criteo\Profiling\Tracing\Tracers\Zipkin\Thrift\Endpoint.cs" />
-    <Compile Include="Tracers\Zipkin\thrift_gen\gen_csharp\Criteo\Profiling\Tracing\Tracers\Zipkin\Thrift\Span.cs" />
-    <Compile Include="Tracers\Zipkin\thrift_gen\gen_csharp\Criteo\Profiling\Tracing\Tracers\Zipkin\Thrift\zipkinCore.Constants.cs" />
+    <Compile Include="Tracers\Zipkin\thrift_gen\gen-csharp\Criteo\Profiling\Tracing\Tracers\Zipkin\Thrift\Annotation.cs" />
+    <Compile Include="Tracers\Zipkin\thrift_gen\gen-csharp\Criteo\Profiling\Tracing\Tracers\Zipkin\Thrift\AnnotationType.cs" />
+    <Compile Include="Tracers\Zipkin\thrift_gen\gen-csharp\Criteo\Profiling\Tracing\Tracers\Zipkin\Thrift\BinaryAnnotation.cs" />
+    <Compile Include="Tracers\Zipkin\thrift_gen\gen-csharp\Criteo\Profiling\Tracing\Tracers\Zipkin\Thrift\Endpoint.cs" />
+    <Compile Include="Tracers\Zipkin\thrift_gen\gen-csharp\Criteo\Profiling\Tracing\Tracers\Zipkin\Thrift\Span.cs" />
+    <Compile Include="Tracers\Zipkin\thrift_gen\gen-csharp\Criteo\Profiling\Tracing\Tracers\Zipkin\Thrift\zipkinCore.Constants.cs" />
     <Compile Include="Utils\IpUtils.cs" />
     <Compile Include="Utils\HighResolutionDateTime.cs" />
     <Compile Include="Utils\TimeUtils.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Criteo.Profiling.Tracing.project.json" />
-    <None Include="packages.config" />
     <Compile Include="Trace.netfw.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
