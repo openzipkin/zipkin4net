@@ -18,7 +18,6 @@ namespace frontend
                 var callServiceUrl = config["callServiceUrl"];
                 using (var httpClient = new HttpClient(new TracingHandler(config["applicationName"])))
                 {
-                    await Task.Delay(100);
                     var response = await httpClient.GetAsync(callServiceUrl);
                     if (!response.IsSuccessStatusCode)
                     {
