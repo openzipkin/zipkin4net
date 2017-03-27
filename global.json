@@ -4,6 +4,7 @@
   },
   "projects": [
     "zipkin4net",
-    "zipkin4net-aspnetcore"
+    "zipkin4net-aspnetcore",
+    "zipkin4net-example"
   ]
 }

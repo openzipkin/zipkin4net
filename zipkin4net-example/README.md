@@ -29,20 +29,20 @@ Next, you can view traces that went through the backend via http://localhost:941
 First, we need to compile the example
 ```bash
 $ pwd
-~/zipkin4net/zipkin-example
-$ ./build.sh
+~/zipkin4net/
+$ ./buildAndTest.sh
 ```
 
 In separate tabs or windows, start each of frontend and backend:
 ```bash
 $ pwd
-~/zipkin4net/zipkin-example/frontend
+~/zipkin4net/zipkin4net-example/frontend
 $ dotnet run http://*:8081
 ```
 and
 ```bash
 $ pwd
-~/zipkin4net/zipkin-example/backend
+~/zipkin4net/zipkin4net-example/backend
 $ dotnet run http://*:9000
 ```
 
