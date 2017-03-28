@@ -2,7 +2,7 @@
 
 namespace Criteo.Profiling.Tracing.Tracers.Zipkin
 {
-    internal interface ISpanSerializer
+    public interface ISpanSerializer
     {
 
         void SerializeTo(Stream stream, Span span);
