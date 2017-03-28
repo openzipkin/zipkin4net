@@ -3,7 +3,7 @@ using Criteo.Profiling.Tracing.Utils;
 
 namespace Criteo.Profiling.Tracing.Tracers.Zipkin
 {
-    internal class ZipkinAnnotation
+    public class ZipkinAnnotation
     {
         public string Value { get; private set; }
 
