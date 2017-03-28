@@ -11,7 +11,7 @@ namespace Criteo.Profiling.Tracing.Tracers.Zipkin
     /// Represent the creation and handling of a single RPC request
     /// or of a single local component.
     /// </summary>
-    internal class Span
+    public class Span
     {
         public SpanState SpanState { get; private set; }
 
