@@ -1,0 +1,48 @@
+using System;
+using System.Linq;
+using System.Net;
+using Criteo.Profiling.Tracing.Utils;
+
+namespace Criteo.Profiling.Tracing.Tracers.Zipkin
+{
+    public static class SerializerUtils
+    {
+        /// <summary>
+        /// Name of the service when none has been recorded
+        /// </summary>
+        public const string DefaultServiceName = "UnknownService";
+        /// <summary>
+        /// Name of the RPC method when none has been recorded
+        /// </summary>
+        public const string DefaultRpcMethodName = "UnknownRpc";
+        /// <summary>
+        /// IpEndpoint to use when none has been recorded
+        /// </summary>
+        public static readonly IPEndPoint DefaultEndPoint = new IPEndPoint(IpUtils.GetLocalIpAddress() ?? IPAddress.Loopback, 0);
+
+        public static int IpToInt(IPAddress ipAddr)
+        {
+            // GetAddressBytes() returns in network order (big-endian)
+            return IPAddress.NetworkToHostOrder(BitConverter.ToInt32(ipAddr.GetAddressBytes(), 0));
+        }
+
+
+        public static string GetServiceNameOrDefault(Span span)
+        {
+            if (string.IsNullOrWhiteSpace(span.ServiceName))
+            {
+                // Since we don't have the app name yet, we need to hack a bit by providing
+                // an empty service name. This will add the endpoint attribute, and thus enable
+                // clock skew correction on the server.
+                return IsLocalSpan(span) ? string.Empty : DefaultServiceName;
+            }
+            return span.ServiceName.Replace(" ", "_"); // whitespaces cause issues with the query and ui
+        }
+
+        private static bool IsLocalSpan(Span span)
+        {
+            return !span.Annotations.Any() &&
+                span.BinaryAnnotations.Any(ba => ba.Key == "lc");
+        }
+    }
+}
