@@ -2,6 +2,7 @@ using System;
 using Microsoft.AspNetCore.Builder;
 using Criteo.Profiling.Tracing;
 using Criteo.Profiling.Tracing.Utils;
+using Microsoft.AspNetCore.Http.Extensions;
 
 namespace Criteo.Profiling.Tracing.Middleware
 {
@@ -21,7 +22,9 @@ namespace Criteo.Profiling.Tracing.Middleware
                 Trace.Current = trace;
                 using (new ServerTrace(serviceName, request.Method))
                 {
-                    trace.Record(Annotations.Tag("http.uri", request.Path));
+                    trace.Record(Annotations.Tag("http.host", request.Host.ToString()));
+                    trace.Record(Annotations.Tag("http.uri", UriHelper.GetDisplayUrl(request)));
+                    trace.Record(Annotations.Tag("http.path", request.Path));
                     await TraceHelper.TracedActionAsync(next());
                 }
             });
