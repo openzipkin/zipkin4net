@@ -12,6 +12,7 @@ namespace Criteo.Profiling.Tracing.Transport.Http
     public class T_HttpZipkinSender
     {
         private const string url = "http://localhost";
+        private const string contentType = "application/json";
         private Mock<FakeHttpMessageHandler> mockMessageHandler;
         private HttpClient httpClient;
         private static byte[] content = Encoding.ASCII.GetBytes("data");
@@ -26,11 +27,12 @@ namespace Criteo.Profiling.Tracing.Transport.Http
         [Test]
         public void sendDataShouldSendOnSpansEndPoint()
         {
-            var sender = new HttpZipkinSender(httpClient, url);
+            var contentType = "application/x-thrift";
+            var sender = new HttpZipkinSender(httpClient, url, contentType);
             sender.Send(content);
             mockMessageHandler.Verify(h => h.Send(It.Is<HttpRequestMessage>(
                 m => m.RequestUri.Equals(url + "/api/v1/spans")
-                && m.Content.Headers.GetValues("Content-Type").Contains("application/x-thrift")
+                && m.Content.Headers.GetValues("Content-Type").Contains(contentType)
                 && m.Content.Headers.GetValues("Content-Length").Contains(content.Length.ToString())
                 && m.Method == HttpMethod.Post
             )));
@@ -39,7 +41,7 @@ namespace Criteo.Profiling.Tracing.Transport.Http
         [Test]
         public void invalidUrlShouldThrowWhenSending()
         {
-            var sender = new HttpZipkinSender(httpClient, "url");
+            var sender = new HttpZipkinSender(httpClient, "url", contentType);
             Assert.Throws<InvalidOperationException>(() => sender.Send(content));
         }
 
@@ -47,7 +49,7 @@ namespace Criteo.Profiling.Tracing.Transport.Http
         public void sendDataShouldNotAddASlashIfAlreadyPresent()
         {
             var url = "http://localhost/";
-            var sender = new HttpZipkinSender(httpClient, url);
+            var sender = new HttpZipkinSender(httpClient, url, contentType);
             sender.Send(content);
             mockMessageHandler.Verify(h => h.Send(It.Is<HttpRequestMessage>(
                 m => m.RequestUri.Equals(url + "api/v1/spans")
