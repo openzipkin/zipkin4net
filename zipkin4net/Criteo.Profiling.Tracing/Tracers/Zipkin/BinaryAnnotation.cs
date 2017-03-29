@@ -3,7 +3,7 @@ using Criteo.Profiling.Tracing.Tracers.Zipkin.Thrift;
 
 namespace Criteo.Profiling.Tracing.Tracers.Zipkin
 {
-    internal class BinaryAnnotation
+    public class BinaryAnnotation
     {
         public AnnotationType AnnotationType { get; private set; }
 
