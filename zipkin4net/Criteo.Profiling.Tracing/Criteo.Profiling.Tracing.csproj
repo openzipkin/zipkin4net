@@ -90,6 +90,8 @@
     <Compile Include="Tracers\Zipkin\IZipkinSender.cs" />
     <Compile Include="Tracers\Zipkin\Span.cs" />
     <Compile Include="Tracers\Zipkin\ISpanSerializer.cs" />
+    <Compile Include="Tracers\Zipkin\SerializerUtils.cs" />
+    <Compile Include="Tracers\Zipkin\JSONSpanSerializer.cs" />
     <Compile Include="Tracers\Zipkin\ThriftSpanSerializer.cs" />
     <Compile Include="Tracers\Zipkin\ZipkinAnnotation.cs" />
     <Compile Include="Tracers\Zipkin\ZipkinAnnotationVisitor.cs" />

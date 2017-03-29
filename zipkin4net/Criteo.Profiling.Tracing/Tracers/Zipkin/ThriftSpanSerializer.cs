@@ -10,24 +10,8 @@ using Thrift.Transport;
 
 namespace Criteo.Profiling.Tracing.Tracers.Zipkin
 {
-    internal class ThriftSpanSerializer : ISpanSerializer
+    public class ThriftSpanSerializer : ISpanSerializer
     {
-
-        /// <summary>
-        /// Name of the RPC method when none has been recorded
-        /// </summary>
-        public const string DefaultRpcMethodName = "UnknownRpc";
-
-        /// <summary>
-        /// Name of the service when none has been recorded
-        /// </summary>
-        public const string DefaultServiceName = "UnknownService";
-
-        /// <summary>
-        /// IpEndpoint to use when none has been recorded
-        /// </summary>
-        public static readonly IPEndPoint DefaultEndPoint = new IPEndPoint(IpUtils.GetLocalIpAddress() ?? IPAddress.Loopback, 0);
-
         public void SerializeTo(Stream stream, Span span)
         {
             var thriftSpan = ConvertToThrift(span);
@@ -50,7 +34,7 @@ namespace Criteo.Profiling.Tracing.Tracers.Zipkin
             {
                 Id = span.SpanState.SpanId,
                 Trace_id = span.SpanState.TraceId,
-                Name = span.Name ?? DefaultRpcMethodName,
+                Name = span.Name ?? SerializerUtils.DefaultRpcMethodName,
                 Debug = false
             };
 
@@ -65,13 +49,12 @@ namespace Criteo.Profiling.Tracing.Tracers.Zipkin
             }
 
             // Use default value if no information were recorded
-            var spanEndpoint = span.Endpoint ?? DefaultEndPoint;
-            var spanServiceName = GetServiceNameOrDefault(span);
-            spanServiceName = spanServiceName.Replace(" ", "_"); // whitespaces cause issues with the query and ui
+            var spanEndpoint = span.Endpoint ?? SerializerUtils.DefaultEndPoint;
+            var spanServiceName = SerializerUtils.GetServiceNameOrDefault(span);
 
             var host = new Endpoint
             {
-                Ipv4 = IpToInt(spanEndpoint.Address),
+                Ipv4 = SerializerUtils.IpToInt(spanEndpoint.Address),
                 Port = (short)spanEndpoint.Port,
                 Service_name = spanServiceName
             };
@@ -93,24 +76,6 @@ namespace Criteo.Profiling.Tracing.Tracers.Zipkin
                 thriftSpan.Duration = (long)(span.Duration.Value.TotalMilliseconds * 1000); // microseconds
             }
             return thriftSpan;
-        }
-
-        private static string GetServiceNameOrDefault(Span span)
-        {
-            if (string.IsNullOrWhiteSpace(span.ServiceName))
-            {
-                // Since we don't have the app name yet, we need to hack a bit by providing
-                // an empty service name. This will add the endpoint attribute, and thus enable
-                // clock skew correction on the server.
-                return IsLocalSpan(span) ? string.Empty : DefaultServiceName;
-            }
-            return span.ServiceName;
-        }
-
-        private static bool IsLocalSpan(Span span)
-        {
-            return !span.Annotations.Any() &&
-                span.BinaryAnnotations.Any(ba => ba.Key == zipkinCoreConstants.LOCAL_COMPONENT);
         }
 
         /// <summary>
@@ -143,12 +108,5 @@ namespace Criteo.Profiling.Tracing.Tracers.Zipkin
                 Host = host
             };
         }
-
-        public static int IpToInt(IPAddress ipAddr)
-        {
-            // GetAddressBytes() returns in network order (big-endian)
-            return IPAddress.NetworkToHostOrder(BitConverter.ToInt32(ipAddr.GetAddressBytes(), 0));
-        }
-
     }
 }

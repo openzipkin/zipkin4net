@@ -57,6 +57,7 @@
     <Compile Include="Tracers\Zipkin\T_BinaryAnnotationValueEncoder.cs" />
     <Compile Include="Tracers\Zipkin\T_RateLimiter.cs" />
     <Compile Include="Tracers\Zipkin\T_Span.cs" />
+    <Compile Include="Tracers\Zipkin\T_SerializerUtils.cs" />
     <Compile Include="Tracers\Zipkin\T_Statistics.cs" />
     <Compile Include="Tracers\Zipkin\T_ThriftSpanSerializer.cs" />
     <Compile Include="Tracers\Zipkin\T_ZipkinAnnotationVisitor.cs" />
