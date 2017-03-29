@@ -44,8 +44,8 @@ namespace common
             lifetime.ApplicationStarted.Register(() => {
                 TraceManager.SamplingRate = 1.0f;
                 var logger = new TracingLogger(loggerFactory, "Criteo.Profiling.Tracing");
-                var httpSender = new HttpZipkinSender( "http://localhost:9411");
-                var tracer = new ZipkinTracer(httpSender);
+                var httpSender = new HttpZipkinSender("http://localhost:9411", "application/json");
+                var tracer = new ZipkinTracer(httpSender, new JSONSpanSerializer());
                 TraceManager.RegisterTracer(tracer);
                 TraceManager.Start(logger);
             });
