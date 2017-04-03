@@ -27,7 +27,7 @@ namespace Criteo.Profiling.Tracing.Middleware
             {
                 if (clientTrace.Trace != null)
                 {
-                    _injector.Inject(clientTrace.Trace, request.Headers);
+                    _injector.Inject(clientTrace.Trace.Child(), request.Headers);
                 }
                 return await TraceHelper.TracedActionAsync(base.SendAsync(request, cancellationToken));
             }
