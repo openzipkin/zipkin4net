@@ -28,7 +28,15 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
         [Test]
         public void ShouldThrowWithNullSender()
         {
-            Assert.Throws<ArgumentNullException>(() => { var tracer = new ZipkinTracer(null);});
+            IZipkinSender sender = null;
+            Assert.Throws<ArgumentNullException>(() => { var tracer = new ZipkinTracer(sender, Mock.Of<ISpanSerializer>());});
+        }
+
+        [Test]
+        public void ShouldThrowWithNullSerializer()
+        {
+            ISpanSerializer spanSerializer = null;
+            Assert.Throws<ArgumentNullException>(() => { var tracer = new ZipkinTracer(Mock.Of<IZipkinSender>(), spanSerializer);});
         }
 
         [Test]
