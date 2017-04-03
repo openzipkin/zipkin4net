@@ -18,25 +18,7 @@ namespace Criteo.Profiling.Tracing.Tracers.Zipkin
         /// <summary>
         /// IpEndpoint to use when none has been recorded
         /// </summary>
-        public static readonly IPEndPoint DefaultEndPoint;
-
-        static SerializerUtils()
-        {
-            IPAddress address;
-
-            try
-            {
-                // get an ip address and use Loopback if none found
-                address = IpUtils.GetLocalIpAddress() ?? IPAddress.Loopback;
-            }
-            catch (Exception)
-            {
-                // on failure, use Loopback
-                address = IPAddress.Loopback;
-            }
-
-            DefaultEndPoint = new IPEndPoint(address, 0);
-        }
+        public static readonly IPEndPoint DefaultEndPoint = GetLocalEndPointOrDefault();
 
         public static int IpToInt(IPAddress ipAddr)
         {
@@ -61,6 +43,24 @@ namespace Criteo.Profiling.Tracing.Tracers.Zipkin
         {
             return !span.Annotations.Any() &&
                 span.BinaryAnnotations.Any(ba => ba.Key == "lc");
+        }
+
+        private static IPEndPoint GetLocalEndPointOrDefault()
+        {
+            IPAddress address;
+
+            try
+            {
+                // get an ip address and use Loopback if none found
+                address = IpUtils.GetLocalIpAddress() ?? IPAddress.Loopback;
+            }
+            catch (Exception)
+            {
+                // on failure, use Loopback
+                address = IPAddress.Loopback;
+            }
+
+            return new IPEndPoint(address, 0);
         }
     }
 }
