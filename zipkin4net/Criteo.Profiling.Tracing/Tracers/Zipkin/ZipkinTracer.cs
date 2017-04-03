@@ -42,7 +42,7 @@ namespace Criteo.Profiling.Tracing.Tracers.Zipkin
             Statistics = statistics ?? new Statistics();
             _spanSender = sender;
 
-            if (sender == null) throw new ArgumentNullException("spanSerializer", "You have to specify a non-null span serializer for Zipkin tracer.");
+            if (spanSerializer == null) throw new ArgumentNullException("spanSerializer", "You have to specify a non-null span serializer for Zipkin tracer.");
             _spanSerializer = spanSerializer;
 
             _flushTimer = new Timer(_ => FlushOldSpans(TimeUtils.UtcNow), null, TimeToLive, TimeToLive);
