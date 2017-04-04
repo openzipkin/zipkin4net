@@ -2,32 +2,85 @@ using System;
 using System.IO;
 using BenchmarkDotNet.Attributes;
 using Criteo.Profiling.Tracing.Tracers.Zipkin;
+using Newtonsoft.Json;
+using System.Collections.Generic;
 
 namespace Criteo.Profiling.Tracing.Benchmark.Tracers.Zipkin
 {
     public class JSONSerializerBenchmark
     {
-        private readonly Span localSpan = CreateLocalSpan();
-        private readonly Span clientSpan = CreateClientSpan();
-        private readonly Span serverSpan = CreateServerSpan();
         private readonly JSONSpanSerializer jsonSerializer = new JSONSpanSerializer();
 
         [Benchmark]
         public void writeLocalSpanJSONWithCustomParser()
         {
-            writeSpanWithCustomParser(localSpan);
+            writeSpanWithCustomParser(Spans.localSpan);
         }
 
         [Benchmark]
         public void writeClientSpanJSONWithCustomParser()
         {
-            writeSpanWithCustomParser(clientSpan);
+            writeSpanWithCustomParser(Spans.clientSpan);
         }
 
         [Benchmark]
         public void writeServerSpanJSONWithCustomParser()
         {
-            writeSpanWithCustomParser(serverSpan);
+            writeSpanWithCustomParser(Spans.serverSpan);
+        }
+
+        [Benchmark]
+        public void writeLocalSpanJSONWithJSONDotNetParserWithoutList()
+        {
+            writeSpanWithJSONDotNetParser(jsondotnetSpans.localSpan);
+        }
+
+        [Benchmark]
+        public void writeClientSpanJSONWithJSONDotNetParserWithoutList()
+        {
+            writeSpanWithJSONDotNetParser(jsondotnetSpans.clientSpan);
+        }
+
+        [Benchmark]
+        public void writeServerSpanJSONWithJSONDotNetParserWithoutList()
+        {
+            writeSpanWithJSONDotNetParser(jsondotnetSpans.serverSpan);
+        }
+
+    [Benchmark]
+        public void writeLocalSpanJSONWithJSONDotNetParserWithList()
+        {
+            writeSpanWithJSONDotNetParser(jsondotnetSpans.listOfLocalSpan);
+        }
+
+        [Benchmark]
+        public void writeClientSpanJSONWithJSONDotNetParserWithList()
+        {
+            writeSpanWithJSONDotNetParser(jsondotnetSpans.listOfClientSpan);
+        }
+
+        [Benchmark]
+        public void writeServerSpanJSONWithJSONDotNetParserWithList()
+        {
+            writeSpanWithJSONDotNetParser(jsondotnetSpans.listOfserverSpan);
+        }
+
+        [Benchmark]
+        public void writeLocalSpanJSONWithJSONDotNetParserWithListCreation()
+        {
+            writeSpanWithJSONDotNetParser(new List<jsondotnet.Span>() { jsondotnetSpans.localSpan });
+        }
+
+        [Benchmark]
+        public void writeClientSpanJSONWithJSONDotNetParserWithListCreation()
+        {
+            writeSpanWithJSONDotNetParser(new List<jsondotnet.Span>() { jsondotnetSpans.clientSpan });
+        }
+
+        [Benchmark]
+        public void writeServerSpanJSONWithJSONDotNetParserWithListCreation()
+        {
+            writeSpanWithJSONDotNetParser(new List<jsondotnet.Span>() { jsondotnetSpans.serverSpan });
         }
 
         private void writeSpanWithCustomParser(Span span)
@@ -37,7 +90,18 @@ namespace Criteo.Profiling.Tracing.Benchmark.Tracers.Zipkin
                 jsonSerializer.SerializeTo(stream, span);
             }
         }
-        
+
+        private void writeSpanWithJSONDotNetParser(object value)
+        {
+            JsonConvert.SerializeObject(value);
+        }
+    }
+
+    public static class Spans
+    {
+        public static Span localSpan = CreateLocalSpan();
+        public static Span clientSpan = CreateClientSpan();
+        public static Span serverSpan = CreateServerSpan();
 
         private static Span CreateLocalSpan()
         {
@@ -70,5 +134,16 @@ namespace Criteo.Profiling.Tracing.Benchmark.Tracers.Zipkin
             trace.Record(Annotations.ServerSend());
             return new Span(trace.CurrentSpan, new DateTime());
         }
+    }
+
+    public static class jsondotnetSpans
+    {
+        public static jsondotnet.Span localSpan = new jsondotnet.Span(Spans.localSpan);
+        public static jsondotnet.Span clientSpan = new jsondotnet.Span(Spans.clientSpan);
+        public static jsondotnet.Span serverSpan = new jsondotnet.Span(Spans.serverSpan);
+
+        public static List<jsondotnet.Span> listOfLocalSpan = new List<jsondotnet.Span>() { localSpan };
+        public static List<jsondotnet.Span> listOfClientSpan = new List<jsondotnet.Span>() { clientSpan };
+        public static List<jsondotnet.Span> listOfserverSpan = new List<jsondotnet.Span>() { serverSpan };
     }
 }

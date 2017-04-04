@@ -9,8 +9,17 @@ dotnet cli version=1.0.0-preview2-003131
 
 
 ```
- |                              Method |      Mean |    StdDev |
- |------------------------------------ |---------- |---------- |
- |  writeLocalSpanJSONWithCustomParser | 2.2808 us | 0.0159 us |
- | writeClientSpanJSONWithCustomParser | 2.2924 us | 0.0443 us |
- | writeServerSpanJSONWithCustomParser | 2.2982 us | 0.0818 us |
+ |                                                  Method |      Mean |    StdDev |
+ |-------------------------------------------------------- |---------- |---------- |
+ |                      writeLocalSpanJSONWithCustomParser | 1.4042 us | 0.0165 us |
+ |                     writeClientSpanJSONWithCustomParser | 1.4692 us | 0.0170 us |
+ |                     writeServerSpanJSONWithCustomParser | 1.4303 us | 0.0189 us |
+ |       writeLocalSpanJSONWithJSONDotNetParserWithoutList | 2.6782 us | 0.0293 us |
+ |      writeClientSpanJSONWithJSONDotNetParserWithoutList | 2.6764 us | 0.0323 us |
+ |      writeServerSpanJSONWithJSONDotNetParserWithoutList | 2.6316 us | 0.0319 us |
+ |          writeLocalSpanJSONWithJSONDotNetParserWithList | 3.0389 us | 0.0307 us |
+ |         writeClientSpanJSONWithJSONDotNetParserWithList | 3.0641 us | 0.0394 us |
+ |         writeServerSpanJSONWithJSONDotNetParserWithList | 3.0670 us | 0.0565 us |
+ |  writeLocalSpanJSONWithJSONDotNetParserWithListCreation | 3.1453 us | 0.0263 us |
+ | writeClientSpanJSONWithJSONDotNetParserWithListCreation | 3.1033 us | 0.0583 us |
+ | writeServerSpanJSONWithJSONDotNetParserWithListCreation | 3.1990 us | 0.0491 us |
