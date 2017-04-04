@@ -1,0 +1,56 @@
+{
+  "version": "0.1",
+  "authors": ["Criteo"],
+  "description": "Benchmark for zipkin4net",
+  "copyright": "Copyright 2017, Criteo",
+
+ "packOptions": {
+    "summary": "Benchmark for zipkin4net",
+    "tags": [ "Zipkin", "Tracer", "Tracing", "Criteo", "Benchmark" ],
+    "owners": [ "Criteo" ],
+    "licenseUrl": "https://github.com/criteo/zipkin4net/blob/master/LICENSE",
+    "projectUrl": "https://github.com/criteo/zipkin4net",
+    "releaseNotes": "Benchmark for zipkin4net",
+    "requireLicenseAcceptance": false
+  },
+
+  "configurations": {
+    "Debug": {
+      "buildOptions": {
+        "define": [ "DEBUG" ],
+        "emitEntryPoint": true
+      }
+    },
+    "Release": {
+      "buildOptions": {
+        "define": [ "RELEASE" ],
+        "optimize": true,
+        "emitEntryPoint": true
+      }
+    }
+  },
+
+  "dependencies": {
+    "BenchmarkDotNet": "0.10.3",
+    "Criteo.Profiling.Tracing":
+    {
+      "target": "project"
+    }
+  },
+  "frameworks": {
+    "netcoreapp1.1": {
+      "imports": [
+        "portable-net45+win8"
+      ],
+      "dependencies": {
+        "Microsoft.NETCore.App": {
+          "version": "1.1.0",
+          "type": "platform"
+        }
+      },
+      "buildOptions": {
+        "define": [ "NET_CORE" ]
+      }
+    }
+  }
+}
