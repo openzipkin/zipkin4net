@@ -20,7 +20,7 @@ namespace Criteo.Profiling.Tracing.Utils
         /// <see href="https://en.wikipedia.org/wiki/Unix_time"/>
         /// <param name="utcDateTime"></param>
         /// <returns></returns>
-        internal static long ToUnixTimestamp(this DateTime utcDateTime)
+        public static long ToUnixTimestamp(this DateTime utcDateTime)
         {
             return (long)(utcDateTime.Subtract(Epoch).TotalMilliseconds * 1000L);
         }
