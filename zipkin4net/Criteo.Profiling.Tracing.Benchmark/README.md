@@ -23,3 +23,20 @@ dotnet cli version=1.0.0-preview2-003131
  |  writeLocalSpanJSONWithJSONDotNetParserWithListCreation | 3.1453 us | 0.0263 us |
  | writeClientSpanJSONWithJSONDotNetParserWithListCreation | 3.1033 us | 0.0583 us |
  | writeServerSpanJSONWithJSONDotNetParserWithListCreation | 3.1990 us | 0.0491 us |
+
+``` ini
+
+BenchmarkDotNet=v0.10.3.0, OS=OSX
+Processor=Intel(R) Core(TM) i5-5287U CPU 2.90GHz, ProcessorCount=4
+Frequency=1000000000 Hz, Resolution=1.0000 ns, Timer=UNKNOWN
+dotnet cli version=1.0.0-preview2-003131
+  [Host]     : .NET Core 4.6.25009.03, 64bit RyuJIT
+  DefaultJob : .NET Core 4.6.24628.01, 64bit RyuJIT
+
+
+```
+ |                Method |      Mean |    StdDev |
+ |---------------------- |---------- |---------- |
+ |  writeLocalSpanThrift | 1.0028 us | 0.0141 us |
+ | writeClientSpanThrift | 1.0334 us | 0.0213 us |
+ | writeServerSpanThrift | 1.0320 us | 0.0235 us |
