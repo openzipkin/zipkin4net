@@ -8,6 +8,7 @@ namespace Criteo.Profiling.Tracing.Benchmark
         public static void Main(string[] args)
         {
             BenchmarkRunner.Run<JSONSerializerBenchmark>();
+            BenchmarkRunner.Run<ThriftSerializerBenchmark>();
         }
     }
 }
