@@ -87,16 +87,6 @@ namespace Criteo.Profiling.Tracing.Tracers.Zipkin
             AddBinaryAnnotation(tagAnnotation.Key, tagAnnotation.Value);
         }
 
-        public void Visit(ClientAddress clientAddress)
-        {
-            AddBinaryAnnotation(zipkinCoreConstants.CLIENT_ADDR, clientAddress.Address);
-        }
-
-        public void Visit(ServerAddress serverAddress)
-        {
-            AddBinaryAnnotation(zipkinCoreConstants.SERVER_ADDR, serverAddress.Address);
-        }
-
         /// <summary>
         /// Cast binary object Value to one of the following types :
         /// string, bool, short, int, long, byte[], double

@@ -19,8 +19,6 @@ namespace Criteo.Profiling.Tracing.UTest
             Assert.IsInstanceOf<ServerSend>(Annotations.ServerSend());
             Assert.IsInstanceOf<ServiceName>(Annotations.ServiceName(""));
             Assert.IsInstanceOf<Event>(Annotations.Event(""));
-            Assert.IsInstanceOf<ClientAddress>(Annotations.ClientAddress(""));
-            Assert.IsInstanceOf<ServerAddress>(Annotations.ServerAddress(""));
         }
 
     }
