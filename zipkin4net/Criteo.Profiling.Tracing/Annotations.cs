@@ -16,7 +16,7 @@ namespace Criteo.Profiling.Tracing
         private static readonly IAnnotation AnnWireSend = new WireSend();
         private static readonly IAnnotation AnnWireRecv = new WireRecv();
         private static readonly IAnnotation AnnLocalOperationStop = new LocalOperationStop();
-        
+
         public static IAnnotation ClientRecv()
         {
             return AnnClientReceive;
@@ -80,16 +80,6 @@ namespace Criteo.Profiling.Tracing
         public static IAnnotation Event(string name)
         {
             return new Event(name);
-        }
-
-        public static IAnnotation ClientAddress(string address)
-        {
-            return new ClientAddress(address);
-        }
-
-        public static IAnnotation ServerAddress(string address)
-        {
-            return new ServerAddress(address);
         }
     }
 }
