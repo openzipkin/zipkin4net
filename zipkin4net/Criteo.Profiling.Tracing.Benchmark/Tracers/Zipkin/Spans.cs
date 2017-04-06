@@ -26,8 +26,8 @@ namespace Criteo.Profiling.Tracing.Benchmark.Tracers.Zipkin
             trace.Record(Annotations.Rpc("query"));
             trace.Record(Annotations.ServiceName("zipkin-client"));
             trace.Record(Annotations.Tag("jdbc.query", "select distinct `zipkin_spans`.`trace_id` from `zipkin_spans` join `zipkin_annotations` on (`zipkin_spans`.`trace_id` = `zipkin_annotations`.`trace_id` and `zipkin_spans`.`id` = `zipkin_annotations`.`span_id`) where (`zipkin_annotations`.`endpoint_service_name` = ? and `zipkin_spans`.`start_ts` between ? and ?) order by `zipkin_spans`.`start_ts` desc limit ?"));
-            trace.Record(Annotations.Tag("ca", "frontend"));
-            trace.Record(Annotations.Tag("sa", "backend"));
+            trace.Record(Annotations.ClientAddress("frontend"));
+            trace.Record(Annotations.ServerAddress("backend"));
             trace.Record(Annotations.ClientRecv());
             return new Span(trace.CurrentSpan, new DateTime());
         }
