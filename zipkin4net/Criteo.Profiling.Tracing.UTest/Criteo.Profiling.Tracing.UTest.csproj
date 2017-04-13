@@ -68,6 +68,7 @@
     <Compile Include="Transport\T_ZipkinHttpTraceInjector.cs" />
     <Compile Include="T_Annotations.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="T_ClientTrace.cs" />
     <Compile Include="T_Trace.cs" />
     <Compile Include="T_TraceContext.cs" />
     <Compile Include="T_TraceManager.cs" />
