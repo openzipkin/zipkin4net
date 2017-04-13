@@ -9,7 +9,9 @@ namespace Criteo.Profiling.Tracing
 
         public ClientTrace(string serviceName, string rpc)
         {
-            Trace = Trace.Current.Child();
+            if (Trace.Current != null) {
+              Trace = Trace.Current.Child();
+            }
 
             Trace.Record(Annotations.ClientSend());
             Trace.Record(Annotations.ServiceName(serviceName));
