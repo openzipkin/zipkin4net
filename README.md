@@ -59,7 +59,7 @@ The transport is responsible to send traces to a zipkin collector.
 
 #### HTTP transport
 
-We provide you with an [HTTP transport](Criteo.Profiling.Tracing/Transport/Http/HttpZipkinSender.cs). Just create it with the zipkin collector url (i.e. if you test locally, you'll probably end up with something like 'http://localhost:9411') and pass it to the creation of the [ZipkinTracer](Criteo.Profiling.Tracing/Tracers/Zipkin/ZipkinTracer.cs) and you're set.
+We provide you with an [HTTP transport](zipkin4net/Criteo.Profiling.Tracing/Transport/Http/HttpZipkinSender.cs). Just create it with the zipkin collector url (i.e. if you test locally, you'll probably end up with something like 'http://localhost:9411') and pass it to the creation of the [ZipkinTracer](zipkin4net/Criteo.Profiling.Tracing/Tracers/Zipkin/ZipkinTracer.cs) and you're set.
 
 #### Custom transport implementation
 
@@ -113,7 +113,7 @@ The library comes with few handy tricks to help you monitor tracers
 
 #### Metrics
 
-ZipkinTracer can be created with an implementation of [IStatistics](Criteo.Profiling.Tracing/Tracers/Zipkin/Statistics.cs) interface. This is useful if you want to send various metrics to graphite.
+ZipkinTracer can be created with an implementation of [IStatistics](zipkin4net/Criteo.Profiling.Tracing/Tracers/Zipkin/Statistics.cs) interface. This is useful if you want to send various metrics to graphite.
 We update four metrics:
 
 | Metric          | Description                                                             |
@@ -131,19 +131,19 @@ When integrating this kind of library, it can be useful to know that we called i
 
 ##### Debugging
 
-[ConsoleTracer](Criteo.Profiling.Tracing/Tracers/ConsoleTracer.cs) writes every record it gets on the console (annotations, service names, ...).
+[ConsoleTracer](zipkin4net/Criteo.Profiling.Tracing/Tracers/ConsoleTracer.cs) writes every record it gets on the console (annotations, service names, ...).
 
 ##### Unit/Integration test
 
-- [InMemoryTracer](Criteo.Profiling.Tracing/Tracers/InMemoryTracer.cs) keeps every record in a queue. It is useful when a mock tracer is not enough.
-- [VoidTracer](Criteo.Profiling.Tracing/Tracers/VoidTracer.cs) drops records. It is useful when you don't need tracing in tests.
+- [InMemoryTracer](zipkin4net/Criteo.Profiling.Tracing/Tracers/InMemoryTracer.cs) keeps every record in a queue. It is useful when a mock tracer is not enough.
+- [VoidTracer](zipkin4net/Criteo.Profiling.Tracing/Tracers/VoidTracer.cs) drops records. It is useful when you don't need tracing in tests.
 
 Please also note that the default sampling is 0 meaning that by default, tracing is disabled. You should either set the sampling to 1.0 (to be deterministic) or force the trace to be sampled.
 
 ### B3 Headers propagation
 
-If your services communicate through HTTP, we provide you with headers injection and extraction ([ZipkinHttpTraceInjector](Criteo.Profiling.Tracing/Transport/ZipkinHttpTraceInjector.cs) and [ZipkinHttpTraceExtractor](Criteo.Profiling.Tracing/Transport/ZipkinHttpTraceExtractor.cs)). It will allow you to add headers in HTTP requests between your services.
-The headers are zipkin standard headers but you can also implement yours with interfaces [ITraceInjector](Criteo.Profiling.Tracing/Transport/ITraceInjector.cs) and [ITraceExtractor](Criteo.Profiling.Tracing/Transport/ITraceExtractor.cs).
+If your services communicate through HTTP, we provide you with headers injection and extraction ([ZipkinHttpTraceInjector](zipkin4net/Criteo.Profiling.Tracing/Transport/ZipkinHttpTraceInjector.cs) and [ZipkinHttpTraceExtractor](zipkin4net/Criteo.Profiling.Tracing/Transport/ZipkinHttpTraceExtractor.cs)). It will allow you to add headers in HTTP requests between your services.
+The headers are zipkin standard headers but you can also implement yours with interfaces [ITraceInjector](zipkin4net/Criteo.Profiling.Tracing/Transport/ITraceInjector.cs) and [ITraceExtractor](zipkin4net/Criteo.Profiling.Tracing/Transport/ITraceExtractor.cs).
 
 ### Flush mechanism
 
@@ -157,11 +157,11 @@ You can force a trace to bypass sampling. It is useful for tests but can also be
 Trace.ForceSampled();
 ```
 
-If you want to do that in production, we highly recommend too wrap your [IZipkinSender](Criteo.Profiling.Tracing/Tracers/Zipkin/IZipkinSender.cs) implementation with the [RateLimiterZipkinSender](Criteo.Profiling.Tracing/Tracers/Zipkin/RateLimiterZipkinSender.cs). It will throttle traces based on a time-window pattern.
+If you want to do that in production, we highly recommend too wrap your [IZipkinSender](zipin4net/Criteo.Profiling.Tracing/Tracers/Zipkin/IZipkinSender.cs) implementation with the [RateLimiterZipkinSender](zipkin4net/Criteo.Profiling.Tracing/Tracers/Zipkin/RateLimiterZipkinSender.cs). It will throttle traces based on a time-window pattern.
 
 ### Trace context
 
-Passing the trace context accross every API can be very cumbersome and doesn't bring any real added value. It's also a bit painful to implement a working solution if you have async code. That's why we implemented [TraceContext](Criteo.Profiling.Tracing/TraceContext.cs) which relies on .Net [CallContext](https://msdn.microsoft.com/fr-fr/library/system.runtime.remoting.messaging.callcontext(v=vs.110).aspx) to carry traces over the execution path.
+Passing the trace context accross every API can be very cumbersome and doesn't bring any real added value. It's also a bit painful to implement a working solution if you have async code. That's why we implemented [TraceContext](zipkin4net/Criteo.Profiling.Tracing/TraceContext.cs) which relies on .Net [CallContext](https://msdn.microsoft.com/fr-fr/library/system.runtime.remoting.messaging.callcontext(v=vs.110).aspx) to carry traces over the execution path.
 
 By setting
 
