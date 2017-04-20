@@ -1,63 +1,44 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Globalization;
 
 namespace Criteo.Profiling.Tracing.Transport
 {
-    public class ZipkinHttpTraceInjector : ITraceInjector<NameValueCollection>, ITraceInjector<IDictionary<string, string>>
+    /**
+     * Inject B3 headers into HTTP headers.
+     */
+    public class ZipkinHttpTraceInjector : ITraceInjector<NameValueCollection>, ITraceInjector<IDictionary<string, string>>, ITraceInjector
     {
+        public bool Inject<TE>(Trace trace, TE carrier, Action<TE, string, string> injector)
+        {
+            var traceId = trace.CurrentSpan;
+
+            injector(carrier, ZipkinHttpHeaders.TraceId, ZipkinHttpHeaders.EncodeLongToHexString(traceId.TraceId));
+            injector(carrier, ZipkinHttpHeaders.SpanId, ZipkinHttpHeaders.EncodeLongToHexString(traceId.SpanId));
+            if (traceId.ParentSpanId != null)
+            {
+                // Cannot be null in theory, the root span must have been created on request receive hence further RPC calls are necessary children
+                injector(carrier, ZipkinHttpHeaders.ParentSpanId, ZipkinHttpHeaders.EncodeLongToHexString(traceId.ParentSpanId.Value));
+            }
+            injector(carrier, ZipkinHttpHeaders.Flags, ((long)traceId.Flags).ToString(CultureInfo.InvariantCulture));
+
+            // Add "Sampled" header for compatibility with Finagle
+            if (traceId.Flags.HasFlag(SpanFlags.SamplingKnown))
+            {
+                injector(carrier, ZipkinHttpHeaders.Sampled, traceId.Flags.HasFlag(SpanFlags.Sampled) ? "1" : "0");
+            }
+            return true;
+        }
+        
         public bool Inject(Trace trace, NameValueCollection carrier)
         {
-            Set(carrier, trace);
-            return true;
+            return Inject(trace, carrier, (c, key, value) => c[key] = value);
         }
 
         public bool Inject(Trace trace, IDictionary<string, string> carrier)
         {
-            Set(carrier, trace);
-            return true;
-        }
-
-        // Duplicate code... Don't know any way to avoid this
-        public static void Set(NameValueCollection headers, Trace trace)
-        {
-            var traceId = trace.CurrentSpan;
-
-            headers[ZipkinHttpHeaders.TraceId] = ZipkinHttpHeaders.EncodeLongToHexString(traceId.TraceId);
-            headers[ZipkinHttpHeaders.SpanId] = ZipkinHttpHeaders.EncodeLongToHexString(traceId.SpanId);
-            if (traceId.ParentSpanId != null)
-            {
-                // Cannot be null in theory, the root span must have been created on request receive hence further RPC calls are necessary children
-                headers[ZipkinHttpHeaders.ParentSpanId] = ZipkinHttpHeaders.EncodeLongToHexString(traceId.ParentSpanId.Value);
-            }
-            headers[ZipkinHttpHeaders.Flags] = ((long)traceId.Flags).ToString(CultureInfo.InvariantCulture);
-
-            // Add "Sampled" header for compatibility with Finagle
-            if (traceId.Flags.HasFlag(SpanFlags.SamplingKnown))
-            {
-                headers[ZipkinHttpHeaders.Sampled] = traceId.Flags.HasFlag(SpanFlags.Sampled) ? "1" : "0";
-            }
-        }
-
-        // Duplicate code... Don't know any way to avoid this
-        public static void Set(IDictionary<string, string> headers, Trace trace)
-        {
-            var traceId = trace.CurrentSpan;
-
-            headers[ZipkinHttpHeaders.TraceId] = ZipkinHttpHeaders.EncodeLongToHexString(traceId.TraceId);
-            headers[ZipkinHttpHeaders.SpanId] = ZipkinHttpHeaders.EncodeLongToHexString(traceId.SpanId);
-            if (traceId.ParentSpanId != null)
-            {
-                // Cannot be null in theory, the root span must have been created on request receive hence further RPC calls are necessary children
-                headers[ZipkinHttpHeaders.ParentSpanId] = ZipkinHttpHeaders.EncodeLongToHexString(traceId.ParentSpanId.Value);
-            }
-            headers[ZipkinHttpHeaders.Flags] = ((long)traceId.Flags).ToString(CultureInfo.InvariantCulture);
-
-            // Add "Sampled" header for compatibility with Finagle
-            if (traceId.Flags.HasFlag(SpanFlags.SamplingKnown))
-            {
-                headers[ZipkinHttpHeaders.Sampled] = traceId.Flags.HasFlag(SpanFlags.Sampled) ? "1" : "0";
-            }
+            return Inject(trace, carrier, (c, key, value) => c[key] = value);
         }
     }
 }
