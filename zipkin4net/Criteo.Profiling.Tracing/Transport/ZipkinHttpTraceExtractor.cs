@@ -4,35 +4,34 @@ using System.Collections.Specialized;
 
 namespace Criteo.Profiling.Tracing.Transport
 {
-    public class ZipkinHttpTraceExtractor : ITraceExtractor<NameValueCollection>, ITraceExtractor<IDictionary<string, string>>
+    /**
+     * Extract B3 headers from HTTP headers.
+     */
+    public class ZipkinHttpTraceExtractor : ITraceExtractor<NameValueCollection>, ITraceExtractor<IDictionary<string, string>>, ITraceExtractor
     {
+        public bool TryExtract<TE>(TE carrier, Func<TE, string, string> extractor, out Trace trace)
+        {
+            return TryParseTrace(
+                extractor(carrier, ZipkinHttpHeaders.TraceId),
+                extractor(carrier, ZipkinHttpHeaders.SpanId),
+                extractor(carrier, ZipkinHttpHeaders.ParentSpanId),
+                extractor(carrier, ZipkinHttpHeaders.Sampled),
+                extractor(carrier, ZipkinHttpHeaders.Flags),
+                out trace 
+            );
+        }
+
         public bool TryExtract(NameValueCollection carrier, out Trace trace)
         {
-            return TryParseTrace(carrier[ZipkinHttpHeaders.TraceId],
-               carrier[ZipkinHttpHeaders.SpanId],
-               carrier[ZipkinHttpHeaders.ParentSpanId],
-               carrier[ZipkinHttpHeaders.Sampled],
-               carrier[ZipkinHttpHeaders.Flags],
-               out trace);
+            return TryExtract(carrier, (c, key) => c[key], out trace);
         }
 
         public bool TryExtract(IDictionary<string, string> carrier, out Trace trace)
         {
-            string encodedTraceId, encodedSpanId;
-
-            if (carrier.TryGetValue(ZipkinHttpHeaders.TraceId, out encodedTraceId)
-                && carrier.TryGetValue(ZipkinHttpHeaders.SpanId, out encodedSpanId))
-            {
-                string flagsStr, sampledStr, encodedParentSpanId;
-                carrier.TryGetValue(ZipkinHttpHeaders.Flags, out flagsStr);
-                carrier.TryGetValue(ZipkinHttpHeaders.Sampled, out sampledStr);
-                carrier.TryGetValue(ZipkinHttpHeaders.ParentSpanId, out encodedParentSpanId);
-
-                return TryParseTrace(encodedTraceId, encodedSpanId, encodedParentSpanId, sampledStr, flagsStr, out trace);
-            }
-
-            trace = default(Trace);
-            return false;
+            return TryExtract(carrier, (c, key) => {
+                string value;
+                return c.TryGetValue(key, out value) ? value : null;
+            }, out trace);
         }
 
         public static bool TryParseTrace(string encodedTraceId, string encodedSpanId, string encodedParentSpanId, string sampledStr, string flagsStr, out Trace trace)
