@@ -51,7 +51,7 @@ trace.Record(Annotations.ServerRecv());
 trace.Record(Annotations.ServiceName(serviceName));
 trace.Record(Annotations.Rpc("GET"));
 trace.Record(Annotations.ServerSend());
-trace.Record(Annotations.Tag("http.Get", "<url>")); //adds binary annotation
+trace.Record(Annotations.Tag("http.url", "<url>")); //adds binary annotation
 ```
 
 ### Transport
