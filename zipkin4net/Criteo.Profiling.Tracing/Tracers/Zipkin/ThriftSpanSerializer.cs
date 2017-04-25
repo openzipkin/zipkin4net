@@ -52,12 +52,7 @@ namespace Criteo.Profiling.Tracing.Tracers.Zipkin
             var spanEndpoint = span.Endpoint ?? SerializerUtils.DefaultEndPoint;
             var spanServiceName = SerializerUtils.GetServiceNameOrDefault(span);
 
-            var host = new Endpoint
-            {
-                Ipv4 = SerializerUtils.IpToInt(spanEndpoint.Address),
-                Port = (short)spanEndpoint.Port,
-                Service_name = spanServiceName
-            };
+            var host = ConvertToThrift(spanEndpoint, spanServiceName);
 
             var thriftAnnotations = span.Annotations.Select(ann => ConvertToThrift(ann, host)).ToList();
             if (thriftAnnotations.Count > 0)
@@ -82,7 +77,7 @@ namespace Criteo.Profiling.Tracing.Tracers.Zipkin
         /// Convert this annotation object to its Thrift equivalent.
         /// </summary>
         /// <returns></returns>
-        public static Thrift.Annotation ConvertToThrift(ZipkinAnnotation zipkinAnnotation, Endpoint host)
+        public static Thrift.Annotation ConvertToThrift(ZipkinAnnotation zipkinAnnotation, Thrift.Endpoint host)
         {
             var thriftAnn = new Thrift.Annotation
             {
@@ -98,8 +93,14 @@ namespace Criteo.Profiling.Tracing.Tracers.Zipkin
         /// Convert this span binary annotation object to its Thrift equivalent.
         /// </summary>
         /// <returns></returns>
-        public static Thrift.BinaryAnnotation ConvertToThrift(BinaryAnnotation binaryAnnotation, Endpoint host)
+        public static Thrift.BinaryAnnotation ConvertToThrift(BinaryAnnotation binaryAnnotation, Thrift.Endpoint spanEndpoint)
         {
+            var host = spanEndpoint;
+            var endpoint = binaryAnnotation.Host;
+            if (endpoint != null)
+            {
+                host = ConvertToThrift(endpoint.IPEndPoint, endpoint.ServiceName ?? spanEndpoint.Service_name);
+            }
             return new Thrift.BinaryAnnotation
             {
                 Annotation_type = binaryAnnotation.AnnotationType,
@@ -108,5 +109,15 @@ namespace Criteo.Profiling.Tracing.Tracers.Zipkin
                 Host = host
             };
         }
+
+        private static Thrift.Endpoint ConvertToThrift(IPEndPoint ipEndPoint, string serviceName)
+        {
+            return new Thrift.Endpoint()
+            {
+                Ipv4 = SerializerUtils.IpToInt(ipEndPoint.Address),
+                Port = (short)ipEndPoint.Port,
+                Service_name = serviceName
+            };
+        } 
     }
 }

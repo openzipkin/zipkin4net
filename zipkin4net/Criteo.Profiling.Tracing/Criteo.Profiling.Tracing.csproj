@@ -49,6 +49,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Annotations.cs" />
+    <Compile Include="Annotation\Addr.cs" />
+    <Compile Include="Annotation\ClientAddr.cs" />
+    <Compile Include="Annotation\ServerAddr.cs" />
     <Compile Include="Annotation\LocalOperationStart.cs" />
     <Compile Include="Annotation\LocalOperationStop.cs" />
     <Compile Include="Annotation\TagAnnotation.cs" />
