@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Net;
 using Criteo.Profiling.Tracing.Annotation;
 using Criteo.Profiling.Tracing.Tracers.Zipkin.Thrift;
 
@@ -87,48 +88,58 @@ namespace Criteo.Profiling.Tracing.Tracers.Zipkin
             AddBinaryAnnotation(tagAnnotation.Key, tagAnnotation.Value);
         }
 
+        public void Visit(ClientAddr clientAddr)
+        {
+            string serviceName = null;
+            AddBinaryAnnotation(zipkinCoreConstants.CLIENT_ADDR, true, serviceName, clientAddr.Endpoint);
+        }
+
+        public void Visit(ServerAddr serverAddr)
+        {
+            AddBinaryAnnotation(zipkinCoreConstants.SERVER_ADDR, true, serverAddr.ServiceName, serverAddr.Endpoint);
+        }
+
+
         /// <summary>
         /// Cast binary object Value to one of the following types :
         /// string, bool, short, int, long, byte[], double
         /// </summary>
-        /// <param name="annotationKey"></param>
-        /// <param name="annotationValue"></param>
-        private void AddBinaryAnnotation(string annotationKey, object annotationValue)
+        private void AddBinaryAnnotation(string annotationKey, object annotationValue, string serviceName = null, IPEndPoint endpoint = null)
         {
             if (annotationValue is string)
             {
                 var bytes = BinaryAnnotationValueEncoder.Encode((string)annotationValue);
-                _span.AddBinaryAnnotation(new BinaryAnnotation(annotationKey, bytes, AnnotationType.STRING, _record.Timestamp));
+                _span.AddBinaryAnnotation(new BinaryAnnotation(annotationKey, bytes, AnnotationType.STRING, _record.Timestamp, serviceName, endpoint));
             }
             else if (annotationValue is bool)
             {
                 var bytes = BinaryAnnotationValueEncoder.Encode((bool)annotationValue);
-                _span.AddBinaryAnnotation(new BinaryAnnotation(annotationKey, bytes, AnnotationType.BOOL, _record.Timestamp));
+                _span.AddBinaryAnnotation(new BinaryAnnotation(annotationKey, bytes, AnnotationType.BOOL, _record.Timestamp, serviceName, endpoint));
             }
             else if (annotationValue is short)
             {
                 var bytes = BinaryAnnotationValueEncoder.Encode((short)annotationValue);
-                _span.AddBinaryAnnotation(new BinaryAnnotation(annotationKey, bytes, AnnotationType.I16, _record.Timestamp));
+                _span.AddBinaryAnnotation(new BinaryAnnotation(annotationKey, bytes, AnnotationType.I16, _record.Timestamp, serviceName, endpoint));
             }
             else if (annotationValue is int)
             {
                 var bytes = BinaryAnnotationValueEncoder.Encode((int)annotationValue);
-                _span.AddBinaryAnnotation(new BinaryAnnotation(annotationKey, bytes, AnnotationType.I32, _record.Timestamp));
+                _span.AddBinaryAnnotation(new BinaryAnnotation(annotationKey, bytes, AnnotationType.I32, _record.Timestamp, serviceName, endpoint));
             }
             else if (annotationValue is long)
             {
                 var bytes = BinaryAnnotationValueEncoder.Encode((long)annotationValue);
-                _span.AddBinaryAnnotation(new BinaryAnnotation(annotationKey, bytes, AnnotationType.I64, _record.Timestamp));
+                _span.AddBinaryAnnotation(new BinaryAnnotation(annotationKey, bytes, AnnotationType.I64, _record.Timestamp, serviceName, endpoint));
             }
             else if (annotationValue is byte[])
             {
                 var bytes = (byte[])(annotationValue);
-                _span.AddBinaryAnnotation(new BinaryAnnotation(annotationKey, bytes, AnnotationType.BYTES, _record.Timestamp));
+                _span.AddBinaryAnnotation(new BinaryAnnotation(annotationKey, bytes, AnnotationType.BYTES, _record.Timestamp, serviceName, endpoint));
             }
             else if (annotationValue is double)
             {
                 var bytes = BinaryAnnotationValueEncoder.Encode((double)annotationValue);
-                _span.AddBinaryAnnotation(new BinaryAnnotation(annotationKey, bytes, AnnotationType.DOUBLE, _record.Timestamp));
+                _span.AddBinaryAnnotation(new BinaryAnnotation(annotationKey, bytes, AnnotationType.DOUBLE, _record.Timestamp, serviceName, endpoint));
             }
             else
             {

@@ -22,24 +22,49 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
         [Test]
         public void ThriftConversionBinaryAnnotationIsCorrect()
         {
+            string serviceName = null;
+            IPEndPoint ipEndPoint = null;
+            AssertBinaryAnnotationConversion(serviceName, ipEndPoint, _someHost);
+        }
+
+        [Test]
+        public void ThriftConversionBinaryAnnotationWithEndPointIsCorrect()
+        {
+            var serviceName = "database";
+            var ipEndPoint = new IPEndPoint(1, 2);
+            var expectedEndpoint = new Endpoint { Service_name = serviceName, Ipv4 = SerializerUtils.IpToInt(ipEndPoint.Address), Port = (short)ipEndPoint.Port };
+            AssertBinaryAnnotationConversion(serviceName, ipEndPoint, expectedEndpoint);
+        }
+
+        [Test]
+        public void ThriftConversionBinaryAnnotationWithEndPointButNoServiceNameIsCorrect()
+        {
+            string serviceName = null;
+            var ipEndPoint = new IPEndPoint(1, 2);
+            var expectedEndpoint = new Endpoint { Service_name = _someHost.Service_name, Ipv4 = SerializerUtils.IpToInt(ipEndPoint.Address), Port = (short)ipEndPoint.Port };
+            AssertBinaryAnnotationConversion(serviceName, ipEndPoint, expectedEndpoint);
+        }
+
+        private void AssertBinaryAnnotationConversion(string serviceName, IPEndPoint endpoint, Endpoint expectedEndpoint)
+        {
             const string key = "myKey";
             var data = Encoding.ASCII.GetBytes("hello");
             const AnnotationType type = AnnotationType.STRING;
 
-            var binAnn = new BinaryAnnotation(key, data, type, TimeUtils.UtcNow);
+            var binAnn = new BinaryAnnotation(key, data, type, TimeUtils.UtcNow, serviceName, endpoint);
 
             var thriftBinAnn = ThriftSpanSerializer.ConvertToThrift(binAnn, _someHost);
 
             Assert.AreEqual(key, thriftBinAnn.Key);
             Assert.AreEqual(data, thriftBinAnn.Value);
             Assert.AreEqual(type, thriftBinAnn.Annotation_type);
-            AssertEndpointIsCorrect(thriftBinAnn.Host);
+            AssertEndpointIsEqual(expectedEndpoint,  thriftBinAnn.Host);
         }
 
         [Test]
         public void ThriftConversionLocalComponentWithHostAndEmptyServiceName()
         {
-            var binAnn = new BinaryAnnotation(zipkinCoreConstants.LOCAL_COMPONENT, Encoding.ASCII.GetBytes("hello"), AnnotationType.STRING, TimeUtils.UtcNow);
+            var binAnn = new BinaryAnnotation(zipkinCoreConstants.LOCAL_COMPONENT, Encoding.ASCII.GetBytes("hello"), AnnotationType.STRING, TimeUtils.UtcNow, null, null);
             var thriftBinAnn = ThriftSpanSerializer.ConvertToThrift(binAnn, _someHost);
             AssertEndpointIsCorrect(thriftBinAnn.Host);
         }
@@ -59,11 +84,16 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
             AssertEndpointIsCorrect(thriftAnn.Host);
         }
 
+        private void AssertEndpointIsEqual(Endpoint expectedEndPoint, Endpoint endpoint)
+        {
+            Assert.AreEqual(expectedEndPoint.Service_name, endpoint.Service_name);
+            Assert.AreEqual(expectedEndPoint.Port, endpoint.Port);
+            Assert.AreEqual(expectedEndPoint.Ipv4, endpoint.Ipv4);
+        }
+
         private void AssertEndpointIsCorrect(Endpoint endpoint)
         {
-            Assert.AreEqual(_someHost.Service_name, endpoint.Service_name);
-            Assert.AreEqual(_someHost.Port, endpoint.Port);
-            Assert.AreEqual(_someHost.Ipv4, endpoint.Ipv4);
+            AssertEndpointIsEqual(_someHost, endpoint);
         }
 
         [TestCase(null)]
@@ -88,7 +118,7 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
             var binAnnVal = new byte[] { 0x00 };
             const AnnotationType binAnnType = AnnotationType.STRING;
 
-            span.AddBinaryAnnotation(new BinaryAnnotation(binAnnKey, binAnnVal, binAnnType, TimeUtils.UtcNow));
+            span.AddBinaryAnnotation(new BinaryAnnotation(binAnnKey, binAnnVal, binAnnType, TimeUtils.UtcNow, null, null));
 
             var thriftSpan = ThriftSpanSerializer.ConvertToThrift(span);
 

@@ -15,5 +15,7 @@
         void Visit(Event ev);
         void Visit(LocalOperationStart localOperation);
         void Visit(LocalOperationStop operation);
+        void Visit(ClientAddr clientAddr);
+        void Visit(ServerAddr serverAddr);
     }
 }

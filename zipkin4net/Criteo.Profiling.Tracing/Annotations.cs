@@ -81,5 +81,15 @@ namespace Criteo.Profiling.Tracing
         {
             return new Event(name);
         }
+
+        public static IAnnotation ClientAddr(IPEndPoint ipEndPoint)
+        {
+            return new ClientAddr(ipEndPoint);
+        }
+
+        public static IAnnotation ServerAddr(string serviceName, IPEndPoint ipEndPoint)
+        {
+            return new ServerAddr(serviceName, ipEndPoint);
+        }
     }
 }
