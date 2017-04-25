@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Criteo.Profiling.Tracing.Annotation
+﻿namespace Criteo.Profiling.Tracing.Annotation
 {
     public sealed class TagAnnotation : IAnnotation
     {
