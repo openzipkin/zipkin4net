@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Net;
 using Criteo.Profiling.Tracing.Annotation;
 using Criteo.Profiling.Tracing.Tracers.Zipkin.Thrift;
@@ -106,45 +107,57 @@ namespace Criteo.Profiling.Tracing.Tracers.Zipkin
         /// </summary>
         private void AddBinaryAnnotation(string annotationKey, object annotationValue, string serviceName = null, IPEndPoint endpoint = null)
         {
-            if (annotationValue is string)
+            var annotationType = GetAnnotationType(annotationValue);
+            var bytes = EncodeValue(annotationValue, annotationType);
+            _span.AddBinaryAnnotation(new BinaryAnnotation(annotationKey, bytes, annotationType, _record.Timestamp, serviceName, endpoint));
+        }
+
+        private static Dictionary<Type, AnnotationType> thriftTypes = new Dictionary<Type, AnnotationType>()
+        {
+            { typeof(string), AnnotationType.STRING },
+            { typeof(bool), AnnotationType.BOOL },
+            { typeof(short), AnnotationType.I16 },
+            { typeof(int), AnnotationType.I32 },
+            { typeof(long), AnnotationType.I64 },
+            { typeof(byte[]), AnnotationType.BYTES },
+            { typeof(double), AnnotationType.DOUBLE }
+        };
+
+        private static byte[] EncodeValue(object annotationValue, AnnotationType annotationType)
+        {
+            switch (annotationType)
             {
-                var bytes = BinaryAnnotationValueEncoder.Encode((string)annotationValue);
-                _span.AddBinaryAnnotation(new BinaryAnnotation(annotationKey, bytes, AnnotationType.STRING, _record.Timestamp, serviceName, endpoint));
+                case AnnotationType.STRING:
+                    return BinaryAnnotationValueEncoder.Encode((string)annotationValue);
+                case AnnotationType.BOOL:
+                    return BinaryAnnotationValueEncoder.Encode((bool)annotationValue);
+                case AnnotationType.I16:
+                    return BinaryAnnotationValueEncoder.Encode((short)annotationValue);
+                case AnnotationType.I32:
+                    return BinaryAnnotationValueEncoder.Encode((int)annotationValue);
+                case AnnotationType.I64:
+                    return BinaryAnnotationValueEncoder.Encode((long)annotationValue);
+                case AnnotationType.BYTES:
+                    return (byte[])(annotationValue);
+                case AnnotationType.DOUBLE:
+                    return BinaryAnnotationValueEncoder.Encode((double)annotationValue);
             }
-            else if (annotationValue is bool)
+            throw new ArgumentException("Unsupported object type for binary annotation.");
+        }
+
+        private static AnnotationType GetAnnotationType(object annotationValue)
+        {
+            if (annotationValue == null)
             {
-                var bytes = BinaryAnnotationValueEncoder.Encode((bool)annotationValue);
-                _span.AddBinaryAnnotation(new BinaryAnnotation(annotationKey, bytes, AnnotationType.BOOL, _record.Timestamp, serviceName, endpoint));
+                throw new NullReferenceException("Binary annotation value can't be null");
             }
-            else if (annotationValue is short)
+            var type = annotationValue.GetType();
+            AnnotationType thriftType;
+            if (thriftTypes.TryGetValue(type, out thriftType))
             {
-                var bytes = BinaryAnnotationValueEncoder.Encode((short)annotationValue);
-                _span.AddBinaryAnnotation(new BinaryAnnotation(annotationKey, bytes, AnnotationType.I16, _record.Timestamp, serviceName, endpoint));
+                return thriftType;
             }
-            else if (annotationValue is int)
-            {
-                var bytes = BinaryAnnotationValueEncoder.Encode((int)annotationValue);
-                _span.AddBinaryAnnotation(new BinaryAnnotation(annotationKey, bytes, AnnotationType.I32, _record.Timestamp, serviceName, endpoint));
-            }
-            else if (annotationValue is long)
-            {
-                var bytes = BinaryAnnotationValueEncoder.Encode((long)annotationValue);
-                _span.AddBinaryAnnotation(new BinaryAnnotation(annotationKey, bytes, AnnotationType.I64, _record.Timestamp, serviceName, endpoint));
-            }
-            else if (annotationValue is byte[])
-            {
-                var bytes = (byte[])(annotationValue);
-                _span.AddBinaryAnnotation(new BinaryAnnotation(annotationKey, bytes, AnnotationType.BYTES, _record.Timestamp, serviceName, endpoint));
-            }
-            else if (annotationValue is double)
-            {
-                var bytes = BinaryAnnotationValueEncoder.Encode((double)annotationValue);
-                _span.AddBinaryAnnotation(new BinaryAnnotation(annotationKey, bytes, AnnotationType.DOUBLE, _record.Timestamp, serviceName, endpoint));
-            }
-            else
-            {
-                throw new ArgumentException("Unsupported object type for binary annotation.");
-            }
+            throw new ArgumentException("Unsupported object type for binary annotation.");
         }
     }
 }
