@@ -1,0 +1,48 @@
+{
+  "version": "0.1",
+  "authors": ["Criteo"],
+  "description": "OpenTracing for zipkin4net",
+  "copyright": "Copyright 2017, Criteo",
+
+ "packOptions": {
+    "summary": "C# Zipkin Tracer",
+    "tags": [ "Zipkin", "Tracer", "OpenTracing","Tracing", "Criteo", "zipkin4net" ],
+    "owners": [ "Criteo" ],
+    "licenseUrl": "https://github.com/criteo/zipkin4net/blob/master/LICENSE",
+    "projectUrl": "https://github.com/criteo/zipkin4net",
+    "releaseNotes": "OpenTracing for zipkin4net",
+    "requireLicenseAcceptance": false
+  },
+
+  "configurations": {
+    "Debug": {
+      "buildOptions": {
+        "define": [ "DEBUG" ]
+      }
+    },
+    "Release": {
+      "buildOptions": {
+        "define": [ "RELEASE" ],
+        "optimize": true
+      }
+    }
+  },
+
+  "dependencies": {
+    "OpenTracing": "0.9",
+    "Criteo.Profiling.Tracing": "0.3.4"
+  },
+  "frameworks": {
+    "net45": {},
+    "netstandard1.6": {
+      "buildOptions": {
+        "define": [
+          "NET_CORE"
+        ]
+      },
+      "dependencies": {
+        "NETStandard.Library": "1.6.1"
+      }
+    }
+  }
+}
