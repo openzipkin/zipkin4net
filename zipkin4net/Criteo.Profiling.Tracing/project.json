@@ -1,5 +1,5 @@
 {
-  "version": "0.3.3",
+  "version": "0.3.4",
   "authors": ["Criteo"],
   "description": "A .NET client library for Zipkin",
   "copyright": "Copyright 2017, Criteo",
