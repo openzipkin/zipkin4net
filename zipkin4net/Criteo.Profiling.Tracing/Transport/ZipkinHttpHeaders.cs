@@ -14,16 +14,6 @@ namespace Criteo.Profiling.Tracing.Transport
         public const string Sampled = "X-B3-Sampled"; // Will be replaced by Flags in the future releases of Finagle
         public const string Flags = "X-B3-Flags";
 
-        public static string EncodeLongToHexString(long value)
-        {
-            return value.ToString("X16");
-        }
-
-        public static long DecodeHexString(string longAsHexString)
-        {
-            return Convert.ToInt64(longAsHexString, 16);
-        }
-
         public static SpanFlags ParseFlagsHeader(string header)
         {
             long flagsLong;

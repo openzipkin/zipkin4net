@@ -17,5 +17,21 @@ namespace Criteo.Profiling.Tracing.Utils
             var blong = BitConverter.ToInt64(b, 0);
             return blong;
         }
+
+        public static string EncodeLongToHexString(long value)
+        {
+            return value.ToString("X16");
+        }
+
+        public static string EncodeLongToLowerHexString(long value)
+        {
+            return value.ToString("x16");
+        }
+        
+        public static long DecodeHexString(string longAsHexString)
+        {
+            return Convert.ToInt64(longAsHexString, 16);
+        }
+
     }
 }
