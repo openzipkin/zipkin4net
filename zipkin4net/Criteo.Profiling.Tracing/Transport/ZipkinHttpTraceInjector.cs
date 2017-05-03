@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Globalization;
+using Criteo.Profiling.Tracing.Utils;
 
 namespace Criteo.Profiling.Tracing.Transport
 {
@@ -14,12 +15,12 @@ namespace Criteo.Profiling.Tracing.Transport
         {
             var traceId = trace.CurrentSpan;
 
-            injector(carrier, ZipkinHttpHeaders.TraceId, ZipkinHttpHeaders.EncodeLongToHexString(traceId.TraceId));
-            injector(carrier, ZipkinHttpHeaders.SpanId, ZipkinHttpHeaders.EncodeLongToHexString(traceId.SpanId));
+            injector(carrier, ZipkinHttpHeaders.TraceId, NumberUtils.EncodeLongToHexString(traceId.TraceId));
+            injector(carrier, ZipkinHttpHeaders.SpanId, NumberUtils.EncodeLongToHexString(traceId.SpanId));
             if (traceId.ParentSpanId != null)
             {
                 // Cannot be null in theory, the root span must have been created on request receive hence further RPC calls are necessary children
-                injector(carrier, ZipkinHttpHeaders.ParentSpanId, ZipkinHttpHeaders.EncodeLongToHexString(traceId.ParentSpanId.Value));
+                injector(carrier, ZipkinHttpHeaders.ParentSpanId, NumberUtils.EncodeLongToHexString(traceId.ParentSpanId.Value));
             }
             injector(carrier, ZipkinHttpHeaders.Flags, ((long)traceId.Flags).ToString(CultureInfo.InvariantCulture));
 

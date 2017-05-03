@@ -6,45 +6,6 @@ namespace Criteo.Profiling.Tracing.UTest.Transport
     [TestFixture]
     internal class T_ZipkinHttpHeaders
     {
-        [Test]
-        public void LongIdEncodingIsCorrect()
-        {
-            const long notEncodedLong = 170;
-            const string expectedEncodedLong = "00000000000000AA";
-
-            var encodedLong = ZipkinHttpHeaders.EncodeLongToHexString(notEncodedLong);
-
-            Assert.AreEqual(expectedEncodedLong, encodedLong);
-        }
-
-        [Test]
-        public void LongIdDecodingIsCorrect()
-        {
-            const string encodedLong = "00000000000000AA";
-            const long expectedLong = 170;
-
-            var decodedLong = ZipkinHttpHeaders.DecodeHexString(encodedLong);
-            Assert.AreEqual(expectedLong, decodedLong);
-        }
-
-        [Test]
-        [Description("Check that encode is the inverse function of decode. In other words that x = encode(decode(x)) and y = decode(encode(y))")]
-        public void IdEncodingDecodingGivesOriginalValues()
-        {
-            const long input = 10;
-
-            var encoded = ZipkinHttpHeaders.EncodeLongToHexString(input);
-            var decoded = ZipkinHttpHeaders.DecodeHexString(encoded);
-
-            Assert.AreEqual(input, decoded);
-
-            const string encodedInput = "00000000000000AA";
-            var decodedInput = ZipkinHttpHeaders.DecodeHexString(encodedInput);
-            var reEncodedInput = ZipkinHttpHeaders.EncodeLongToHexString(decodedInput);
-
-            Assert.AreEqual(encodedInput, reEncodedInput);
-        }
-
         [TestCase("null", SpanFlags.None)]
         [TestCase("", SpanFlags.None)]
         [TestCase("notANumber", SpanFlags.None)]
