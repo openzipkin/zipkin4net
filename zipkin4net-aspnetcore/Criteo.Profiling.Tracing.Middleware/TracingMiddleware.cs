@@ -1,6 +1,7 @@
 using System;
 using Microsoft.AspNetCore.Builder;
 using Criteo.Profiling.Tracing;
+using Criteo.Profiling.Tracing.Transport;
 using Criteo.Profiling.Tracing.Utils;
 using Microsoft.AspNetCore.Http.Extensions;
 
@@ -10,12 +11,12 @@ namespace Criteo.Profiling.Tracing.Middleware
     {
         public static void UseTracing(this IApplicationBuilder app, string serviceName)
         {
-            var extractor = new Middleware.ZipkinHttpTraceExtractor();
+            var extractor = new ZipkinHttpTraceExtractor();
             app.Use(async (context, next) =>
             {
                 Trace trace;
                 var request = context.Request;
-                if (!extractor.TryExtract(request.Headers, out trace))
+                if (!extractor.TryExtract(request.Headers, (c, key) => c[key], out trace))
                 {
                     trace = Trace.Create();
                 }

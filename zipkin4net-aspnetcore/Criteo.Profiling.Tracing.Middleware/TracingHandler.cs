@@ -8,14 +8,14 @@ namespace Criteo.Profiling.Tracing.Middleware
 {
     public class TracingHandler : DelegatingHandler
     {
-        private readonly ITraceInjector<HttpHeaders> _injector;
+        private readonly ITraceInjector _injector;
         private readonly string _serviceName;
 
         public TracingHandler(string serviceName, HttpMessageHandler httpMessageHandler = null)
-        : this(new Middleware.ZipkinHttpTraceInjector(), serviceName, httpMessageHandler)
+        : this(new ZipkinHttpTraceInjector(), serviceName, httpMessageHandler)
         {}
 
-        internal TracingHandler(ITraceInjector<HttpHeaders> injector, string serviceName, HttpMessageHandler httpMessageHandler = null)
+        internal TracingHandler(ITraceInjector injector, string serviceName, HttpMessageHandler httpMessageHandler = null)
         {
             _injector = injector;
             _serviceName = serviceName;
@@ -27,7 +27,7 @@ namespace Criteo.Profiling.Tracing.Middleware
             {
                 if (clientTrace.Trace != null)
                 {
-                    _injector.Inject(clientTrace.Trace, request.Headers);
+                    _injector.Inject(clientTrace.Trace, request.Headers, (c, key, value) => c.Add(key, value));
                 }
                 return await TraceHelper.TracedActionAsync(base.SendAsync(request, cancellationToken));
             }
