@@ -68,12 +68,12 @@ namespace Criteo.Profiling.Tracing.Tracers.Zipkin
             writer.Write(comma);
             writer.WriteField(debug, false);
             writer.Write(comma);
-            writer.WriteField(id, span.SpanState.SpanId);
+            writer.WriteField(id, NumberUtils.EncodeLongToLowerHexString(span.SpanState.SpanId));
             writer.Write(comma);
             writer.WriteField(name, span.Name ?? SerializerUtils.DefaultRpcMethodName);
             writer.Write(comma);
-            writer.WriteField(traceId, span.SpanState.TraceId);
-            
+            writer.WriteField(traceId, NumberUtils.EncodeLongToLowerHexString(span.SpanState.TraceId));
+
             if (span.SpanStarted.HasValue)
             {
                 writer.Write(comma);
@@ -87,7 +87,7 @@ namespace Criteo.Profiling.Tracing.Tracers.Zipkin
             if (!span.IsRoot)
             {
                 writer.Write(comma);
-                writer.WriteField(parentId, span.SpanState.ParentSpanId.Value);
+                writer.WriteField(parentId, NumberUtils.EncodeLongToLowerHexString(span.SpanState.ParentSpanId.Value));
             }
             writer.Write(closingBrace);
         }
