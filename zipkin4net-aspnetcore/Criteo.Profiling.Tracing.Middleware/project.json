@@ -1,5 +1,5 @@
 {
-  "version": "0.1",
+  "version": "0.2",
   "authors": ["Criteo"],
   "description": "Asp.net core middleware for zipkin4net",
   "copyright": "Copyright 2017, Criteo",
@@ -32,7 +32,7 @@
     "Microsoft.AspNetCore.Hosting": "1.1.1",
     "Microsoft.Extensions.Logging": "1.1.1",
     "System.Net.Http": "4.3.0",
-    "Criteo.Profiling.Tracing": "0.3.4"
+    "Criteo.Profiling.Tracing": "0.3.5"
   },
   "frameworks": {
     "net451": {},

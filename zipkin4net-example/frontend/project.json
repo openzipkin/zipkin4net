@@ -24,7 +24,7 @@
     "Microsoft.AspNetCore": "1.1.1",
     "System.Net.Http": "4.3.0",
     "Microsoft.Extensions.Configuration": "1.1.1",
-    "Criteo.Profiling.Tracing": "0.3.3",
+    "Criteo.Profiling.Tracing": "0.3.5",
     "Criteo.Profiling.Tracing.Middleware": "0.1",
     "common":
     {
