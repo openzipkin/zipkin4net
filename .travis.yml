@@ -1,11 +1,10 @@
 language: csharp
 env:  
   - CLI_VERSION=latest
-sudo: required
 dist: trusty
 mono:
   - latest
-dotnet: 1.0.0-preview2-003131
+dotnet: 1.0.1
 os:  
   - linux
 script:
