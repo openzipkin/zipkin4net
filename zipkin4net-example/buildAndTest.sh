@@ -11,8 +11,6 @@ function check_availability() {
 
 check_availability "dotnet"
 
-dotnet restore         \
-&& dotnet build "common"   \
-&& dotnet build "backend"   \
-&& dotnet build "frontend"   \
+dotnet restore   \
+&& dotnet build  \
 
