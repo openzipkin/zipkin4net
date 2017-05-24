@@ -9,12 +9,11 @@ function check_availability() {
     fi
 }
 
-src="Criteo.Profiling.Tracing"
-tests="Criteo.Profiling.Tracing.UTest"
+solution="zipkin4net.dotnetcore.sln"
+tests="Criteo.Profiling.Tracing.UTest/Criteo.Profiling.Tracing.UTest.dotnetcore.csproj"
 
 check_availability "dotnet"
 
-dotnet restore         \
-&& dotnet build $src   \
-&& dotnet build $tests \
-&& dotnet test $tests  \
+dotnet restore  $solution   \
+&& dotnet build $solution   \
+&& dotnet test $tests       \

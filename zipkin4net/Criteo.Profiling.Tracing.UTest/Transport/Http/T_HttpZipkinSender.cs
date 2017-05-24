@@ -5,8 +5,9 @@ using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
+using Criteo.Profiling.Tracing.Transport.Http;
 
-namespace Criteo.Profiling.Tracing.Transport.Http
+namespace Criteo.Profiling.Tracing.UTest.Transport.Http
 {
     [TestFixture]
     public class T_HttpZipkinSender

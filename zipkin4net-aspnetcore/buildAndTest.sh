@@ -9,9 +9,7 @@ function check_availability() {
     fi
 }
 
-src="Criteo.Profiling.Tracing.Middleware"
-
 check_availability "dotnet"
 
-dotnet restore         \
-&& dotnet build $src   \
+dotnet restore    \
+&& dotnet build   \
