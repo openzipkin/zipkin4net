@@ -33,6 +33,7 @@ namespace Criteo.Profiling.Tracing.Tracers.Zipkin
             var thriftSpan = new Thrift.Span()
             {
                 Id = span.SpanState.SpanId,
+                Trace_id_high = span.SpanState.TraceIdHigh,
                 Trace_id = span.SpanState.TraceId,
                 Name = span.Name ?? SerializerUtils.DefaultRpcMethodName,
                 Debug = false
@@ -118,6 +119,6 @@ namespace Criteo.Profiling.Tracing.Tracers.Zipkin
                 Port = (short)ipEndPoint.Port,
                 Service_name = serviceName
             };
-        } 
+        }
     }
 }

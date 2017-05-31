@@ -105,7 +105,7 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
             const string serviceName = "myCriteoService";
             const string methodName = "GET";
 
-            var spanState = new SpanState(1, parentSpanId, 2, SpanFlags.None);
+            var spanState = new SpanState(2, 1, parentSpanId, 2, SpanFlags.None);
             var timestamp = TimeUtils.UtcNow;
             var span = new Span(spanState, timestamp) { Endpoint = new IPEndPoint(hostIp, hostPort), ServiceName = serviceName, Name = methodName };
 
@@ -129,8 +129,9 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
                 Service_name = serviceName
             };
 
-            Assert.AreEqual(1, thriftSpan.Trace_id);
-            Assert.AreEqual(2, thriftSpan.Id);
+            Assert.AreEqual(spanState.TraceIdHigh, thriftSpan.Trace_id_high);
+            Assert.AreEqual(spanState.TraceId, thriftSpan.Trace_id);
+            Assert.AreEqual(spanState.SpanId, thriftSpan.Id);
             Assert.True(thriftSpan.Timestamp.HasValue);
 
             if (span.IsRoot)

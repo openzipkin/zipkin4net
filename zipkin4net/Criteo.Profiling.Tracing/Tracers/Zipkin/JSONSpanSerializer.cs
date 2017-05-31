@@ -72,7 +72,10 @@ namespace Criteo.Profiling.Tracing.Tracers.Zipkin
             writer.Write(comma);
             writer.WriteField(name, span.Name ?? SerializerUtils.DefaultRpcMethodName);
             writer.Write(comma);
-            writer.WriteField(traceId, NumberUtils.EncodeLongToLowerHexString(span.SpanState.TraceId));
+            var hexTraceIdHigh = TraceManager.Trace128Bits ? NumberUtils.EncodeLongToHexString(span.SpanState.TraceIdHigh) : "";
+            writer.WriteField(traceId, 
+                              hexTraceIdHigh
+                              + NumberUtils.EncodeLongToHexString(span.SpanState.TraceId));
 
             if (span.SpanStarted.HasValue)
             {
