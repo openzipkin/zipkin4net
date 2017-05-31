@@ -287,7 +287,7 @@ struct Annotation {
    * Microseconds from epoch.
    *
    * This value should use the most precise value possible. For example,
-   * gettimeofday or syncing nanoTime against a tick of currentTimeMillis.
+   * gettimeofday or multiplying currentTimeMillis by 1000.
    */
   1: i64 timestamp
   /**
@@ -455,4 +455,9 @@ struct Span {
    * This field is i64 vs i32 to support spans longer than 35 minutes.
    */
   11: optional i64 duration
+  /**
+   * Optional unique 8-byte additional identifier for a trace. If non zero, this
+   * means the trace uses 128 bit traceIds instead of 64 bit.
+   */
+  12: optional i64 trace_id_high
 }

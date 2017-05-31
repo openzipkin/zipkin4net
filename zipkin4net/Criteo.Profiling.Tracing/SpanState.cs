@@ -6,11 +6,15 @@ namespace Criteo.Profiling.Tracing
     [Serializable]
     public sealed class SpanState : IEquatable<SpanState>
     {
+        public long TraceIdHigh { get; private set; }
+
         public long TraceId { get; private set; }
 
         public long? ParentSpanId { get; private set; }
 
         public long SpanId { get; private set; }
+
+        internal const long NoTraceIdHigh = 0;
 
         public SamplingStatus SamplingStatus
         {
@@ -28,7 +32,12 @@ namespace Criteo.Profiling.Tracing
         public SpanFlags Flags { get; private set; }
 
         public SpanState(long traceId, long? parentSpanId, long spanId, SpanFlags flags)
+            : this(NoTraceIdHigh, traceId, parentSpanId, spanId, flags)
+        { }
+
+        public SpanState(long traceIdHigh, long traceId, long? parentSpanId, long spanId, SpanFlags flags)
         {
+            TraceIdHigh = traceIdHigh;
             TraceId = traceId;
             ParentSpanId = parentSpanId;
             SpanId = spanId;
@@ -47,7 +56,10 @@ namespace Criteo.Profiling.Tracing
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
-            return TraceId == other.TraceId && ParentSpanId == other.ParentSpanId && SpanId == other.SpanId;
+            return TraceIdHigh == other.TraceIdHigh
+                   && TraceId == other.TraceId
+                   && ParentSpanId == other.ParentSpanId
+                   && SpanId == other.SpanId;
         }
 
         public override bool Equals(object obj)
@@ -62,7 +74,8 @@ namespace Criteo.Profiling.Tracing
         {
             unchecked
             {
-                var hashCode = TraceId.GetHashCode();
+                var hashCode = TraceIdHigh.GetHashCode();
+                hashCode = (hashCode * 397) ^ TraceId.GetHashCode();
                 hashCode = (hashCode * 397) ^ SpanId.GetHashCode();
                 return hashCode;
             }
@@ -70,7 +83,7 @@ namespace Criteo.Profiling.Tracing
 
         public override string ToString()
         {
-            return string.Format("{0}.{1}<:{2}", TraceId, SpanId, ParentSpanId.HasValue ? ParentSpanId.Value.ToString(CultureInfo.InvariantCulture) : "_");
+            return string.Format("{0}{1}.{2}<:{3}", TraceIdHigh == SpanState.NoTraceIdHigh ? "" : TraceIdHigh.ToString(), TraceId, SpanId, ParentSpanId.HasValue ? ParentSpanId.Value.ToString(CultureInfo.InvariantCulture) : "_");
         }
 
     }

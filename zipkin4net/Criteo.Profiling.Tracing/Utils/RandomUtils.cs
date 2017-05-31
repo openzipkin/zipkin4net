@@ -21,6 +21,5 @@ namespace Criteo.Profiling.Tracing.Utils
             LocalRandom.Value.NextBytes(buffer);
             return BitConverter.ToInt64(buffer, 0);
         }
-
     }
 }
