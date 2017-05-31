@@ -1,4 +1,4 @@
-﻿using System;
+﻿﻿using System;
 using Criteo.Profiling.Tracing.Annotation;
 using Criteo.Profiling.Tracing.Utils;
 
@@ -52,6 +52,7 @@ namespace Criteo.Profiling.Tracing
         private Trace()
         {
             var traceId = RandomUtils.NextLong();
+            var traceIdHigh = TraceManager.Trace128Bits ? RandomUtils.NextLong() : 0;
             var spanId = RandomUtils.NextLong();
 
             var isSampled = TraceManager.Sampler.Sample(traceId);
@@ -62,7 +63,7 @@ namespace Criteo.Profiling.Tracing
                 flags = flags | SpanFlags.Sampled;
             }
 
-            CurrentSpan = new SpanState(traceId: traceId, parentSpanId: null, spanId: spanId, flags: flags);
+            CurrentSpan = new SpanState(traceIdHigh: traceIdHigh, traceId: traceId, parentSpanId: null, spanId: spanId, flags: flags);
             CorrelationId = NumberUtils.LongToGuid(traceId);
         }
 
@@ -90,7 +91,7 @@ namespace Criteo.Profiling.Tracing
         /// <returns></returns>
         public Trace Child()
         {
-            var childState = new SpanState(traceId: CurrentSpan.TraceId, parentSpanId: CurrentSpan.SpanId, spanId: RandomUtils.NextLong(), flags: CurrentSpan.Flags);
+            var childState = new SpanState(traceIdHigh: CurrentSpan.TraceIdHigh, traceId: CurrentSpan.TraceId, parentSpanId: CurrentSpan.SpanId, spanId: RandomUtils.NextLong(), flags: CurrentSpan.Flags);
             return new Trace(childState);
         }
 

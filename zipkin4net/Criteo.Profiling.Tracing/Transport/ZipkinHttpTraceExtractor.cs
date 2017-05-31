@@ -10,6 +10,8 @@ namespace Criteo.Profiling.Tracing.Transport
      */
     public class ZipkinHttpTraceExtractor : ITraceExtractor<NameValueCollection>, ITraceExtractor<IDictionary<string, string>>, ITraceExtractor
     {
+        private const int traceId64BitsSerializationLength = 16;
+
         public bool TryExtract<TE>(TE carrier, Func<TE, string, string> extractor, out Trace trace)
         {
             return TryParseTrace(
@@ -18,7 +20,7 @@ namespace Criteo.Profiling.Tracing.Transport
                 extractor(carrier, ZipkinHttpHeaders.ParentSpanId),
                 extractor(carrier, ZipkinHttpHeaders.Sampled),
                 extractor(carrier, ZipkinHttpHeaders.Flags),
-                out trace 
+                out trace
             );
         }
 
@@ -29,7 +31,8 @@ namespace Criteo.Profiling.Tracing.Transport
 
         public bool TryExtract(IDictionary<string, string> carrier, out Trace trace)
         {
-            return TryExtract(carrier, (c, key) => {
+            return TryExtract(carrier, (c, key) =>
+            {
                 string value;
                 return c.TryGetValue(key, out value) ? value : null;
             }, out trace);
@@ -46,7 +49,8 @@ namespace Criteo.Profiling.Tracing.Transport
 
             try
             {
-                var traceId = NumberUtils.DecodeHexString(encodedTraceId);
+				var traceIdHigh = ExtractTraceIdHigh(encodedTraceId);
+                var traceId = ExtractTraceId(encodedTraceId);
                 var spanId = NumberUtils.DecodeHexString(encodedSpanId);
                 var parentSpanId = string.IsNullOrWhiteSpace(encodedParentSpanId) ? null : (long?)NumberUtils.DecodeHexString(encodedParentSpanId);
                 var flags = ZipkinHttpHeaders.ParseFlagsHeader(flagsStr);
@@ -63,7 +67,7 @@ namespace Criteo.Profiling.Tracing.Transport
                 }
 
 
-                var state = new SpanState(traceId, parentSpanId, spanId, flags);
+                var state = new SpanState(traceIdHigh, traceId, parentSpanId, spanId, flags);
                 trace = Trace.CreateFromId(state);
                 return true;
             }
@@ -76,5 +80,32 @@ namespace Criteo.Profiling.Tracing.Transport
             return false;
         }
 
+        /// <summary>
+        /// Extracts traceIdHigh. Detects if present and then decode the first 16 bytes
+        /// </summary>
+        private static long ExtractTraceIdHigh(string encodedTraceId)
+        {
+            if (encodedTraceId.Length <= traceId64BitsSerializationLength)
+            {
+                return SpanState.NoTraceIdHigh;
+            }
+            var traceIdHighLength = encodedTraceId.Length - traceId64BitsSerializationLength;
+            var traceIdHighStr = encodedTraceId.Substring(0, traceIdHighLength);
+            return NumberUtils.DecodeHexString(traceIdHighStr);
+        }
+
+        /// <summary>
+        /// Extracts traceId. Detects if present and then decode the last 16 bytes
+        /// </summary>
+        private static long ExtractTraceId(string encodedTraceId)
+        {
+            var traceIdLength = traceId64BitsSerializationLength;
+            if (encodedTraceId.Length <= traceId64BitsSerializationLength)
+            {
+                traceIdLength = encodedTraceId.Length;
+            }
+            var traceIdStartIndex = encodedTraceId.Length - traceIdLength;
+            return NumberUtils.DecodeHexString(encodedTraceId.Substring(traceIdStartIndex, traceIdLength));
+        }
     }
 }

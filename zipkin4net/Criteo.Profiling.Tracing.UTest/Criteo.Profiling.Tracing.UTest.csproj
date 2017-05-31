@@ -74,6 +74,7 @@
     <Compile Include="T_TraceManager.cs" />
     <Compile Include="Utils\T_NumberUtils.cs" />
     <Compile Include="Utils\T_TimeUtils.cs" />
+    <Compile Include="T_SpanState.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Criteo.Profiling.Tracing\Criteo.Profiling.Tracing.csproj">

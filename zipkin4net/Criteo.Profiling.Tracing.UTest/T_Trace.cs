@@ -1,4 +1,4 @@
-﻿using System;
+﻿﻿using System;
 using System.IO;
 #if !NET_CORE
 using System.Runtime.Serialization.Formatters.Binary;
@@ -19,6 +19,7 @@ namespace Criteo.Profiling.Tracing.UTest
         {
             TraceManager.ClearTracers();
             TraceManager.Stop();
+            TraceManager.Trace128Bits = false;
         }
 
         [Test]
@@ -127,5 +128,20 @@ namespace Criteo.Profiling.Tracing.UTest
             dispatcher.Verify(d => d.Dispatch(It.IsAny<Record>()), Times.Once());
         }
 
+        [Test]
+        public void TraceIdHighIsGeneratedIf128BitsActivated()
+        {
+            TraceManager.Trace128Bits = true;
+            var trace = Trace.Create();
+            Assert.AreNotEqual(SpanState.NoTraceIdHigh, trace.CurrentSpan.TraceIdHigh);
+        }
+
+        [Test]
+        public void TraceIdHighIsNotGeneratedIf128BitsDeactivated()
+        {
+            TraceManager.Trace128Bits = false;
+            var trace = Trace.Create();
+            Assert.AreEqual(SpanState.NoTraceIdHigh, trace.CurrentSpan.TraceIdHigh);
+        }
     }
 }

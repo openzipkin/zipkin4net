@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Collections.Specialized;
 using Criteo.Profiling.Tracing.Transport;
+using Criteo.Profiling.Tracing.Utils;
 using NUnit.Framework;
 
 namespace Criteo.Profiling.Tracing.UTest.Transport
@@ -29,6 +30,19 @@ namespace Criteo.Profiling.Tracing.UTest.Transport
             Assert.AreEqual(flagsStr, recreatedHeaders[ZipkinHttpHeaders.Flags]);
         }
 
+        [Test]
+        public void Supports128BitsTraceId()
+        {
+            var traceIdHigh = 1L;
+            var traceId = 2L;
+            var encodedTraceId = NumberUtils.EncodeLongToHexString(traceIdHigh) + NumberUtils.EncodeLongToHexString(traceId);
+
+            Trace parsedTrace;
+            Assert.True(ZipkinHttpTraceExtractor.TryParseTrace(encodedTraceId, "0000000000000000", "0000000000000000", null, "", out parsedTrace));
+            Assert.AreEqual(traceIdHigh, parsedTrace.CurrentSpan.TraceIdHigh);
+            Assert.AreEqual(traceId, parsedTrace.CurrentSpan.TraceId);
+        }
+
         [TestCase(null)]
         [TestCase(9845431L)]
         public void SetHeadersThenGetTraceEqualsOriginal(long? parentSpanId)
@@ -39,7 +53,7 @@ namespace Criteo.Profiling.Tracing.UTest.Transport
 
         private static void CheckSetHeadersThenGetTrace_Dict(long? parentSpanId)
         {
-            var spanState = new SpanState(1, parentSpanId, 2, SpanFlags.None);
+            var spanState = new SpanState(2, 1, parentSpanId, 2, SpanFlags.None);
             var originalTrace = Trace.CreateFromId(spanState);
 
             var headers = new Dictionary<string, string>();
@@ -51,12 +65,11 @@ namespace Criteo.Profiling.Tracing.UTest.Transport
             Assert.True(extractor.TryExtract(headers, out deserializedTrace));
 
             Assert.AreEqual(originalTrace, deserializedTrace);
-            Assert.AreEqual(originalTrace.CurrentSpan.Flags, deserializedTrace.CurrentSpan.Flags);
         }
 
         private static void CheckSetHeadersThenGetTrace_NVC(long? parentSpanId)
         {
-            var spanState = new SpanState(1, parentSpanId, 2, SpanFlags.None);
+            var spanState = new SpanState(2, 1, parentSpanId, 2, SpanFlags.None);
             var originalTrace = Trace.CreateFromId(spanState);
 
             var headers = new NameValueCollection();
@@ -68,8 +81,6 @@ namespace Criteo.Profiling.Tracing.UTest.Transport
             Assert.True(extractor.TryExtract(headers, out deserializedTrace));
 
             Assert.AreEqual(originalTrace, deserializedTrace);
-            Assert.AreEqual(originalTrace.CurrentSpan.Flags, deserializedTrace.CurrentSpan.Flags);
         }
-
     }
 }

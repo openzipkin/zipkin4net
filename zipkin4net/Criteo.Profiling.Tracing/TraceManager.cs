@@ -47,6 +47,11 @@ namespace Criteo.Profiling.Tracing
             get { return _status == (int)Status.Started; }
         }
 
+        public static bool Trace128Bits
+        {
+            get; set;
+        }
+
         /// <summary>
         /// Start tracing, records will be forwarded to the registered tracers.
         /// </summary>

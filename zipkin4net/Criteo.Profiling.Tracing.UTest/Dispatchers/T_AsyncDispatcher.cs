@@ -76,9 +76,9 @@ namespace Criteo.Profiling.Tracing.UTest.Dispatchers
         public void RecordsShouldBeDispatchedInOrder()
         {
             var sync = new CountdownEvent(2);
-
-            var firstRecord = new Record(new SpanState(1, 0, 1, SpanFlags.None), TimeUtils.UtcNow, Annotations.ClientRecv());
-            var secondRecord = new Record(new SpanState(1, 0, 1, SpanFlags.None), TimeUtils.UtcNow, Annotations.ClientRecv());
+            var traceId = 1;
+            var firstRecord = new Record(new SpanState(traceId, 0, 1, SpanFlags.None), TimeUtils.UtcNow, Annotations.ClientRecv());
+            var secondRecord = new Record(new SpanState(traceId, 0, 1, SpanFlags.None), TimeUtils.UtcNow, Annotations.ClientRecv());
 
             var queue = new ConcurrentQueue<Record>();
 

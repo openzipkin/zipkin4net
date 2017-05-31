@@ -6,7 +6,6 @@ namespace Criteo.Profiling.Tracing.UTest.Utils
     [TestFixture]
     internal class T_NumberUtils
     {
-
         [Test]
         public void TransformationIsReversible()
         {
