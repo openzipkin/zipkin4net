@@ -81,6 +81,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Record.cs" />
     <Compile Include="TraceContext.cs" />
+    <Compile Include="Batcher\ISpanProcessor.cs" />
     <Compile Include="Tracers\Zipkin\RateLimiterZipkinSender.cs" />
     <Compile Include="Tracers\Zipkin\Statistics.cs" />
     <Compile Include="Trace.cs" />
@@ -98,12 +99,15 @@
     <Compile Include="Tracers\Zipkin\ThriftSpanSerializer.cs" />
     <Compile Include="Tracers\Zipkin\ZipkinAnnotation.cs" />
     <Compile Include="Tracers\Zipkin\ZipkinAnnotationVisitor.cs" />
+    <Compile Include="Batcher\ZipkinBatchSpanProcessor.cs" />
+    <Compile Include="Batcher\ZipkinSimpleSpanProcessor.cs" />
     <Compile Include="Tracers\Zipkin\ZipkinTracer.cs" />
     <Compile Include="Transport\ZipkinHttpHeaders.cs" />
     <Compile Include="Transport\ZipkinHttpTraceExtractor.cs" />
     <Compile Include="Transport\ZipkinHttpTraceInjector.cs" />
     <Compile Include="Transport\ITraceExtractor.cs" />
     <Compile Include="Transport\ITraceInjector.cs" />
+    <Compile Include="Utils\Guard.cs" />
     <Compile Include="Utils\NumberUtils.cs" />
     <Compile Include="Utils\RandomUtils.cs" />
     <Compile Include="Tracers\Zipkin\thrift_gen\gen-csharp\Criteo\Profiling\Tracing\Tracers\Zipkin\Thrift\Annotation.cs" />

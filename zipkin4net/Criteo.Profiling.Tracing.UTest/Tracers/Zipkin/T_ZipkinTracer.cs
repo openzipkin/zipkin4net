@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using Criteo.Profiling.Tracing.Annotation;
+using Criteo.Profiling.Tracing.Batcher;
 using Criteo.Profiling.Tracing.Tracers.Zipkin;
 using Criteo.Profiling.Tracing.Utils;
 using Moq;
@@ -11,18 +12,17 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
     [TestFixture]
     internal class T_ZipkinTracer
     {
-        private Mock<ISpanSerializer> _spanSerializer;
-        private Mock<IZipkinSender> _spanSender;
+        private Mock<ISpanProcessor> _spanBatcher;
         private Mock<IStatistics> _statistics;
         private ZipkinTracer _tracer;
 
         [SetUp]
         public void Setup()
         {
-            _spanSerializer = new Mock<ISpanSerializer>();
-            _spanSender = new Mock<IZipkinSender>();
+            _spanBatcher = new Mock<ISpanProcessor>();
             _statistics = new Mock<IStatistics>();
-            _tracer = new ZipkinTracer(_spanSender.Object, _spanSerializer.Object, _statistics.Object);
+
+            _tracer = new ZipkinTracer(_spanBatcher.Object, _statistics.Object);
         }
 
         [Test]
@@ -47,8 +47,7 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
             Record(trace, Annotations.ClientSend());
             Record(trace, Annotations.ClientRecv());
 
-            _spanSerializer.Verify(s => s.SerializeTo(It.IsAny<Stream>(), It.IsAny<Span>()), Times.Once());
-            _spanSender.Verify(sender => sender.Send(It.IsAny<byte[]>()), Times.Once());
+            _spanBatcher.Verify(b => b.LogSpan(It.IsAny<Span>()), Times.Once());
         }
 
         [Test]
@@ -59,8 +58,7 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
             Record(trace, Annotations.ServerRecv());
             Record(trace, Annotations.ServerSend());
 
-            _spanSerializer.Verify(s => s.SerializeTo(It.IsAny<Stream>(), It.IsAny<Span>()), Times.Once());
-            _spanSender.Verify(sender => sender.Send(It.IsAny<byte[]>()), Times.Once());
+            _spanBatcher.Verify(b => b.LogSpan(It.IsAny<Span>()), Times.Once());
 
         }
 
@@ -79,7 +77,7 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
 
             _tracer.FlushOldSpans(futureTime); // shouldn't do anything since we haven't reached span ttl yet
 
-            _spanSender.Verify(sender => sender.Send(It.IsAny<byte[]>()), Times.Never());
+            _spanBatcher.Verify(b => b.LogSpan(It.IsAny<Span>()), Times.Never);
 
             var newerSpanState = new SpanState(traceId: 2, parentSpanId: 0, spanId: 9988415021, flags: SpanFlags.None);
             var newerRecord = new Record(newerSpanState, futureTime, Annotations.ServerRecv());
@@ -89,13 +87,13 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
 
             _tracer.FlushOldSpans(futureTime); // should flush only the first span since we are 1 second past its TTL but 5 seconds before the second span TTL
 
-            _spanSender.Verify(sender => sender.Send(It.IsAny<byte[]>()), Times.Once());
+            _spanBatcher.Verify(b => b.LogSpan(It.IsAny<Span>()), Times.Once());
 
             // "ServerSend" should make the second span "complete" hence the second span should be sent immediately
             var newerComplementaryRecord = new Record(newerSpanState, futureTime, Annotations.ServerSend());
             _tracer.Record(newerComplementaryRecord);
 
-            _spanSender.Verify(sender => sender.Send(It.IsAny<byte[]>()), Times.Exactly(2));
+            _spanBatcher.Verify(b => b.LogSpan(It.IsAny<Span>()), Times.Exactly(2));
         }
 
         [Test]
@@ -111,17 +109,6 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
             _statistics.Verify(s => s.UpdateSpanFlushed(), Times.Once());
         }
 
-
-        [Test]
-        public void StatisticsAreUpdatedForSent()
-        {
-            var trace = Trace.Create();
-
-            Record(trace, Annotations.ServerSend());
-
-            _statistics.Verify(s => s.UpdateSpanSent(1), Times.Once());
-            _statistics.Verify(s => s.UpdateSpanSentBytes(It.IsAny<int>()), Times.Once());
-        }
 
         [Test]
         public void StatisticsAreUpdatedForRecord()
