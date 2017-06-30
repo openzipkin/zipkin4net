@@ -29,7 +29,7 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
             stats.UpdateSpanFlushed();
             Assert.AreEqual(1, stats.SpanFlushed);
 
-            stats.UpdateSpanSent();
+            stats.UpdateSpanSent(1);
             Assert.AreEqual(1, stats.SpanSent);
 
             stats.UpdateSpanSentBytes(10);

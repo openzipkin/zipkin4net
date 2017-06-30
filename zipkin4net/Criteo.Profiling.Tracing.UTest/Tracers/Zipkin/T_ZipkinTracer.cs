@@ -119,7 +119,7 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
 
             Record(trace, Annotations.ServerSend());
 
-            _statistics.Verify(s => s.UpdateSpanSent(), Times.Once());
+            _statistics.Verify(s => s.UpdateSpanSent(1), Times.Once());
             _statistics.Verify(s => s.UpdateSpanSentBytes(It.IsAny<int>()), Times.Once());
         }
 

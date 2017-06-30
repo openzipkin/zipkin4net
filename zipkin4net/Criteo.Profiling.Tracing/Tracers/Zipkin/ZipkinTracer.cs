@@ -87,7 +87,7 @@ namespace Criteo.Profiling.Tracing.Tracers.Zipkin
             var serializedSpan = memoryStream.ToArray();
 
             _spanSender.Send(serializedSpan);
-            Statistics.UpdateSpanSent();
+            Statistics.UpdateSpanSent(1);
             Statistics.UpdateSpanSentBytes(serializedSpan.Length);
         }
 
