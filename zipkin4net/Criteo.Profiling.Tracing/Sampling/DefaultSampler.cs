@@ -9,6 +9,7 @@ namespace Criteo.Profiling.Tracing.Sampling
         private readonly long _salt;
 
         private float _samplingRate;
+        private const int RatePrecision = 1000000;
 
         public DefaultSampler(long salt, float samplingRate = 0f)
         {
@@ -30,7 +31,7 @@ namespace Criteo.Profiling.Tracing.Sampling
 
         public bool Sample(long traceId)
         {
-            return Math.Abs(traceId ^ _salt) % 10000 < (_samplingRate * 10000);
+            return Math.Abs(traceId ^ _salt) % RatePrecision < (_samplingRate * RatePrecision);
         }
 
         private static bool IsValidSamplingRate(float rate)

@@ -53,12 +53,12 @@ namespace Criteo.Profiling.Tracing.UTest.Sampling
         [Test]
         public void SampleWorksAsExpected()
         {
-            var sampler = new DefaultSampler(NoSalt, 0.5f);
+            var sampler = new DefaultSampler(NoSalt, 0.000005f);
 
-            const int shouldTraceId = 4999;
+            const int shouldTraceId = 4;
             Assert.True(sampler.Sample(shouldTraceId));
 
-            const int notTraceId = 5000;
+            const int notTraceId = 5;
             Assert.False(sampler.Sample(notTraceId));
         }
 
