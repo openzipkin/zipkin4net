@@ -4,6 +4,13 @@
     <TargetFramework>netstandard1.5</TargetFramework>
     <AssemblyName>Criteo.Profiling.Tracing</AssemblyName>
     <PackageId>Criteo.Profiling.Tracing</PackageId>
+    <Title>Criteo.Profiling.Tracing</Title>
+    <Authors>Criteo</Authors>
+    <Copyright>Criteo</Copyright>
+    <Owners>Criteo</Owners>
+    <Description>C# Zipkin Tracer</Description>
+    <PackageVersion>0.3.6</PackageVersion>
+    <PackageTags>Zipkin;Tracer;Tracing;Criteo</PackageTags>
     <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
     <GenerateAssemblyDescriptionAttribute>false</GenerateAssemblyDescriptionAttribute>
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
