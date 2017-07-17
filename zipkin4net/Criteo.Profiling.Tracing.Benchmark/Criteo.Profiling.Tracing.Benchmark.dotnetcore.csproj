@@ -1,0 +1,34 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <Description>Benchmark for zipkin4net</Description>
+    <Copyright>Copyright 2017, Criteo</Copyright>
+    <VersionPrefix>0.1</VersionPrefix>
+    <Authors>Criteo</Authors>
+    <TargetFramework>netcoreapp1.1</TargetFramework>
+    <AssemblyName>Criteo.Profiling.Tracing.Benchmark</AssemblyName>
+    <PackageId>Criteo.Profiling.Tracing.Benchmark</PackageId>
+    <PackageTags>Zipkin;Tracer;Tracing;Criteo;Benchmark</PackageTags>
+    <PackageReleaseNotes>Benchmark for zipkin4net</PackageReleaseNotes>
+    <PackageProjectUrl>https://github.com/criteo/zipkin4net</PackageProjectUrl>
+    <PackageLicenseUrl>https://github.com/criteo/zipkin4net/blob/master/LICENSE</PackageLicenseUrl>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../Criteo.Profiling.Tracing/Criteo.Profiling.Tracing.dotnetcore.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="BenchmarkDotNet" Version="0.10.3" />
+    <PackageReference Include="Newtonsoft.Json" Version="10.0.2" />
+  </ItemGroup>
+
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'netcoreapp1.1' ">
+    <DefineConstants>$(DefineConstants);NET_CORE</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+  </PropertyGroup>
+
+</Project>

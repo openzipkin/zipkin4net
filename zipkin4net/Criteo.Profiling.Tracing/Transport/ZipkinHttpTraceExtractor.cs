@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using Criteo.Profiling.Tracing.Utils;
 
 namespace Criteo.Profiling.Tracing.Transport
 {
@@ -45,9 +46,9 @@ namespace Criteo.Profiling.Tracing.Transport
 
             try
             {
-                var traceId = ZipkinHttpHeaders.DecodeHexString(encodedTraceId);
-                var spanId = ZipkinHttpHeaders.DecodeHexString(encodedSpanId);
-                var parentSpanId = string.IsNullOrWhiteSpace(encodedParentSpanId) ? null : (long?)ZipkinHttpHeaders.DecodeHexString(encodedParentSpanId);
+                var traceId = NumberUtils.DecodeHexString(encodedTraceId);
+                var spanId = NumberUtils.DecodeHexString(encodedSpanId);
+                var parentSpanId = string.IsNullOrWhiteSpace(encodedParentSpanId) ? null : (long?)NumberUtils.DecodeHexString(encodedParentSpanId);
                 var flags = ZipkinHttpHeaders.ParseFlagsHeader(flagsStr);
                 var sampled = ZipkinHttpHeaders.ParseSampledHeader(sampledStr);
 
