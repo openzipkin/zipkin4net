@@ -30,7 +30,7 @@ namespace Criteo.Profiling.Tracing.Tracers.Zipkin
 
         void UpdateRecordProcessed();
 
-        void UpdateSpanSent();
+        void UpdateSpanSent(int sent);
 
         void UpdateSpanFlushed();
 
@@ -70,9 +70,9 @@ namespace Criteo.Profiling.Tracing.Tracers.Zipkin
             Interlocked.Increment(ref _recordProcessed);
         }
 
-        public void UpdateSpanSent()
+        public void UpdateSpanSent(int sent)
         {
-            Interlocked.Increment(ref _spanSent);
+            Interlocked.Add(ref _spanSent,sent);
         }
 
         public void UpdateSpanFlushed()

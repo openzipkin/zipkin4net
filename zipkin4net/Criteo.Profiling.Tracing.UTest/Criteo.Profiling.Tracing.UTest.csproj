@@ -61,6 +61,7 @@
     <Compile Include="Tracers\Zipkin\T_Statistics.cs" />
     <Compile Include="Tracers\Zipkin\T_ThriftSpanSerializer.cs" />
     <Compile Include="Tracers\Zipkin\T_ZipkinAnnotationVisitor.cs" />
+    <Compile Include="Batcher\T_ZipkinBatchProcessor.cs" />
     <Compile Include="Transport\T_ZipkinHttpTraceInjectorExtractor.cs" />
     <Compile Include="Tracers\Zipkin\T_ZipkinTracer.cs" />
     <Compile Include="Transport\T_ZipkinHttpHeaders.cs" />

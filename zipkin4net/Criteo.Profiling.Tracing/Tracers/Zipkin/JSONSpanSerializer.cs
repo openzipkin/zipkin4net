@@ -8,8 +8,10 @@ namespace Criteo.Profiling.Tracing.Tracers.Zipkin
 {
     public class JSONSpanSerializer : ISpanSerializer
     {
+        internal const char openingBracket = '[';
+        internal const char closingBracket = ']';
         private const char openingBrace = '{';
-        private const char closingBrace = '}';        
+        private const char closingBrace = '}';
         internal const char comma = ',';
         private const string annotations = "annotations";
         private const string binaryAnnotations = "binaryAnnotations";
@@ -26,17 +28,33 @@ namespace Criteo.Profiling.Tracing.Tracers.Zipkin
         private const string ipv4 = "ipv4";
         private const string port = "port";
         private const string serviceName = "serviceName";
-        
+
 
         public void SerializeTo(Stream stream, Span span)
         {
             using (var writer = new StreamWriter(stream))
             {
-                writer.Write(WriterExtensions.openingBracket);
+                writer.Write(openingBracket);
                 SerializeSpan(writer, span);
-                writer.Write(WriterExtensions.closingBracket);
+                writer.Write(closingBracket);
             }
-            
+        }
+
+        public void SerializeTo(Stream stream, IEnumerable<Span> spans)
+        {
+            using (var writer = new StreamWriter(stream))
+            {
+                writer.Write(openingBracket);
+                var index = 0;
+                foreach (var span in spans)
+                {
+                    if (index > 0)
+                        writer.Write(comma);
+                    SerializeSpan(writer, span);
+                    index++;
+                }
+                writer.Write(closingBracket);
+            }
         }
 
         private void SerializeSpan(StreamWriter writer, Span span)
@@ -45,25 +63,12 @@ namespace Criteo.Profiling.Tracing.Tracers.Zipkin
             var endPoint = span.Endpoint ?? SerializerUtils.DefaultEndPoint;
             writer.Write(openingBrace);
             if (span.Annotations.Count != 0)
-            {
-                writer.WriteList(
-                    SerializeAnnotation,
-                    annotations,
-                    span.Annotations,
-                    endPoint,
-                    serviceName
-                );
-            }
+                writer.WriteList(SerializeAnnotation, annotations, span.Annotations, endPoint, serviceName);
             if (span.BinaryAnnotations.Count != 0)
             {
                 writer.Write(comma);
-                writer.WriteList(
-                    SerializeBinaryAnnotation,
-                    binaryAnnotations,
-                    span.BinaryAnnotations,
-                    endPoint,
-                    serviceName
-                );
+                writer.WriteList(SerializeBinaryAnnotation, binaryAnnotations, span.BinaryAnnotations, endPoint,
+                    serviceName);
             }
             writer.Write(comma);
             writer.WriteField(debug, false);
@@ -82,7 +87,7 @@ namespace Criteo.Profiling.Tracing.Tracers.Zipkin
             if (span.Duration.HasValue && span.Duration.Value.TotalMilliseconds > 0)
             {
                 writer.Write(comma);
-                writer.WriteField(duration, (long)(span.Duration.Value.TotalMilliseconds * 1000)); // microseconds
+                writer.WriteField(duration, (long) (span.Duration.Value.TotalMilliseconds * 1000)); // microseconds
             }
             if (!span.IsRoot)
             {
@@ -92,7 +97,8 @@ namespace Criteo.Profiling.Tracing.Tracers.Zipkin
             writer.Write(closingBrace);
         }
 
-        private static void SerializeBinaryAnnotation(StreamWriter writer, BinaryAnnotation binaryAnnotation, IPEndPoint endPoint, string serviceName)
+        private static void SerializeBinaryAnnotation(StreamWriter writer, BinaryAnnotation binaryAnnotation,
+            IPEndPoint endPoint, string serviceName)
         {
             writer.Write(openingBrace);
             writer.WriteField(key, binaryAnnotation.Key);
@@ -104,7 +110,8 @@ namespace Criteo.Profiling.Tracing.Tracers.Zipkin
             writer.Write(closingBrace);
         }
 
-        private static void SerializeAnnotation(StreamWriter writer, ZipkinAnnotation annotation, IPEndPoint endPoint, string serviceName)
+        private static void SerializeAnnotation(StreamWriter writer, ZipkinAnnotation annotation, IPEndPoint endPoint,
+            string serviceName)
         {
             writer.Write(openingBrace);
             writer.WriteField(timestamp, annotation.Timestamp.ToUnixTimestamp());
@@ -121,78 +128,52 @@ namespace Criteo.Profiling.Tracing.Tracers.Zipkin
             writer.Write(openingBrace);
             writer.WriteField(ipv4, SerializerUtils.IpToInt(endPoint.Address));
             writer.Write(comma);
-            writer.WriteField(port, (short)endPoint.Port);
+            writer.WriteField(port, (short) endPoint.Port);
             writer.Write(comma);
             writer.WriteField(JSONSpanSerializer.serviceName, serviceName);
             writer.Write(closingBrace);
         }
     }
 
-    delegate void SerializeMethod<T>(StreamWriter writer, T element, IPEndPoint endPoint, string serviceName);
+    internal delegate void SerializeMethod<T>(StreamWriter writer, T element, IPEndPoint endPoint, string serviceName);
 
     internal static class WriterExtensions
     {
         private const char quotes = '"';
         private const char colon = ':';
-        internal const char openingBracket = '[';
-        internal const char closingBracket = ']';
-        internal static void WriteList<U>
-        (
-            this StreamWriter writer,
-            SerializeMethod<U> serializer,
-            string fieldName,
-            ICollection<U> elements,
-            IPEndPoint endPoint,
-            string serviceName
-        )
+
+        internal static void WriteList<U>(this StreamWriter writer, SerializeMethod<U> serializer, string fieldName,
+            ICollection<U> elements, IPEndPoint endPoint, string serviceName)
         {
-            bool firstElement = true;
+            var firstElement = true;
             WriteAnchor(writer, fieldName);
-            writer.Write(openingBracket);
+            writer.Write(JSONSpanSerializer.openingBracket);
             foreach (var element in elements)
             {
-                if (firstElement == true)
-                {
+                if (firstElement)
                     firstElement = false;
-                }
                 else
-                {
                     writer.Write(JSONSpanSerializer.comma);
-                }
                 serializer(writer, element, endPoint, serviceName);
             }
-            writer.Write(closingBracket);
+            writer.Write(JSONSpanSerializer.closingBracket);
         }
 
-        internal static void WriteField
-        (
-            this StreamWriter writer,
-            string fieldName,
-            bool fieldValue
-        )
+        internal static void WriteField(this StreamWriter writer, string fieldName, bool fieldValue)
         {
             WriteAnchor(writer, fieldName);
             writer.Write(fieldValue);
         }
 
-        internal static void WriteField
-        (
-            this StreamWriter writer,
-            string fieldName,
-            string fieldValue
-        )
+        internal static void WriteField(this StreamWriter writer, string fieldName, string fieldValue)
         {
             WriteAnchor(writer, fieldName);
             writer.Write(quotes);
             writer.Write(fieldValue);
             writer.Write(quotes);
         }
-        internal static void WriteField
-        (
-            this StreamWriter writer,
-            string fieldName,
-            long fieldValue
-        )
+
+        internal static void WriteField(this StreamWriter writer, string fieldName, long fieldValue)
         {
             WriteAnchor(writer, fieldName);
             writer.Write(quotes);

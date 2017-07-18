@@ -24,6 +24,20 @@ namespace Criteo.Profiling.Tracing.Tracers.Zipkin
             protocol.WriteListEnd();
         }
 
+        public void SerializeTo(Stream stream, IEnumerable<Span> spans)
+        {
+            var transport = new TStreamTransport(null, stream);
+            var protocol = new TBinaryProtocol(transport);
+
+            protocol.WriteListBegin(new TList(TType.Struct, spans.Count()));
+            foreach (var span in spans)
+            {
+                var thriftSpan = ConvertToThrift(span);
+                thriftSpan.Write(protocol);
+            }
+            protocol.WriteListEnd();
+        }
+
         /// <summary>
         /// Convert this span object to its Thrift equivalent.
         /// </summary>

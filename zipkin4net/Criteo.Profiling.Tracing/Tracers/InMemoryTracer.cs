@@ -19,6 +19,5 @@ namespace Criteo.Profiling.Tracing.Tracers
         {
             Records.Enqueue(record);
         }
-
     }
 }
