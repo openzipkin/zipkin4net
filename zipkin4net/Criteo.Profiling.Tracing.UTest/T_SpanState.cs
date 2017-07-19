@@ -43,6 +43,22 @@ namespace Criteo.Profiling.Tracing.UTest
         }
 
         [Test]
+        public void HashCodeShouldVaryIfParentSpanIdsAreNotEqual()
+        {
+            var spanState1 = new SpanState(traceIdHigh, traceId, 1, spanId, flags);
+            var spanState2 = new SpanState(traceIdHigh, traceId, 2, spanId, flags);
+            Assert.AreNotEqual(spanState1.GetHashCode(), spanState2.GetHashCode());
+        }
+
+        [Test]
+        public void EqualsShouldReturnFalseIfParentSpanIdsAreNotEqual()
+        {
+            var spanState1 = new SpanState(traceIdHigh, traceId, 1, spanId, flags);
+            var spanState2 = new SpanState(traceIdHigh, traceId, 2, spanId, flags);
+            Assert.AreNotEqual(spanState1, spanState2);
+        }
+
+        [Test]
         public void HashCodeShouldVaryIfSpanIdsAreNotEqual()
         {
             var spanState1 = new SpanState(traceIdHigh, traceId, null, 1, flags);

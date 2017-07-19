@@ -76,6 +76,7 @@ namespace Criteo.Profiling.Tracing
             {
                 var hashCode = TraceIdHigh.GetHashCode();
                 hashCode = (hashCode * 397) ^ TraceId.GetHashCode();
+                hashCode = (hashCode * 397) ^ ParentSpanId.GetHashCode();
                 hashCode = (hashCode * 397) ^ SpanId.GetHashCode();
                 return hashCode;
             }
