@@ -10,10 +10,14 @@ function check_availability() {
 }
 
 solution="zipkin4net.dotnetcore.sln"
+src="Criteo.Profiling.Tracing/Criteo.Profiling.Tracing.dotnetcore.csproj"
 tests="Criteo.Profiling.Tracing.UTest/Criteo.Profiling.Tracing.UTest.dotnetcore.csproj"
+benchmark="Criteo.Profiling.Tracing.Benchmark/Criteo.Profiling.Tracing.Benchmark.dotnetcore.csproj"
 
 check_availability "dotnet"
 
 dotnet restore  $solution   \
-&& dotnet build $solution   \
-&& dotnet test $tests       \
+&& dotnet build -f "netstandard1.5" $src         \
+&& dotnet build -f "netcoreapp1.1" $benchmark         \
+&& dotnet build -f "netcoreapp1.0" $tests        \
+&& dotnet test -f "netcoreapp1.0" $tests           \
