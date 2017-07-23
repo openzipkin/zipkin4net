@@ -2,6 +2,7 @@
 *.suo
 *.user
 *.DotSettings
+.vs/
 bin/
 obj/
 packages/
