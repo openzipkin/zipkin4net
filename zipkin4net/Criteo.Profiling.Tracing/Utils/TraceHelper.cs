@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 
 namespace Criteo.Profiling.Tracing.Utils
 {
+    [System.Obsolete("TraceHelper is deprecated, please use ClientTrace/ServerTrace extensions")]
     public static class TraceHelper
     {
         /// <summary>
