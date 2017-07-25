@@ -1,5 +1,7 @@
 using Criteo.Profiling.Tracing.Annotation;
 using System;
+using System.Threading.Tasks;
+
 namespace Criteo.Profiling.Tracing
 {
     public class ServerTrace : IDisposable
@@ -23,10 +25,36 @@ namespace Criteo.Profiling.Tracing
         {
             Trace.Record(annotation);
         }
-
+        
         public void Dispose()
         {
             Trace.Record(Annotations.ServerSend());
+        }
+
+        public virtual void Error(Exception ex)
+        {
+            Trace.RecordAnnotation(Annotations.Tag("error", ex.Message));
+        }
+    }
+
+    public static class ServerTraceExtensions
+    {
+        /// <summary>
+        /// Runs the task asynchronously and adds an error annotation in case of failure
+        /// </summary>
+        /// <param name="serverTrace"></param>
+        /// <param name="task"></param>
+        public static async Task TracedActionAsync(this ServerTrace serverTrace, Task task)
+        {
+            try
+            {
+                await task;
+            }
+            catch (Exception ex)
+            {
+                serverTrace?.Error(ex);
+                throw;
+            }
         }
     }
 }
