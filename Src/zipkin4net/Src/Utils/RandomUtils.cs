@@ -13,13 +13,26 @@ namespace zipkin4net.Utils
     {
         private static int _seed = Guid.NewGuid().GetHashCode();
 
-        private static readonly ThreadLocal<Random> LocalRandom = new ThreadLocal<Random>(() => new Random(Interlocked.Increment(ref _seed)));
+        [ThreadStatic]
+        private static Random _localRandom;
+
+        [ThreadStatic]
+        private static byte[] _buffer;
 
         public static long NextLong()
         {
-            var buffer = new byte[8];
-            LocalRandom.Value.NextBytes(buffer);
-            return BitConverter.ToInt64(buffer, 0);
+            EnsureInitialized();
+
+            _localRandom.NextBytes(_buffer);
+            return BitConverter.ToInt64(_buffer, 0);
+        }
+
+        private static void EnsureInitialized()
+        {
+            if (_localRandom != null)
+                return;
+            _localRandom = new Random(Interlocked.Increment(ref _seed));
+            _buffer = new byte[8];
         }
     }
 }
