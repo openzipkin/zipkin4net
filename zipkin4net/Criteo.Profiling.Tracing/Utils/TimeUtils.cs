@@ -22,7 +22,7 @@ namespace Criteo.Profiling.Tracing.Utils
         /// <returns></returns>
         public static long ToUnixTimestamp(this DateTime utcDateTime)
         {
-            return (long)(utcDateTime.Subtract(Epoch).TotalMilliseconds * 1000L);
+            return (long)(utcDateTime.ToUniversalTime().Subtract(Epoch).TotalMilliseconds * 1000L);
         }
     }
 }
