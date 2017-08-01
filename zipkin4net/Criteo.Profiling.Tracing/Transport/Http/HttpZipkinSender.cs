@@ -19,7 +19,7 @@ namespace Criteo.Profiling.Tracing.Transport.Http
         : this(new HttpClient(), zipkinCollectorUrl, contentType)
         {}
 
-        internal HttpZipkinSender(HttpClient httplient, string zipkinCollectorUrl, string contentType)
+        public HttpZipkinSender(HttpClient httplient, string zipkinCollectorUrl, string contentType)
         {
             _zipkinCollectorUrl = ForgeSpansEndpoint(zipkinCollectorUrl);
             _httpClient = httplient;
