@@ -29,5 +29,5 @@ java -jar zipkin.jar
 ## Advanced setup
 
 If you want to use different ports that 8081 and 9000 for frontend and backend, you have to do two things:
-* Edit the [configuration](https://github.com/criteo/zipkin4net/blob/master/zipkin4net-example/frontend/appSettings.json) and change the callServiceUrl to the desired backend url
-* Launch frontend and backend with the ports you want (the parameter just after dotnet run)
+* Edit the [run file](run.cmd) and change port in urls
+* Launch the run script again
