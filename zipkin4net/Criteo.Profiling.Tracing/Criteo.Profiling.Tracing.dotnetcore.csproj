@@ -9,7 +9,7 @@
     <Copyright>Criteo</Copyright>
     <Owners>Criteo</Owners>
     <Description>C# Zipkin Tracer</Description>
-    <PackageVersion>0.4.1</PackageVersion>
+    <PackageVersion>0.4.2</PackageVersion>
     <PackageTags>Zipkin;Tracer;Tracing;Criteo</PackageTags>
     <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
     <GenerateAssemblyDescriptionAttribute>false</GenerateAssemblyDescriptionAttribute>
