@@ -30,9 +30,9 @@ namespace Criteo.Profiling.Tracing.UTest.Transport
             }
         }
 
-        [TestCase("0000000000000001", 0L, "0000000000000000", "00000000000000FA", true, "6", "1", 5)]
-        [TestCase("0000000000000001", 0L, "0000000000000000", "00000000000000FA", false, "0", null, 4)]
-        [TestCase("0000000000000001", null, null, "00000000000000FA", true, "6", "1", 4)]
+        [TestCase("0000000000000001", 0L, "0000000000000000", "00000000000000fa", true, "6", "1", 5)]
+        [TestCase("0000000000000001", 0L, "0000000000000000", "00000000000000fa", false, "0", null, 4)]
+        [TestCase("0000000000000001", null, null, "00000000000000fa", true, "6", "1", 4)]
         public void HeadersAreCorrectlySet(string expectedTraceId, long? parentSpanId, string expectedParentSpanId, string expectedSpanId, bool setSampled, string expectedFlags, string expectedSampled, int expectedCount)
         {
             var spanState = new SpanState(1, parentSpanId, 250, setSampled ? (SpanFlags.SamplingKnown | SpanFlags.Sampled) : SpanFlags.None);

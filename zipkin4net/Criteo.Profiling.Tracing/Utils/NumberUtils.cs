@@ -26,11 +26,6 @@ namespace Criteo.Profiling.Tracing.Utils
             return blong;
         }
 
-        public static string EncodeLongToHexString(long value)
-        {
-            return value.ToString("X16");
-        }
-
         public static string EncodeLongToLowerHexString(long value)
         {
             return value.ToString("x16");
