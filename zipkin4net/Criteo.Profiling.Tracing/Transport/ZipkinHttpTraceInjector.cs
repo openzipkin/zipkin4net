@@ -16,11 +16,11 @@ namespace Criteo.Profiling.Tracing.Transport
             var spanState = trace.CurrentSpan;
 
             injector(carrier, ZipkinHttpHeaders.TraceId, SerializeTraceId(spanState));
-            injector(carrier, ZipkinHttpHeaders.SpanId, NumberUtils.EncodeLongToHexString(spanState.SpanId));
+            injector(carrier, ZipkinHttpHeaders.SpanId, NumberUtils.EncodeLongToLowerHexString(spanState.SpanId));
             if (spanState.ParentSpanId != null)
             {
                 // Cannot be null in theory, the root span must have been created on request receive hence further RPC calls are necessary children
-                injector(carrier, ZipkinHttpHeaders.ParentSpanId, NumberUtils.EncodeLongToHexString(spanState.ParentSpanId.Value));
+                injector(carrier, ZipkinHttpHeaders.ParentSpanId, NumberUtils.EncodeLongToLowerHexString(spanState.ParentSpanId.Value));
             }
             injector(carrier, ZipkinHttpHeaders.Flags, ((long)spanState.Flags).ToString(CultureInfo.InvariantCulture));
 
@@ -44,12 +44,12 @@ namespace Criteo.Profiling.Tracing.Transport
 
         private static string SerializeTraceId(SpanState spanState)
         {
-            var hexTraceId = NumberUtils.EncodeLongToHexString(spanState.TraceId);
+            var hexTraceId = NumberUtils.EncodeLongToLowerHexString(spanState.TraceId);
             if (spanState.TraceIdHigh == SpanState.NoTraceIdHigh)
             {
                 return hexTraceId;
             }
-            return NumberUtils.EncodeLongToHexString(spanState.TraceIdHigh) + hexTraceId;
+            return NumberUtils.EncodeLongToLowerHexString(spanState.TraceIdHigh) + hexTraceId;
         }
     }
 }
