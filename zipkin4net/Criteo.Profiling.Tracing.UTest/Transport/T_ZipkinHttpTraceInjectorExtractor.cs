@@ -10,8 +10,8 @@ namespace Criteo.Profiling.Tracing.UTest.Transport
     internal class T_ZipkinHttpTraceInjectorExtractor
     {
 
-        [TestCase("0000000000000001", "0000000000000000", "00000000000000FA", "0", null, 4)]
-        [TestCase("0000000000000001", "0000000000000000", "00000000000000FA", "0", "", 4)]
+        [TestCase("0000000000000001", "0000000000000000", "00000000000000fa", "0", null, 4)]
+        [TestCase("0000000000000001", "0000000000000000", "00000000000000fa", "0", "", 4)]
         [TestCase("0000000000000001", "0000000000000000", null, "0", null, 3)]
         public void GetTraceThenSetHeadersEqualsOriginal(string encodedTraceId, string encodedSpanId, string encodedParentSpanId, string flagsStr, string sampledStr, int expectedHeadersCount)
         {
@@ -35,7 +35,7 @@ namespace Criteo.Profiling.Tracing.UTest.Transport
         {
             var traceIdHigh = 1L;
             var traceId = 2L;
-            var encodedTraceId = NumberUtils.EncodeLongToHexString(traceIdHigh) + NumberUtils.EncodeLongToHexString(traceId);
+            var encodedTraceId = NumberUtils.EncodeLongToLowerHexString(traceIdHigh) + NumberUtils.EncodeLongToLowerHexString(traceId);
 
             Trace parsedTrace;
             Assert.True(ZipkinHttpTraceExtractor.TryParseTrace(encodedTraceId, "0000000000000000", "0000000000000000", null, "", out parsedTrace));

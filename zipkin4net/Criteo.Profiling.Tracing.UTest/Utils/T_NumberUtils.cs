@@ -18,17 +18,6 @@ namespace Criteo.Profiling.Tracing.UTest.Utils
         }
 
         [Test]
-        public void LongIdEncodingIsCorrect()
-        {
-            const long notEncodedLong = 170;
-            const string expectedEncodedLong = "00000000000000AA";
-
-            var encodedLong = NumberUtils.EncodeLongToHexString(notEncodedLong);
-
-            Assert.AreEqual(expectedEncodedLong, encodedLong);
-        }
-
-        [Test]
         public void LongIdLowerEncodingIsCorrect()
         {
             const long notEncodedLong = 170;
@@ -55,14 +44,14 @@ namespace Criteo.Profiling.Tracing.UTest.Utils
         {
             const long input = 10;
 
-            var encoded = NumberUtils.EncodeLongToHexString(input);
+            var encoded = NumberUtils.EncodeLongToLowerHexString(input);
             var decoded = NumberUtils.DecodeHexString(encoded);
 
             Assert.AreEqual(input, decoded);
 
-            const string encodedInput = "00000000000000AA";
+            const string encodedInput = "00000000000000aa";
             var decodedInput = NumberUtils.DecodeHexString(encodedInput);
-            var reEncodedInput = NumberUtils.EncodeLongToHexString(decodedInput);
+            var reEncodedInput = NumberUtils.EncodeLongToLowerHexString(decodedInput);
 
             Assert.AreEqual(encodedInput, reEncodedInput);
         }
