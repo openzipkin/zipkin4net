@@ -1,8 +1,6 @@
 using System.Net.Http;
-using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using Criteo.Profiling.Tracing.Transport;
-using Criteo.Profiling.Tracing.Utils;
 
 namespace Criteo.Profiling.Tracing.Middleware
 {
@@ -29,7 +27,7 @@ namespace Criteo.Profiling.Tracing.Middleware
                 {
                     _injector.Inject(clientTrace.Trace, request.Headers, (c, key, value) => c.Add(key, value));
                 }
-                return await TraceHelper.TracedActionAsync(base.SendAsync(request, cancellationToken));
+                return await clientTrace.TracedActionAsync(base.SendAsync(request, cancellationToken));
             }
         }
     }
