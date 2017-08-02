@@ -82,9 +82,13 @@ namespace Criteo.Profiling.Tracing.Tracers.Zipkin
 
         private void LogSpan(Span span)
         {
-            var memoryStream = new MemoryStream();
-            _spanSerializer.SerializeTo(memoryStream, span);
-            var serializedSpan = memoryStream.ToArray();
+            byte[] serializedSpan = null;
+            
+            using(var memoryStream = new MemoryStream())
+            {
+                _spanSerializer.SerializeTo(memoryStream, span);
+                serializedSpan = memoryStream.ToArray();
+            }
 
             _spanSender.Send(serializedSpan);
             Statistics.UpdateSpanSent();
