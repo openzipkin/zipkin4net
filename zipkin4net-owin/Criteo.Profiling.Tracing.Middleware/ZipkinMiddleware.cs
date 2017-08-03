@@ -32,7 +32,7 @@ namespace Criteo.Profiling.Tracing.Middleware
             using (var serverTrace = new ServerTrace(this.serviceName, context.Request.Method))
             {
                 trace.Record(Annotations.Tag("http.host", context.Request.Host.Value));
-                trace.Record(Annotations.Tag("http.uri", context.Request.Uri.AbsoluteUri));
+                trace.Record(Annotations.Tag("http.url", context.Request.Uri.AbsoluteUri));
                 trace.Record(Annotations.Tag("http.path", context.Request.Uri.AbsolutePath));
 
                 await serverTrace.TracedActionAsync(Next.Invoke(context));
