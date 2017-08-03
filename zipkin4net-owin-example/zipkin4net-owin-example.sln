@@ -9,13 +9,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "common", "common", "{7827C1
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "frontend", "frontend", "{50D3D407-4302-45A1-B9E3-BA9A64FA282E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "backend", "backend\backend\backend.csproj", "{2595C23C-BB61-4031-B1A7-AE93FFEC021B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "backend", "backend\backend.csproj", "{2595C23C-BB61-4031-B1A7-AE93FFEC021B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Criteo.Profiling.Tracing.Middleware", "..\zipkin4net-owin\Criteo.Profiling.Tracing.Middleware\Criteo.Profiling.Tracing.Middleware.csproj", "{6A57C709-4443-4735-94CF-19DE60B00F59}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "common", "common\common\common.csproj", "{13A1D84E-7B4B-44C1-853A-13B9E260256D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "common", "common\common.csproj", "{13A1D84E-7B4B-44C1-853A-13B9E260256D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "frontend", "frontend\frontend\frontend.csproj", "{E16E9473-C308-4F42-9BD3-7A2E03463421}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "frontend", "frontend\frontend.csproj", "{E16E9473-C308-4F42-9BD3-7A2E03463421}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

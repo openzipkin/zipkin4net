@@ -88,11 +88,11 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\zipkin4net-owin\Criteo.Profiling.Tracing.Middleware\Criteo.Profiling.Tracing.Middleware.csproj">
+    <ProjectReference Include="..\..\zipkin4net-owin\Criteo.Profiling.Tracing.Middleware\Criteo.Profiling.Tracing.Middleware.csproj">
       <Project>{6a57c709-4443-4735-94cf-19de60b00f59}</Project>
       <Name>Criteo.Profiling.Tracing.Middleware</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\common\common\common.csproj">
+    <ProjectReference Include="..\common\common.csproj">
       <Project>{13a1d84e-7b4b-44c1-853a-13b9e260256d}</Project>
       <Name>common</Name>
     </ProjectReference>
