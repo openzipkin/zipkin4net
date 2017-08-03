@@ -85,7 +85,7 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\zipkin4net-owin\Criteo.Profiling.Tracing.Middleware\Criteo.Profiling.Tracing.Middleware.csproj">
+    <ProjectReference Include="..\..\zipkin4net-owin\Criteo.Profiling.Tracing.Middleware\Criteo.Profiling.Tracing.Middleware.csproj">
       <Project>{6a57c709-4443-4735-94cf-19de60b00f59}</Project>
       <Name>Criteo.Profiling.Tracing.Middleware</Name>
     </ProjectReference>
