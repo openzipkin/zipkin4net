@@ -29,7 +29,7 @@ namespace Criteo.Profiling.Tracing.Middleware
                 {
                     _injector.Inject(clientTrace.Trace, request.Headers, (c, key, value) => c.Add(key, value));
                 }
-                return await TraceHelper.TracedActionAsync(base.SendAsync(request, cancellationToken));
+                return await clientTrace.TracedActionAsync(base.SendAsync(request, cancellationToken));
             }
         }
     }
