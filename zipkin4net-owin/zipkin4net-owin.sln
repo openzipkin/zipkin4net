@@ -5,6 +5,10 @@ VisualStudioVersion = 15.0.26430.16
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Criteo.Profiling.Tracing.Middleware", "Criteo.Profiling.Tracing.Middleware\Criteo.Profiling.Tracing.Middleware.csproj", "{6A57C709-4443-4735-94CF-19DE60B00F59}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Criteo.Profiling.Tracing.Middleware.Tests", "Criteo.Profiling.Tracing.Middleware.Tests\Criteo.Profiling.Tracing.Middleware.Tests.csproj", "{3DDF4522-E86B-40CD-87E4-0CCD132860B5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Criteo.Profiling.Tracing", "..\zipkin4net\Criteo.Profiling.Tracing\Criteo.Profiling.Tracing.csproj", "{48712463-66FF-4C76-B63D-097B57A1477F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +19,14 @@ Global
 		{6A57C709-4443-4735-94CF-19DE60B00F59}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6A57C709-4443-4735-94CF-19DE60B00F59}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6A57C709-4443-4735-94CF-19DE60B00F59}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3DDF4522-E86B-40CD-87E4-0CCD132860B5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3DDF4522-E86B-40CD-87E4-0CCD132860B5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3DDF4522-E86B-40CD-87E4-0CCD132860B5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3DDF4522-E86B-40CD-87E4-0CCD132860B5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{48712463-66FF-4C76-B63D-097B57A1477F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{48712463-66FF-4C76-B63D-097B57A1477F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{48712463-66FF-4C76-B63D-097B57A1477F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{48712463-66FF-4C76-B63D-097B57A1477F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
