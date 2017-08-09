@@ -26,10 +26,10 @@ namespace Criteo.Profiling.Tracing.Middleware.Tests.Helpers
                 {
                     app.UseZipkinTracer(serviceName, traceExtractor);
 
-                    app.Run(context =>
+                    app.Run(async context =>
                     {
                         context.Response.ContentType = "text/plain";
-                        return context.Response.WriteAsync(DateTime.Now.ToString());
+                        await context.Response.WriteAsync(DateTime.Now.ToString());
                     });
                 };
         }
