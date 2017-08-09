@@ -3,33 +3,31 @@ using common;
 using System.Threading.Tasks;
 using System.Threading;
 using Criteo.Profiling.Tracing.Middleware;
+using Microsoft.Owin;
+using System;
 
 namespace frontend
 {
     public class Startup : CommonStartup
     {
-        protected override HttpMessageHandler GetHandler() => new CallApiHandler();
+        private static readonly string callServiceUrl = System.Configuration.ConfigurationManager.AppSettings["callServiceUrl"];
+        private static readonly string applicationName = System.Configuration.ConfigurationManager.AppSettings["applicationName"];
 
-        class CallApiHandler : HttpMessageHandler
+        protected override async Task RunHandler(IOwinContext context)
         {
-            private static readonly string callServiceUrl = System.Configuration.ConfigurationManager.AppSettings["callServiceUrl"];
-            private static readonly string applicationName = System.Configuration.ConfigurationManager.AppSettings["applicationName"];
-
-            protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+            if (!context.Request.Path.HasValue ||
+                !context.Request.Path.Value.Equals("/", StringComparison.InvariantCultureIgnoreCase))
             {
-                using (var httpClient = new HttpClient(new TracingHandler(applicationName)))
-                {
-                    var response = await httpClient.GetAsync(callServiceUrl);
+                context.Response.StatusCode = 404;
+                return;
+            }
 
-                    if (!response.IsSuccessStatusCode)
-                    {
-                        return response;
-                    }
+            using (var httpClient = new HttpClient(new TracingHandler(applicationName)))
+            {
+                var response = await httpClient.GetAsync(callServiceUrl);
+                var content = await response.Content.ReadAsStringAsync();
 
-                    var content = await response.Content.ReadAsStringAsync();
-
-                    return request.CreateResponse(System.Net.HttpStatusCode.OK, content);
-                }
+                await context.Response.WriteAsync(content);
             }
         }
     }
