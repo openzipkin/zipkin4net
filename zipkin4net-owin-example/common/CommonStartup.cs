@@ -1,11 +1,11 @@
 ﻿using Criteo.Profiling.Tracing;
 using Criteo.Profiling.Tracing.Tracers.Zipkin;
 using Criteo.Profiling.Tracing.Transport.Http;
+using Microsoft.Owin;
 using Microsoft.Owin.BuilderProperties;
 using Owin;
-using System.Net.Http;
 using System.Threading;
-using System.Web.Http;
+using System.Threading.Tasks;
 
 namespace common
 {
@@ -13,16 +13,6 @@ namespace common
     {
         public void Configuration(IAppBuilder appBuilder)
         {
-            HttpConfiguration config = new HttpConfiguration();
-
-            config.Routes.MapHttpRoute(
-                name: "Default",
-                routeTemplate: GetRouteTemplate(),
-                defaults: null,
-                constraints: null,
-                handler: GetHandler()
-            );
-
             //Setup tracing
             TraceManager.SamplingRate = 1.0f;
             var logger = new ConsoleLogger();
@@ -45,13 +35,13 @@ namespace common
             }
             //
 
-            // Owin Middleware
+            // Setup Owin Middleware
             appBuilder.UseZipkinTracer(System.Configuration.ConfigurationManager.AppSettings["applicationName"]);
+            //
 
-            appBuilder.UseWebApi(config);
+            appBuilder.Run(RunHandler);
         }
 
-        protected abstract HttpMessageHandler GetHandler();
-        protected virtual string GetRouteTemplate() => "";
+        protected abstract Task RunHandler(IOwinContext context);
     }
 }
