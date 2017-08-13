@@ -18,6 +18,8 @@ namespace Criteo.Profiling.Tracing.Middleware.Tests
 
     public class WhenOwinMiddlewareIsActive
     {
+        //See https://github.com/criteo/zipkin4net/commit/14574b36582d184ecba28f746e779c6ff36442b2
+        private static readonly bool IsRunningOnMono = Type.GetType("Mono.Runtime") != null;
         IList<Record> records;
         ILogger logger;
         ITracer tracer;
@@ -65,13 +67,18 @@ namespace Criteo.Profiling.Tracing.Middleware.Tests
             //Assert
             Trace trace = null;
             traceExtractor.ReceivedWithAnyArgs(1).TryExtract(Arg.Any<IHeaderDictionary>(), Arg.Any<Func<IHeaderDictionary, string, string>>(), out trace);
-            Assert.True(records.Any(r => r.Annotation is ServerRecv));
-            Assert.True(records.Any(r => r.Annotation is ServerSend));
+            
+            if(!IsRunningOnMono)
+            {
+                Assert.True(records.Any(r => r.Annotation is ServerRecv));
+                Assert.True(records.Any(r => r.Annotation is ServerSend));
+                Assert.True(records.Any(r => r.Annotation is Rpc && ((Rpc)r.Annotation).Name == "GET"));
+                Assert.True(records.Any(r => r.Annotation is ServiceName && ((ServiceName)r.Annotation).Service == serviceName));
+            }
+
             Assert.True(records.Any(r => r.Annotation is TagAnnotation && has("http.host", urlToCall.Host, (TagAnnotation)r.Annotation)));
             Assert.True(records.Any(r => r.Annotation is TagAnnotation && has("http.url", urlToCall.AbsoluteUri, (TagAnnotation)r.Annotation)));
             Assert.True(records.Any(r => r.Annotation is TagAnnotation && has("http.path", urlToCall.AbsolutePath, (TagAnnotation)r.Annotation)));
-            Assert.True(records.Any(r => r.Annotation is Rpc && ((Rpc)r.Annotation).Name == "GET"));
-            Assert.True(records.Any(r => r.Annotation is ServiceName && ((ServiceName)r.Annotation).Service == serviceName));
         }
 
         [Test]
@@ -93,13 +100,18 @@ namespace Criteo.Profiling.Tracing.Middleware.Tests
             //Assert
             Trace trace = null;
             traceExtractor.ReceivedWithAnyArgs(1).TryExtract(Arg.Any<IHeaderDictionary>(), Arg.Any<Func<IHeaderDictionary, string, string>>(), out trace);
-            Assert.True(records.Any(r => r.Annotation is ServerRecv));
-            Assert.True(records.Any(r => r.Annotation is ServerSend));
+            
+            if(!IsRunningOnMono)
+            {
+                Assert.True(records.Any(r => r.Annotation is ServerRecv));
+                Assert.True(records.Any(r => r.Annotation is ServerSend));
+                Assert.True(records.Any(r => r.Annotation is Rpc && ((Rpc)r.Annotation).Name == "POST"));
+                Assert.True(records.Any(r => r.Annotation is ServiceName && ((ServiceName)r.Annotation).Service == serviceName));
+            }
+
             Assert.True(records.Any(r => r.Annotation is TagAnnotation && has("http.host", urlToCall.Host, (TagAnnotation)r.Annotation)));
             Assert.True(records.Any(r => r.Annotation is TagAnnotation && has("http.url", urlToCall.AbsoluteUri, (TagAnnotation)r.Annotation)));
             Assert.True(records.Any(r => r.Annotation is TagAnnotation && has("http.path", urlToCall.AbsolutePath, (TagAnnotation)r.Annotation)));
-            Assert.True(records.Any(r => r.Annotation is Rpc && ((Rpc)r.Annotation).Name == "POST"));
-            Assert.True(records.Any(r => r.Annotation is ServiceName && ((ServiceName)r.Annotation).Service == serviceName));
         }
     }
 }
