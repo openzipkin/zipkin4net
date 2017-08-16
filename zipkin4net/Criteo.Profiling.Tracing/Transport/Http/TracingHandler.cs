@@ -1,11 +1,8 @@
-using System;
-using System.Net.Http;
+﻿using System.Net.Http;
 using System.Threading.Tasks;
-using Criteo.Profiling.Tracing.Transport;
 
-namespace Criteo.Profiling.Tracing.Middleware
+namespace Criteo.Profiling.Tracing.Transport.Http
 {
-    [Obsolete("Use Criteo.Profiling.Tracing.Transport.Http.TracingHandler")]
     public class TracingHandler : DelegatingHandler
     {
         private readonly ITraceInjector _injector;
@@ -13,7 +10,7 @@ namespace Criteo.Profiling.Tracing.Middleware
 
         public TracingHandler(string serviceName, HttpMessageHandler httpMessageHandler = null)
         : this(new ZipkinHttpTraceInjector(), serviceName, httpMessageHandler)
-        {}
+        { }
 
         internal TracingHandler(ITraceInjector injector, string serviceName, HttpMessageHandler httpMessageHandler = null)
         {
