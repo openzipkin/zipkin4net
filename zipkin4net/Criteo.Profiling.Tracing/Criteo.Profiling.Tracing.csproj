@@ -110,6 +110,7 @@
     <Compile Include="Transport\ZipkinHttpTraceInjector.cs" />
     <Compile Include="Transport\ITraceExtractor.cs" />
     <Compile Include="Transport\ITraceInjector.cs" />
+    <Compile Include="Transport\Http\TracingHandler.cs" />
     <Compile Include="Utils\NumberUtils.cs" />
     <Compile Include="Utils\RandomUtils.cs" />
     <Compile Include="Tracers\Zipkin\thrift_gen\gen-csharp\Criteo\Profiling\Tracing\Tracers\Zipkin\Thrift\Annotation.cs" />
