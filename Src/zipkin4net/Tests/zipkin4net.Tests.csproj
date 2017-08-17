@@ -77,13 +77,13 @@
     <Compile Include="T_SpanState.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Criteo.Profiling.Tracing\Criteo.Profiling.Tracing.csproj">
+    <ProjectReference Include="..\Src\zipkin4net.csproj">
       <Project>{48712463-66ff-4c76-b63d-097b57a1477f}</Project>
       <Name>Criteo.Profiling.Tracing</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Criteo.Profiling.Tracing.UTest.project.json" />
+    <None Include="zipkin4net.Tests.project.json" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
