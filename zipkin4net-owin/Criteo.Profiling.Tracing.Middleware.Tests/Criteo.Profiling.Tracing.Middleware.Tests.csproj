@@ -30,6 +30,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Criteo.Profiling.Tracing, Version=0.4.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>$(SolutionDir)\packages\Criteo.Profiling.Tracing.0.4.2\lib\net45\Criteo.Profiling.Tracing.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.Owin, Version=3.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>$(SolutionDir)\packages\Microsoft.Owin.3.1.0\lib\net45\Microsoft.Owin.dll</HintPath>
     </Reference>
@@ -72,10 +75,6 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\zipkin4net\Criteo.Profiling.Tracing\Criteo.Profiling.Tracing.csproj">
-      <Project>{48712463-66ff-4c76-b63d-097b57a1477f}</Project>
-      <Name>Criteo.Profiling.Tracing</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Criteo.Profiling.Tracing.Middleware\Criteo.Profiling.Tracing.Middleware.csproj">
       <Project>{6a57c709-4443-4735-94cf-19de60b00f59}</Project>
       <Name>Criteo.Profiling.Tracing.Middleware</Name>
