@@ -1,5 +1,6 @@
 ﻿using Criteo.Profiling.Tracing.Annotation;
 using Criteo.Profiling.Tracing.Dispatcher;
+using Criteo.Profiling.Tracing.Tracers;
 using NSubstitute;
 using NUnit.Framework;
 using System;
@@ -20,26 +21,21 @@ namespace Criteo.Profiling.Tracing.Middleware.Tests
     {
         //See https://github.com/criteo/zipkin4net/commit/14574b36582d184ecba28f746e779c6ff36442b2
         private static readonly bool IsRunningOnMono = Type.GetType("Mono.Runtime") != null;
-        IList<Record> records;
         ILogger logger;
-        ITracer tracer;
-        IRecordDispatcher dispatcher;
+        InMemoryTracer tracer;
         ITraceExtractor traceExtractor;
 
         [SetUp]
         public void Setup()
         {
             logger = Substitute.For<ILogger>();
-            tracer = Substitute.For<ITracer>();
-            dispatcher = Substitute.For<IRecordDispatcher>();
+            tracer = new InMemoryTracer();
             traceExtractor = Substitute.For<ITraceExtractor>();
 
-            records = new List<Record>();
-            dispatcher.Dispatch(Arg.Do<Record>(r => records.Add(r)));
 
             TraceManager.SamplingRate = 1.0f;
             TraceManager.RegisterTracer(tracer);
-            TraceManager.Start(logger, dispatcher);
+            TraceManager.Start(logger);
         }
 
         [TearDown]
@@ -67,8 +63,9 @@ namespace Criteo.Profiling.Tracing.Middleware.Tests
             //Assert
             Trace trace = null;
             traceExtractor.ReceivedWithAnyArgs(1).TryExtract(Arg.Any<IHeaderDictionary>(), Arg.Any<Func<IHeaderDictionary, string, string>>(), out trace);
-            
-            if(!IsRunningOnMono)
+
+            var records = tracer.Records;
+            if (!IsRunningOnMono)
             {
                 Assert.True(records.Any(r => r.Annotation is ServerRecv));
                 Assert.True(records.Any(r => r.Annotation is ServerSend));
@@ -100,8 +97,9 @@ namespace Criteo.Profiling.Tracing.Middleware.Tests
             //Assert
             Trace trace = null;
             traceExtractor.ReceivedWithAnyArgs(1).TryExtract(Arg.Any<IHeaderDictionary>(), Arg.Any<Func<IHeaderDictionary, string, string>>(), out trace);
-            
-            if(!IsRunningOnMono)
+
+            var records = tracer.Records;
+            if (!IsRunningOnMono)
             {
                 Assert.True(records.Any(r => r.Annotation is ServerRecv));
                 Assert.True(records.Any(r => r.Annotation is ServerSend));
