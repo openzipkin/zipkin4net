@@ -18,7 +18,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Criteo.Profiling.Tracing\Criteo.Profiling.Tracing.dotnetcore.csproj" />
+    <ProjectReference Include="..\Src\zipkin4net.dotnetcore.csproj" />
   </ItemGroup>
 
   <ItemGroup>

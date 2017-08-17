@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26430.16
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Criteo.Profiling.Tracing.Middleware", "Criteo.Profiling.Tracing.Middleware\Criteo.Profiling.Tracing.Middleware.csproj", "{6A57C709-4443-4735-94CF-19DE60B00F59}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "zipkin4net.middleware.owin", "Src\zipkin4net.middleware.owin.csproj", "{6A57C709-4443-4735-94CF-19DE60B00F59}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Criteo.Profiling.Tracing.Middleware.Tests", "Criteo.Profiling.Tracing.Middleware.Tests\Criteo.Profiling.Tracing.Middleware.Tests.csproj", "{3DDF4522-E86B-40CD-87E4-0CCD132860B5}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "zipkin4net.middleware.owin.Tests", "Tests\zipkin4net.middleware.owin.Tests.csproj", "{3DDF4522-E86B-40CD-87E4-0CCD132860B5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

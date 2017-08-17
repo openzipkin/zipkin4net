@@ -1,7 +1,7 @@
 
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Criteo.Profiling.Tracing.Middleware.dotnetcore", "Criteo.Profiling.Tracing.Middleware\Criteo.Profiling.Tracing.Middleware.dotnetcore.csproj", "{88103E35-E8EF-416B-902C-229713067F8B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "zipkin4net.middleware.aspnetcore", "Src\zipkin4net.middleware.aspnetcore.dotnetcore.csproj", "{88103E35-E8EF-416B-902C-229713067F8B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
