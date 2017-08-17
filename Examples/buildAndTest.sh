@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-declare -a repositories=("Src" "Examples")
+declare -a repositories=("aspnetcore" "owin")
 
 for i in "${repositories[@]}"; do
     if [ -d $i ]; then

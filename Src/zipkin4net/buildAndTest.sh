@@ -10,9 +10,9 @@ function check_availability() {
 }
 
 solution="zipkin4net.dotnetcore.sln"
-src="Criteo.Profiling.Tracing/Criteo.Profiling.Tracing.dotnetcore.csproj"
-tests="Criteo.Profiling.Tracing.UTest/Criteo.Profiling.Tracing.UTest.dotnetcore.csproj"
-benchmark="Criteo.Profiling.Tracing.Benchmark/Criteo.Profiling.Tracing.Benchmark.dotnetcore.csproj"
+src="Src/zipkin4net.dotnetcore.csproj"
+tests="Tests/zipkin4net.Tests.dotnetcore.csproj"
+benchmark="Benchmark/zipkin4net.Benchmark.dotnetcore.csproj"
 
 check_availability "dotnet"
 

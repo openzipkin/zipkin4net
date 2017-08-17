@@ -4,15 +4,15 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{E16E9473-C308-4F42-9BD3-7A2E03463421}</ProjectGuid>
-    <OutputType>Exe</OutputType>
-    <RootNamespace>frontend</RootNamespace>
-    <AssemblyName>frontend</AssemblyName>
+    <ProjectGuid>{13A1D84E-7B4B-44C1-853A-13B9E260256D}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>common</RootNamespace>
+    <AssemblyName>common</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -22,7 +22,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -32,19 +31,13 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="apache-thrift-netcore, Version=0.9.3.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>$(SolutionDir)\packages\apache-thrift-netcore.0.9.3.1\lib\net35\apache-thrift-netcore.dll</HintPath>
+      <HintPath>..\packages\apache-thrift-netcore.0.9.3.1\lib\net35\apache-thrift-netcore.dll</HintPath>
     </Reference>
     <Reference Include="Criteo.Profiling.Tracing, Version=0.4.2.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>$(SolutionDir)\packages\Criteo.Profiling.Tracing.0.4.2\lib\net45\Criteo.Profiling.Tracing.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Owin, Version=3.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>$(SolutionDir)\packages\Microsoft.Owin.3.1.0\lib\net45\Microsoft.Owin.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.Owin.Host.HttpListener, Version=3.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>$(SolutionDir)\packages\Microsoft.Owin.Host.HttpListener.3.1.0\lib\net45\Microsoft.Owin.Host.HttpListener.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.Owin.Hosting, Version=3.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>$(SolutionDir)\packages\Microsoft.Owin.Hosting.3.1.0\lib\net45\Microsoft.Owin.Hosting.dll</HintPath>
     </Reference>
     <Reference Include="Owin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=f0ebd12fd5e55cc5, processorArchitecture=MSIL">
       <HintPath>$(SolutionDir)\packages\Owin.1.0\lib\net40\Owin.dll</HintPath>
@@ -64,25 +57,18 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\..\zipkin4net-aspnetcore\Criteo.Profiling.Tracing.Middleware\TracingHandler.cs">
-      <Link>TracingHandler.cs</Link>
-    </Compile>
-    <Compile Include="Program.cs" />
+    <Compile Include="CommonStartup.cs" />
+    <Compile Include="ConsoleLogger.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Startup.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
+    <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\zipkin4net-owin\Criteo.Profiling.Tracing.Middleware\Criteo.Profiling.Tracing.Middleware.csproj">
+    <ProjectReference Include="..\..\..\Src\zipkin4net.middleware.owin\Src\zipkin4net.middleware.owin.csproj">
       <Project>{6a57c709-4443-4735-94cf-19de60b00f59}</Project>
       <Name>Criteo.Profiling.Tracing.Middleware</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\common\common.csproj">
-      <Project>{13a1d84e-7b4b-44c1-853a-13b9e260256d}</Project>
-      <Name>common</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
