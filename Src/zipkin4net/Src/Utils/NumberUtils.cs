@@ -1,6 +1,6 @@
-﻿﻿using System;
+﻿using System;
 
-namespace Criteo.Profiling.Tracing.Utils
+namespace zipkin4net.Utils
 {
     public static class NumberUtils
     {

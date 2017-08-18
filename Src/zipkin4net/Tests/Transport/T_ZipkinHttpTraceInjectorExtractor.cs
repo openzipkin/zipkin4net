@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Collections.Specialized;
-using Criteo.Profiling.Tracing.Transport;
-using Criteo.Profiling.Tracing.Utils;
+using zipkin4net.Transport;
+using zipkin4net.Utils;
 using NUnit.Framework;
 
-namespace Criteo.Profiling.Tracing.UTest.Transport
+namespace zipkin4net.UTest.Transport
 {
     [TestFixture]
     internal class T_ZipkinHttpTraceInjectorExtractor

@@ -2,13 +2,13 @@
 using System.Collections.Concurrent;
 using System.Threading;
 using System.Threading.Tasks;
-using Criteo.Profiling.Tracing.Dispatcher;
-using Criteo.Profiling.Tracing.Logger;
-using Criteo.Profiling.Tracing.Utils;
+using zipkin4net.Dispatcher;
+using zipkin4net.Logger;
+using zipkin4net.Utils;
 using Moq;
 using NUnit.Framework;
 
-namespace Criteo.Profiling.Tracing.UTest.Dispatchers
+namespace zipkin4net.UTest.Dispatchers
 {
     [TestFixture(true)]
     [TestFixture(false)]

@@ -1,7 +1,7 @@
 ﻿using System;
-using Criteo.Profiling.Tracing.Annotation;
+using zipkin4net.Annotation;
 
-namespace Criteo.Profiling.Tracing
+namespace zipkin4net
 {
     public sealed class Record
     {

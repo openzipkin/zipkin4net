@@ -1,10 +1,10 @@
-using System.IO;
+﻿using System.IO;
 using BenchmarkDotNet.Attributes;
-using Criteo.Profiling.Tracing.Tracers.Zipkin;
+using zipkin4net.Tracers.Zipkin;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 
-namespace Criteo.Profiling.Tracing.Benchmark.Tracers.Zipkin
+namespace zipkin4net.Benchmark.Tracers.Zipkin
 {
     public class JSONSerializerBenchmark
     {

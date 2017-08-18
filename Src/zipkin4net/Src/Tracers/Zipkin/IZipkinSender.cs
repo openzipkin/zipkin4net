@@ -1,4 +1,4 @@
-﻿namespace Criteo.Profiling.Tracing.Tracers.Zipkin
+﻿namespace zipkin4net.Tracers.Zipkin
 {
     public interface IZipkinSender
     {

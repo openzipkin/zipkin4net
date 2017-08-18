@@ -1,7 +1,7 @@
 ﻿#if !NET_CORE
 using System;
 
-namespace Criteo.Profiling.Tracing
+namespace zipkin4net
 {
     public sealed partial class Trace : MarshalByRefObject
     {

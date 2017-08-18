@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Linq;
-using Criteo.Profiling.Tracing.Tracers;
-using Criteo.Profiling.Tracing.Utils;
+using zipkin4net.Tracers;
+using zipkin4net.Utils;
 using NUnit.Framework;
 
-namespace Criteo.Profiling.Tracing.UTest.Tracers
+namespace zipkin4net.UTest.Tracers
 {
     [TestFixture]
     internal class T_InMemoryTracer

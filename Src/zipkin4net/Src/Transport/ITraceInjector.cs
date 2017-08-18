@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Criteo.Profiling.Tracing.Transport
+namespace zipkin4net.Transport
 {
     /**
     * Distributed tracing injection interface.

@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading;
-using Criteo.Profiling.Tracing.Dispatcher;
-using Criteo.Profiling.Tracing.Logger;
-using Criteo.Profiling.Tracing.Sampling;
-using Criteo.Profiling.Tracing.Utils;
+using zipkin4net.Dispatcher;
+using zipkin4net.Logger;
+using zipkin4net.Sampling;
+using zipkin4net.Utils;
 
-namespace Criteo.Profiling.Tracing
+namespace zipkin4net
 {
     public static class TraceManager
     {

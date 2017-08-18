@@ -1,4 +1,4 @@
-﻿namespace Criteo.Profiling.Tracing.Tracers
+﻿namespace zipkin4net.Tracers
 {
     /// <summary>
     /// Empty tracer which simply discards records.

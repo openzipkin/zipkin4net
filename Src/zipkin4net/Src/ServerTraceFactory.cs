@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Criteo.Profiling.Tracing.dotnetcore
+namespace zipkin4net.dotnetcore
 {
     public class ServerTraceFactory : IServerTraceFactory
     {

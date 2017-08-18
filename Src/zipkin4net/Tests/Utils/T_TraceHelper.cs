@@ -1,13 +1,13 @@
-using System;
-using Criteo.Profiling.Tracing.Annotation;
-using Criteo.Profiling.Tracing.Dispatcher;
-using Criteo.Profiling.Tracing.Logger;
-using Criteo.Profiling.Tracing.Utils;
+﻿using System;
+using zipkin4net.Annotation;
+using zipkin4net.Dispatcher;
+using zipkin4net.Logger;
+using zipkin4net.Utils;
 using NUnit.Framework;
 using Moq;
 using System.Threading.Tasks;
 
-namespace Criteo.Profiling.Tracing.UTest.Utils
+namespace zipkin4net.UTest.Utils
 {
 
     [TestFixture]

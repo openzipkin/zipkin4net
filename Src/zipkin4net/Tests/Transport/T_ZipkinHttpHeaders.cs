@@ -1,7 +1,7 @@
-﻿using Criteo.Profiling.Tracing.Transport;
+﻿using zipkin4net.Transport;
 using NUnit.Framework;
 
-namespace Criteo.Profiling.Tracing.UTest.Transport
+namespace zipkin4net.UTest.Transport
 {
     [TestFixture]
     internal class T_ZipkinHttpHeaders

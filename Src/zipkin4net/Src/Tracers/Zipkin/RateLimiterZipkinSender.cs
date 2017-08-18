@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 
-namespace Criteo.Profiling.Tracing.Tracers.Zipkin
+namespace zipkin4net.Tracers.Zipkin
 {
     /// <summary>
     /// The RateLimiterZipkinSender throttle the trace sending via a token bucket.

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Dynamic;
 using System.Text;
 
-namespace Criteo.Profiling.Tracing.dotnetcore
+namespace zipkin4net.dotnetcore
 {
     public interface IServerTraceFactory
     {

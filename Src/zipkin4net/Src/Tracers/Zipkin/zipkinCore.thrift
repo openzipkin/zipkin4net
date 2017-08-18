@@ -1,4 +1,4 @@
-# Copyright 2012 Twitter Inc.
+﻿# Copyright 2012 Twitter Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@
 # limitations under the License.
 namespace java com.twitter.zipkin.thriftjava
 #@namespace scala com.twitter.zipkin.thriftscala
-namespace csharp Criteo.Profiling.Tracing.Tracers.Zipkin.Thrift
+namespace csharp zipkin4net.Tracers.Zipkin.Thrift
 namespace rb Zipkin
 
 #************** Annotation.value **************
