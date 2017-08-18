@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
 
-namespace Criteo.Profiling.Tracing.Dispatcher
+namespace zipkin4net.Dispatcher
 {
     /// <summary>
     /// Dispatch messages asynchronously in order using an ActionBlock

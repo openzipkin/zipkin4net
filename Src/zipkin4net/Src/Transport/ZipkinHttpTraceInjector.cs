@@ -1,10 +1,10 @@
-﻿﻿using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Globalization;
-using Criteo.Profiling.Tracing.Utils;
+using zipkin4net.Utils;
 
-namespace Criteo.Profiling.Tracing.Transport
+namespace zipkin4net.Transport
 {
     /**
      * Inject B3 headers into HTTP headers.

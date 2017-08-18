@@ -21,7 +21,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyDescription("A .NET client library for Zipkin. Unit tests")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Criteo")]
-[assembly: AssemblyProduct("Criteo.Profiling.Tracing")]
+[assembly: AssemblyProduct("Criteo.Profiling.Tracing.UTest")]
 [assembly: AssemblyCopyright("Copyright © Criteo 2017")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]

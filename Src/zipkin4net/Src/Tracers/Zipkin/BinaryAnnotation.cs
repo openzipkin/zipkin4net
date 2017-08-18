@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Net;
-using Criteo.Profiling.Tracing.Tracers.Zipkin.Thrift;
+using zipkin4net.Tracers.Zipkin.Thrift;
 
-namespace Criteo.Profiling.Tracing.Tracers.Zipkin
+namespace zipkin4net.Tracers.Zipkin
 {
     public class BinaryAnnotation
     {

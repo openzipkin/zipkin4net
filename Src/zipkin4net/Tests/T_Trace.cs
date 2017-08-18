@@ -1,15 +1,15 @@
-﻿﻿using System;
+﻿using System;
 using System.IO;
 #if !NET_CORE
 using System.Runtime.Serialization.Formatters.Binary;
 #endif
-using Criteo.Profiling.Tracing.Dispatcher;
-using Criteo.Profiling.Tracing.Logger;
-using Criteo.Profiling.Tracing.Utils;
+using zipkin4net.Dispatcher;
+using zipkin4net.Logger;
+using zipkin4net.Utils;
 using Moq;
 using NUnit.Framework;
 
-namespace Criteo.Profiling.Tracing.UTest
+namespace zipkin4net.UTest
 {
     [TestFixture]
     internal class T_Trace

@@ -1,11 +1,11 @@
 ﻿using System;
-using Criteo.Profiling.Tracing.Annotation;
-using Criteo.Profiling.Tracing.Tracers.Zipkin;
-using Criteo.Profiling.Tracing.Utils;
+using zipkin4net.Annotation;
+using zipkin4net.Tracers.Zipkin;
+using zipkin4net.Utils;
 using NUnit.Framework;
-using Span = Criteo.Profiling.Tracing.Tracers.Zipkin.Span;
+using Span = zipkin4net.Tracers.Zipkin.Span;
 
-namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
+namespace zipkin4net.UTest.Tracers.Zipkin
 {
     [TestFixture]
     internal class T_Span

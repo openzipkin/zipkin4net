@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading;
 
-namespace Criteo.Profiling.Tracing.Utils
+namespace zipkin4net.Utils
 {
     /// <summary>
     /// Thread-safe random long generator.

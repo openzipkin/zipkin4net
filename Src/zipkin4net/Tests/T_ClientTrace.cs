@@ -1,7 +1,7 @@
-using Criteo.Profiling.Tracing;
+﻿using zipkin4net;
 using NUnit.Framework;
 
-namespace Criteo.Profiling.Tracing.UTest
+namespace zipkin4net.UTest
 {
     [TestFixture]
     internal class T_ClientTrace

@@ -49,4 +49,4 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyFileVersion("0.4.2.0")]
 [assembly: InternalsVisibleTo("Criteo.Profiling.Tracing.UTest")]
 [assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]
-[assembly: InternalsVisibleTo("Criteo.Profiling.Tracing.Middleware.Tests")]
+[assembly: InternalsVisibleTo("zipkin4net.Middleware.Tests")]

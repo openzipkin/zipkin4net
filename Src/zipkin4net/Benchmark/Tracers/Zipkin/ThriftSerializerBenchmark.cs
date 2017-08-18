@@ -1,8 +1,8 @@
-using System.IO;
-using Criteo.Profiling.Tracing.Tracers.Zipkin;
+﻿using System.IO;
+using zipkin4net.Tracers.Zipkin;
 using BenchmarkDotNet.Attributes;
 
-namespace Criteo.Profiling.Tracing.Benchmark.Tracers.Zipkin
+namespace zipkin4net.Benchmark.Tracers.Zipkin
 {
     public class ThriftSerializerBenchmark
     {

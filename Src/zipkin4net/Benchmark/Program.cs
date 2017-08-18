@@ -1,7 +1,7 @@
-using BenchmarkDotNet.Running;
-using Criteo.Profiling.Tracing.Benchmark.Tracers.Zipkin;
+﻿using BenchmarkDotNet.Running;
+using zipkin4net.Benchmark.Tracers.Zipkin;
 
-namespace Criteo.Profiling.Tracing.Benchmark
+namespace zipkin4net.Benchmark
 {
     public class Program
     {

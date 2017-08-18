@@ -1,8 +1,8 @@
 ﻿using System;
-using Criteo.Profiling.Tracing.Sampling;
+using zipkin4net.Sampling;
 using NUnit.Framework;
 
-namespace Criteo.Profiling.Tracing.UTest.Sampling
+namespace zipkin4net.UTest.Sampling
 {
     [TestFixture]
     internal class T_Sampler

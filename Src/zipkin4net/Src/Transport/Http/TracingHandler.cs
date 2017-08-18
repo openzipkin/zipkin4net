@@ -1,7 +1,7 @@
 ﻿using System.Net.Http;
 using System.Threading.Tasks;
 
-namespace Criteo.Profiling.Tracing.Transport.Http
+namespace zipkin4net.Transport.Http
 {
     public class TracingHandler : DelegatingHandler
     {
