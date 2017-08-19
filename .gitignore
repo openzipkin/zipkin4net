@@ -12,3 +12,6 @@ cbs.log
 logs/
 
 *project.lock.json
+
+build-packages
+.fake
