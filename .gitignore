@@ -17,3 +17,5 @@ logs/
 *~
 *.userprefs
 TestResult.xml
+build-packages
+.fake
