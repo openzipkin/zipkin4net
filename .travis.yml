@@ -9,7 +9,7 @@ dotnet: 1.0.1
 os:  
   - linux
 script:
-  - ./buildAndTest.sh
+  - ./build.sh
 notifications:
   webhooks:
     urls:
