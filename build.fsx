@@ -2,21 +2,24 @@
 open Fake
 
 type ProjectAndFramework = {Project : string ; Framework : string}
-let outputFoler = "bin"
+let outputFolder = "bin"
 let dotnetExePath = "dotnet"
 let nugetVersion = "1.0.0"
 
 Target "Clean" (fun _ ->
-    !! "Src/**/*.csproj"
-    |> Seq.map (System.IO.Path.GetDirectoryName)
-    |> Seq.map (fun p -> [p </> "bin" ; p </> "obj"])
+    let extractBinAndObjFromPath =
+        System.IO.Path.GetDirectoryName
+        >> fun p -> [p </> "bin" ; p </> "obj"]
+
+    !! "Src/**/*dotnetcore.csproj"
+    |> Seq.map extractBinAndObjFromPath
     |> Seq.collect id
     |> Seq.toList
-    |> fun paths -> outputFoler :: paths
+    |> fun paths -> outputFolder :: paths
     |> CleanDirs
 )
 
-Target "DotnetRestoreTools" (fun _ ->
+Target "DotnetRestore" (fun _ ->
     DotNetCli.Restore (fun c ->
         { c with
             Project = "Src/zipkin4net/zipkin4net.dotnetcore.sln"
@@ -51,11 +54,11 @@ let testProjects = [
 Target "DotnetTest" (fun _ ->
     testProjects
     |> Seq.iter (fun proj ->
-        DotNetCli.Build (fun c ->
+        DotNetCli.Test (fun c ->
             { c with
                 Project = proj.Project
                 ToolPath = dotnetExePath
-                AdditionalArgs = [ "-f " + proj.Framework ]
+                AdditionalArgs = [ "-f " + proj.Framework ; "--no-build" ]
             })
     )
 )
@@ -71,13 +74,13 @@ Target "DotnetPackage" (fun _ ->
             { c with
                 Project = proj.Project
                 ToolPath = dotnetExePath
-                AdditionalArgs = [(sprintf "-o %s" outputFoler) ; (sprintf "/p:Version=%s" nugetVersion)]
+                AdditionalArgs = [(sprintf "-o %s" outputFolder) ; (sprintf "/p:Version=%s" nugetVersion)]
             })
     )
 )
 
 "Clean"
-    ==> "DotnetRestoreTools"
+    ==> "DotnetRestore"
     ==> "DotnetBuild"
     ==> "DotnetTest"
     ==> "DotnetPackage"
