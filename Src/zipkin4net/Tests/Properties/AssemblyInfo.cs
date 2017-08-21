@@ -17,11 +17,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Criteo.Profiling.Tracing.UTest")]
+[assembly: AssemblyTitle("zipkin4net.UTest")]
 [assembly: AssemblyDescription("A .NET client library for Zipkin. Unit tests")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Criteo")]
-[assembly: AssemblyProduct("Criteo.Profiling.Tracing.UTest")]
+[assembly: AssemblyProduct("zipkin4net.UTest")]
 [assembly: AssemblyCopyright("Copyright © Criteo 2017")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]

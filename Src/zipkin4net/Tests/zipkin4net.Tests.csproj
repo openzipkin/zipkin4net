@@ -7,8 +7,8 @@
     <ProjectGuid>{61E65D99-367D-4C87-8EDB-4A5CC9ECAF89}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Criteo.Profiling.Tracing.UTest</RootNamespace>
-    <AssemblyName>Criteo.Profiling.Tracing.UTest</AssemblyName>
+    <RootNamespace>zipkin4net.UTest</RootNamespace>
+    <AssemblyName>zipkin4net.UTest</AssemblyName>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
   </PropertyGroup>
@@ -79,11 +79,8 @@
   <ItemGroup>
     <ProjectReference Include="..\Src\zipkin4net.csproj">
       <Project>{48712463-66ff-4c76-b63d-097b57a1477f}</Project>
-      <Name>Criteo.Profiling.Tracing</Name>
+      <Name>zipkin4net</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="zipkin4net.Tests.project.json" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
