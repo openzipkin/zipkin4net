@@ -1,12 +1,12 @@
 ﻿using System;
 using System.IO;
-using Criteo.Profiling.Tracing.Annotation;
-using Criteo.Profiling.Tracing.Tracers.Zipkin;
-using Criteo.Profiling.Tracing.Utils;
+using zipkin4net.Annotation;
+using zipkin4net.Tracers.Zipkin;
+using zipkin4net.Utils;
 using Moq;
 using NUnit.Framework;
 
-namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
+namespace zipkin4net.UTest.Tracers.Zipkin
 {
     [TestFixture]
     internal class T_ZipkinTracer

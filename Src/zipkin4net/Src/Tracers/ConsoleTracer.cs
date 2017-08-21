@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Criteo.Profiling.Tracing.Tracers
+namespace zipkin4net.Tracers
 {
     /// <summary>
     /// Prints records to the console.

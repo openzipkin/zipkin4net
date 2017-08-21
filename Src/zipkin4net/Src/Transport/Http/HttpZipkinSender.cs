@@ -1,8 +1,8 @@
-using Criteo.Profiling.Tracing.Tracers.Zipkin;
+﻿using zipkin4net.Tracers.Zipkin;
 using System;
 using System.Net.Http;
 
-namespace Criteo.Profiling.Tracing.Transport.Http
+namespace zipkin4net.Transport.Http
 {
     public class HttpZipkinSender : IZipkinSender
     {

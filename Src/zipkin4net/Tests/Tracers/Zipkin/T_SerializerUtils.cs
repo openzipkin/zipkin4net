@@ -1,8 +1,8 @@
-using System.Net;
+﻿using System.Net;
 using NUnit.Framework;
-using Criteo.Profiling.Tracing.Tracers.Zipkin;
+using zipkin4net.Tracers.Zipkin;
 
-namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
+namespace zipkin4net.UTest.Tracers.Zipkin
 {
     [TestFixture]
     internal class T_SerializerUtils

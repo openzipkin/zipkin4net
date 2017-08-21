@@ -1,7 +1,7 @@
-﻿using Criteo.Profiling.Tracing.Tracers.Zipkin;
+﻿using zipkin4net.Tracers.Zipkin;
 using NUnit.Framework;
 
-namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
+namespace zipkin4net.UTest.Tracers.Zipkin
 {
     [TestFixture]
     internal class T_Statistics

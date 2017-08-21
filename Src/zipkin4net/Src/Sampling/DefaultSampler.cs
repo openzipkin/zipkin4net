@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading;
 
-namespace Criteo.Profiling.Tracing.Sampling
+namespace zipkin4net.Sampling
 {
     internal class DefaultSampler : ISampler
     {

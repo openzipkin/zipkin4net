@@ -1,7 +1,7 @@
-using System;
-using Criteo.Profiling.Tracing.Tracers.Zipkin;
+﻿using System;
+using zipkin4net.Tracers.Zipkin;
 
-namespace Criteo.Profiling.Tracing.Benchmark.Tracers.Zipkin
+namespace zipkin4net.Benchmark.Tracers.Zipkin
 {
     public static class Spans
     {

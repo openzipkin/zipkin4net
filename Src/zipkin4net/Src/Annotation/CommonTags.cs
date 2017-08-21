@@ -1,6 +1,6 @@
-﻿using Criteo.Profiling.Tracing.Tracers.Zipkin.Thrift;
+﻿using zipkin4net.Tracers.Zipkin.Thrift;
 
-namespace Criteo.Profiling.Tracing.Annotation
+namespace zipkin4net.Annotation
 {
     public static class CommonTags
     {

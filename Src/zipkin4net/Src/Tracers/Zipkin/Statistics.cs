@@ -1,6 +1,6 @@
 ﻿using System.Threading;
 
-namespace Criteo.Profiling.Tracing.Tracers.Zipkin
+namespace zipkin4net.Tracers.Zipkin
 {
     /// <summary>
     /// Some statistics about the tracing

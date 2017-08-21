@@ -1,8 +1,8 @@
-using Criteo.Profiling.Tracing.Annotation;
+﻿using zipkin4net.Annotation;
 using System;
 using System.Threading.Tasks;
 
-namespace Criteo.Profiling.Tracing
+namespace zipkin4net
 {
     public class ServerTrace : IDisposable
     {

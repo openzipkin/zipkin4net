@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Globalization;
 
-namespace Criteo.Profiling.Tracing
+namespace zipkin4net
 {
     [Serializable]
     public sealed class SpanState : IEquatable<SpanState>

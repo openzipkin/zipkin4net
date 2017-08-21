@@ -1,6 +1,6 @@
 ﻿using System.Collections.Concurrent;
 
-namespace Criteo.Profiling.Tracing.Tracers
+namespace zipkin4net.Tracers
 {
 
     /// <summary>

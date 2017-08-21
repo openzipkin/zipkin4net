@@ -1,4 +1,4 @@
-﻿namespace Criteo.Profiling.Tracing.Dispatcher
+﻿namespace zipkin4net.Dispatcher
 {
     internal interface IRecordDispatcher
     {

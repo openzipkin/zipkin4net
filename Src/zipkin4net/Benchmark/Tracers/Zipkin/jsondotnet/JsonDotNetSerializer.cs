@@ -1,18 +1,18 @@
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Text;
-using Criteo.Profiling.Tracing.Tracers.Zipkin;
-using Criteo.Profiling.Tracing.Utils;
+using zipkin4net.Tracers.Zipkin;
+using zipkin4net.Utils;
 
-namespace Criteo.Profiling.Tracing.Benchmark.Tracers.Zipkin.jsondotnet
+namespace zipkin4net.Benchmark.Tracers.Zipkin.jsondotnet
 {
     public class Span
     {
-        private readonly Tracing.Tracers.Zipkin.Span span;
+        private readonly zipkin4net.Tracers.Zipkin.Span span;
 
-        public Span(Tracing.Tracers.Zipkin.Span span)
+        public Span(zipkin4net.Tracers.Zipkin.Span span)
         {
             this.span = span;
         }
@@ -55,11 +55,11 @@ namespace Criteo.Profiling.Tracing.Benchmark.Tracers.Zipkin.jsondotnet
 
     public class BinaryAnnotation
     {
-        private Tracing.Tracers.Zipkin.BinaryAnnotation binaryAnnotation;
+        private zipkin4net.Tracers.Zipkin.BinaryAnnotation binaryAnnotation;
         private IPEndPoint endpoint;
         private readonly string serviceName;
 
-        public BinaryAnnotation(Tracing.Tracers.Zipkin.BinaryAnnotation binaryAnnotation, IPEndPoint endpoint, string serviceName)
+        public BinaryAnnotation(zipkin4net.Tracers.Zipkin.BinaryAnnotation binaryAnnotation, IPEndPoint endpoint, string serviceName)
         {
             this.binaryAnnotation = binaryAnnotation;
             this.endpoint = endpoint;

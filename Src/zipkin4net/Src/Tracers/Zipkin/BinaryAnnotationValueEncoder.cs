@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Text;
 
-namespace Criteo.Profiling.Tracing.Tracers.Zipkin
+namespace zipkin4net.Tracers.Zipkin
 {
     internal static class BinaryAnnotationValueEncoder
     {

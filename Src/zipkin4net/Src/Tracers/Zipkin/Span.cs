@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Resources;
-using Criteo.Profiling.Tracing.Tracers.Zipkin.Thrift;
+using zipkin4net.Tracers.Zipkin.Thrift;
 
-namespace Criteo.Profiling.Tracing.Tracers.Zipkin
+namespace zipkin4net.Tracers.Zipkin
 {
     /// <summary>
     /// Represent the creation and handling of a single RPC request
