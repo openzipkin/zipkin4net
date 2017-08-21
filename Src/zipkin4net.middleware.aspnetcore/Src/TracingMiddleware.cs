@@ -21,12 +21,12 @@ namespace Criteo.Profiling.Tracing.Middleware
                     trace = Trace.Create();
                 }
                 Trace.Current = trace;
-                using (new ServerTrace(serviceName, request.Method))
+                using (var serverTrace = new ServerTrace(serviceName, request.Method))
                 {
                     trace.Record(Annotations.Tag("http.host", request.Host.ToString()));
                     trace.Record(Annotations.Tag("http.uri", UriHelper.GetDisplayUrl(request)));
                     trace.Record(Annotations.Tag("http.path", request.Path));
-                    await TraceHelper.TracedActionAsync(next());
+                    await serverTrace.TracedActionAsync(next());
                 }
             });
         }
