@@ -34,8 +34,8 @@
     <Reference Include="apache-thrift-netcore, Version=0.9.3.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>$(SolutionDir)\packages\apache-thrift-netcore.0.9.3.1\lib\net35\apache-thrift-netcore.dll</HintPath>
     </Reference>
-    <Reference Include="Criteo.Profiling.Tracing, Version=0.4.2.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>$(SolutionDir)\packages\Criteo.Profiling.Tracing.0.4.2\lib\net45\Criteo.Profiling.Tracing.dll</HintPath>
+    <Reference Include="Criteo.Profiling.Tracing, Version=0.4.3.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>$(SolutionDir)\packages\Criteo.Profiling.Tracing.0.4.3\lib\net45\Criteo.Profiling.Tracing.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Owin, Version=3.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>$(SolutionDir)\packages\Microsoft.Owin.3.1.0\lib\net45\Microsoft.Owin.dll</HintPath>
