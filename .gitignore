@@ -12,3 +12,8 @@ cbs.log
 logs/
 
 *project.lock.json
+
+.DS_Store
+*~
+*.userprefs
+TestResult.xml
