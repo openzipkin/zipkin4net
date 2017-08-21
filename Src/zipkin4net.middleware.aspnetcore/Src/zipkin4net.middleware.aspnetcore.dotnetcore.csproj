@@ -6,7 +6,7 @@
     <PackageId>Criteo.Profiling.Tracing.Middleware</PackageId>
     <Description>Asp.net core middleware for zipkin4net</Description>
     <Copyright>Copyright 2017, Criteo</Copyright>
-    <VersionPrefix>0.3</VersionPrefix>
+    <VersionPrefix>0.3.1</VersionPrefix>
     <Authors>Criteo</Authors>
     <TargetFrameworks>net461;netstandard1.6</TargetFrameworks>
     <PackageTags>Zipkin;Tracer;Tracing;Criteo;Asp.net core</PackageTags>
