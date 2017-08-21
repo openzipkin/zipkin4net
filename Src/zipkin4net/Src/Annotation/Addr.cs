@@ -1,6 +1,6 @@
-using System.Net;
+﻿using System.Net;
 
-namespace Criteo.Profiling.Tracing.Annotation
+namespace zipkin4net.Annotation
 {
     public abstract class Addr : IAnnotation
     {

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Criteo.Profiling.Tracing.Annotation
+namespace zipkin4net.Annotation
 {
     public sealed class LocalOperationStop : IAnnotation
     {

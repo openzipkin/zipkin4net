@@ -1,13 +1,13 @@
-using Moq;
+﻿using Moq;
 using NUnit.Framework;
 using System;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
-using Criteo.Profiling.Tracing.Transport.Http;
+using zipkin4net.Transport.Http;
 
-namespace Criteo.Profiling.Tracing.UTest.Transport.Http
+namespace zipkin4net.UTest.Transport.Http
 {
     [TestFixture]
     public class T_HttpZipkinSender

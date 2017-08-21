@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Criteo.Profiling.Tracing.Annotation
+namespace zipkin4net.Annotation
 {
     public sealed class Event : IAnnotation
     {

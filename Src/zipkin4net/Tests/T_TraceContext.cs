@@ -1,7 +1,7 @@
 ﻿using System.Threading;
 using NUnit.Framework;
 
-namespace Criteo.Profiling.Tracing.UTest
+namespace zipkin4net.UTest
 {
     [TestFixture]
     internal class T_TraceContext

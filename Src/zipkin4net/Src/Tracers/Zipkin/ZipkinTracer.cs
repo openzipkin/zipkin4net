@@ -3,9 +3,9 @@ using System.Collections.Concurrent;
 using System.IO;
 using System.Linq;
 using System.Threading;
-using Criteo.Profiling.Tracing.Utils;
+using zipkin4net.Utils;
 
-namespace Criteo.Profiling.Tracing.Tracers.Zipkin
+namespace zipkin4net.Tracers.Zipkin
 {
     /// <summary>
     /// Tracer which logs annotations in Twitter Zipkin format.

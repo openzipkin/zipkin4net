@@ -3,7 +3,7 @@
 using System.Runtime.InteropServices;
 #endif
 
-namespace Criteo.Profiling.Tracing.Utils
+namespace zipkin4net.Utils
 {
     internal static class HighResolutionDateTime
     {

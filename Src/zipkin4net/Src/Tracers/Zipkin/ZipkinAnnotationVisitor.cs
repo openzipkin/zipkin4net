@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Net;
-using Criteo.Profiling.Tracing.Annotation;
-using Criteo.Profiling.Tracing.Tracers.Zipkin.Thrift;
+using zipkin4net.Annotation;
+using zipkin4net.Tracers.Zipkin.Thrift;
 
-namespace Criteo.Profiling.Tracing.Tracers.Zipkin
+namespace zipkin4net.Tracers.Zipkin
 {
     internal class ZipkinAnnotationVisitor : IAnnotationVisitor
     {

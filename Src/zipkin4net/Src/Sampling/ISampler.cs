@@ -1,4 +1,4 @@
-﻿namespace Criteo.Profiling.Tracing.Sampling
+﻿namespace zipkin4net.Sampling
 {
     internal interface ISampler
     {

@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Linq;
-using Criteo.Profiling.Tracing.Utils;
+using zipkin4net.Utils;
 using Moq;
 using NUnit.Framework;
 
-namespace Criteo.Profiling.Tracing.UTest
+namespace zipkin4net.UTest
 {
     [TestFixture]
     internal class T_TraceManager

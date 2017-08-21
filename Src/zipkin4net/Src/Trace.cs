@@ -1,8 +1,8 @@
-﻿﻿using System;
-using Criteo.Profiling.Tracing.Annotation;
-using Criteo.Profiling.Tracing.Utils;
+﻿using System;
+using zipkin4net.Annotation;
+using zipkin4net.Utils;
 
-namespace Criteo.Profiling.Tracing
+namespace zipkin4net
 {
 
     /// <summary>

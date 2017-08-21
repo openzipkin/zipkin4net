@@ -1,9 +1,9 @@
-using System;
+﻿using System;
 using System.Linq;
 using System.Net;
-using Criteo.Profiling.Tracing.Utils;
+using zipkin4net.Utils;
 
-namespace Criteo.Profiling.Tracing.Tracers.Zipkin
+namespace zipkin4net.Tracers.Zipkin
 {
     public static class SerializerUtils
     {

@@ -1,7 +1,7 @@
 ﻿using System;
-using Criteo.Profiling.Tracing.Utils;
+using zipkin4net.Utils;
 
-namespace Criteo.Profiling.Tracing.Tracers.Zipkin
+namespace zipkin4net.Tracers.Zipkin
 {
     public class ZipkinAnnotation
     {
