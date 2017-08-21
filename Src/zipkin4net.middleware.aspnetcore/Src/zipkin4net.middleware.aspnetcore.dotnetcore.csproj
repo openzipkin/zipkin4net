@@ -2,8 +2,8 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard1.6</TargetFramework>
-    <AssemblyName>Criteo.Profiling.Tracing.Middleware</AssemblyName>
-    <PackageId>Criteo.Profiling.Tracing.Middleware</PackageId>
+    <AssemblyName>zipkin4net.middleware.aspnetcore</AssemblyName>
+    <PackageId>zipkin4net.middleware.aspnetcore</PackageId>
     <Description>Asp.net core middleware for zipkin4net</Description>
     <Copyright>Copyright 2017, Criteo</Copyright>
     <VersionPrefix>0.3.1</VersionPrefix>
@@ -19,7 +19,7 @@
     <PackageReference Include="Microsoft.AspNetCore.Hosting" Version="1.1.1" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="1.1.1" />
     <PackageReference Include="System.Net.Http" Version="4.3.0" />
-    <PackageReference Include="Criteo.Profiling.Tracing" Version="0.4.3" />
+    <PackageReference Include="zipkin4net" Version="1.0.0" />
   </ItemGroup>
 
   <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard1.6' ">

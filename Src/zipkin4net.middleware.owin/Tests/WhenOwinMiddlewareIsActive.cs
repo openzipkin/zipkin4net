@@ -1,6 +1,6 @@
-﻿using Criteo.Profiling.Tracing.Annotation;
-using Criteo.Profiling.Tracing.Dispatcher;
-using Criteo.Profiling.Tracing.Tracers;
+﻿using zipkin4net.Annotation;
+using zipkin4net.Dispatcher;
+using zipkin4net.Tracers;
 using NSubstitute;
 using NUnit.Framework;
 using System;
@@ -8,11 +8,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Criteo.Profiling.Tracing.Middleware.Tests.Helpers;
-using Criteo.Profiling.Tracing.Transport;
+using zipkin4net.Middleware.Tests.Helpers;
+using zipkin4net.Transport;
 using Microsoft.Owin;
 
-namespace Criteo.Profiling.Tracing.Middleware.Tests
+namespace zipkin4net.Middleware.Tests
 {
     using static OwinHelper;
     using static CheckHelper;

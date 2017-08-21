@@ -1,7 +1,7 @@
-﻿using Criteo.Profiling.Tracing.Annotation;
+﻿using zipkin4net.Annotation;
 using System;
 
-namespace Criteo.Profiling.Tracing.Middleware.Tests.Helpers
+namespace zipkin4net.Middleware.Tests.Helpers
 {
     static class CheckHelper
     {
