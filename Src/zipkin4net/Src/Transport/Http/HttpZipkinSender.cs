@@ -10,11 +10,6 @@ namespace zipkin4net.Transport.Http
         private HttpClient _httpClient;
         private readonly string _contentType;
 
-        [Obsolete("Please specify the content type. E.g. application/x-thrift for thrift and application/json for JSON)")]
-        public HttpZipkinSender(string zipkinCollectorUrl)
-        : this(zipkinCollectorUrl, "application/x-thrift")
-        {}
-
         public HttpZipkinSender(string zipkinCollectorUrl, string contentType)
         : this(new HttpClient(), zipkinCollectorUrl, contentType)
         {}
