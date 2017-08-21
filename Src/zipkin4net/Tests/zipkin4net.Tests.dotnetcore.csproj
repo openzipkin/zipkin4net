@@ -2,8 +2,8 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp1.0</TargetFramework>
-    <AssemblyName>Criteo.Profiling.Tracing.UTest</AssemblyName>
-    <PackageId>Criteo.Profiling.Tracing.UTest</PackageId>
+    <AssemblyName>zipkin4net.UTest</AssemblyName>
+    <PackageId>zipkin4net.UTest</PackageId>
     <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
     <PackageTargetFallback>$(PackageTargetFallback);portable-net45+win8</PackageTargetFallback>
     <RuntimeFrameworkVersion>1.0.4</RuntimeFrameworkVersion>

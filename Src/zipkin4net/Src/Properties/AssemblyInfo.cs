@@ -18,11 +18,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Criteo.Profiling.Tracing")]
+[assembly: AssemblyTitle("zipkin4net")]
 [assembly: AssemblyDescription("A .NET client library for Zipkin")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Criteo")]
-[assembly: AssemblyProduct("Criteo.Profiling.Tracing")]
+[assembly: AssemblyProduct("zipkin4net")]
 [assembly: AssemblyCopyright("Copyright © Criteo 2017")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -47,6 +47,6 @@ using System.Runtime.InteropServices;
 // [assembly: AssemblyVersion("1.0.*")]
 [assembly: AssemblyVersion("0.4.3.0")]
 [assembly: AssemblyFileVersion("0.4.3.0")]
-[assembly: InternalsVisibleTo("Criteo.Profiling.Tracing.UTest")]
+[assembly: InternalsVisibleTo("zipkin4net.UTest")]
 [assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]
 

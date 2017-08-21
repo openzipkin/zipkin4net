@@ -7,8 +7,8 @@
     <ProjectGuid>{48712463-66FF-4C76-B63D-097B57A1477F}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Criteo.Profiling.Tracing</RootNamespace>
-    <AssemblyName>Criteo.Profiling.Tracing</AssemblyName>
+    <RootNamespace>zipkin4net</RootNamespace>
+    <AssemblyName>zipkin4net</AssemblyName>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
   </PropertyGroup>
@@ -124,7 +124,6 @@
     <Compile Include="Utils\TimeUtils.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Criteo.Profiling.Tracing.project.json" />
     <Compile Include="Trace.netfw.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

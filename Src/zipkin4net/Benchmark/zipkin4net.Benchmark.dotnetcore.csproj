@@ -6,8 +6,8 @@
     <VersionPrefix>0.1</VersionPrefix>
     <Authors>Criteo</Authors>
     <TargetFramework>netcoreapp1.1</TargetFramework>
-    <AssemblyName>Criteo.Profiling.Tracing.Benchmark</AssemblyName>
-    <PackageId>Criteo.Profiling.Tracing.Benchmark</PackageId>
+    <AssemblyName>zipkin4net.Benchmark</AssemblyName>
+    <PackageId>zipkin4net.Benchmark</PackageId>
     <PackageTags>Zipkin;Tracer;Tracing;Criteo;Benchmark</PackageTags>
     <PackageReleaseNotes>Benchmark for zipkin4net</PackageReleaseNotes>
     <PackageProjectUrl>https://github.com/criteo/zipkin4net</PackageProjectUrl>

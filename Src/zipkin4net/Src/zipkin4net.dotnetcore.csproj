@@ -2,9 +2,9 @@
 
   <PropertyGroup>
     <TargetFrameworks>netstandard1.5;net45</TargetFrameworks>
-    <AssemblyName>Criteo.Profiling.Tracing</AssemblyName>
-    <PackageId>Criteo.Profiling.Tracing</PackageId>
-    <Title>Criteo.Profiling.Tracing</Title>
+    <AssemblyName>zipkin4net</AssemblyName>
+    <PackageId>zipkin4net</PackageId>
+    <Title>zipkin4net</Title>
     <Authors>Criteo</Authors>
     <Copyright>Criteo</Copyright>
     <Owners>Criteo</Owners>
