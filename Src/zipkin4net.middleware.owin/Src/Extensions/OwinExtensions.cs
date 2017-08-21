@@ -1,5 +1,5 @@
-﻿using Criteo.Profiling.Tracing.Middleware;
-using Criteo.Profiling.Tracing.Transport;
+﻿using zipkin4net.Middleware;
+using zipkin4net.Transport;
 
 namespace Owin
 {

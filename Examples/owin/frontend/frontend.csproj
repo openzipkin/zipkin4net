@@ -64,9 +64,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\..\..\Src\zipkin4net.middleware.aspnetcore\Src\TracingHandler.cs">
-      <Link>TracingHandler.cs</Link>
-    </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Startup.cs" />
@@ -78,7 +75,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\..\Src\zipkin4net.middleware.owin\Src\zipkin4net.middleware.owin.csproj">
       <Project>{6a57c709-4443-4735-94cf-19de60b00f59}</Project>
-      <Name>Criteo.Profiling.Tracing.Middleware</Name>
+      <Name>zipkin4net.middleware.owin</Name>
     </ProjectReference>
     <ProjectReference Include="..\common\common.csproj">
       <Project>{13a1d84e-7b4b-44c1-853a-13b9e260256d}</Project>

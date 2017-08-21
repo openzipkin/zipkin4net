@@ -1,7 +1,7 @@
-using Criteo.Profiling.Tracing;
+﻿using zipkin4net;
 using Microsoft.Extensions.Logging;
 
-namespace Criteo.Profiling.Tracing.Middleware
+namespace zipkin4net.Middleware
 {
     public class TracingLogger : ILogger
     {

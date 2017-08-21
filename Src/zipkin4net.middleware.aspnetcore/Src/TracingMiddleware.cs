@@ -1,11 +1,11 @@
-using System;
+﻿using System;
 using Microsoft.AspNetCore.Builder;
-using Criteo.Profiling.Tracing;
-using Criteo.Profiling.Tracing.Transport;
-using Criteo.Profiling.Tracing.Utils;
+using zipkin4net;
+using zipkin4net.Transport;
+using zipkin4net.Utils;
 using Microsoft.AspNetCore.Http.Extensions;
 
-namespace Criteo.Profiling.Tracing.Middleware
+namespace zipkin4net.Middleware
 {
     public static class TracingMiddleware
     {

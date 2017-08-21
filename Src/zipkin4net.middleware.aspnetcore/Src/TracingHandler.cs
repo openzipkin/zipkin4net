@@ -1,11 +1,11 @@
-using System;
+﻿using System;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Criteo.Profiling.Tracing.Transport;
+using zipkin4net.Transport;
 
-namespace Criteo.Profiling.Tracing.Middleware
+namespace zipkin4net.Middleware
 {
-    [Obsolete("Use Criteo.Profiling.Tracing.Transport.Http.TracingHandler")]
+    [Obsolete("Use zipkin4net.Transport.Http.TracingHandler")]
     public class TracingHandler : DelegatingHandler
     {
         private readonly ITraceInjector _injector;
