@@ -2,7 +2,7 @@
 using common;
 using System.Threading.Tasks;
 using System.Threading;
-using Criteo.Profiling.Tracing.Transport.Http;
+using zipkin4net.Transport.Http;
 using Microsoft.Owin;
 using System;
 

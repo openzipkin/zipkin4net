@@ -1,4 +1,4 @@
-﻿using Criteo.Profiling.Tracing;
+﻿using zipkin4net;
 using System;
 using System.Collections.Generic;
 using System.Linq;
