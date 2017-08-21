@@ -1,8 +1,8 @@
-﻿using Criteo.Profiling.Tracing.Transport;
+﻿using zipkin4net.Transport;
 using Microsoft.Owin;
 using System.Threading.Tasks;
 
-namespace Criteo.Profiling.Tracing.Middleware
+namespace zipkin4net.Middleware
 {
     class ZipkinMiddleware : OwinMiddleware
     {

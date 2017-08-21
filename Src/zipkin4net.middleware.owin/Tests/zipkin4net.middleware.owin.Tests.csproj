@@ -7,8 +7,8 @@
     <ProjectGuid>{3DDF4522-E86B-40CD-87E4-0CCD132860B5}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Criteo.Profiling.Tracing.Middleware.Tests</RootNamespace>
-    <AssemblyName>Criteo.Profiling.Tracing.Middleware.Tests</AssemblyName>
+    <RootNamespace>zipkin4net.middleware.owin.Tests</RootNamespace>
+    <AssemblyName>zipkin4net.middleware.owin.Tests</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -30,8 +30,8 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Criteo.Profiling.Tracing, Version=0.4.3.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>$(SolutionDir)\packages\Criteo.Profiling.Tracing.0.4.3\lib\net45\Criteo.Profiling.Tracing.dll</HintPath>
+    <Reference Include="zipkin4net, Version=1.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>$(SolutionDir)\packages\zipkin4net.1.0.0\lib\net45\zipkin4net.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Owin, Version=3.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>$(SolutionDir)\packages\Microsoft.Owin.3.1.0\lib\net45\Microsoft.Owin.dll</HintPath>
@@ -77,7 +77,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Src\zipkin4net.middleware.owin.csproj">
       <Project>{6a57c709-4443-4735-94cf-19de60b00f59}</Project>
-      <Name>Criteo.Profiling.Tracing.Middleware</Name>
+      <Name>zipkin4net.middleware.owin</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

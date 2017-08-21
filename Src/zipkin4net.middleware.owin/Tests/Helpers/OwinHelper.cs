@@ -1,11 +1,11 @@
-﻿using Criteo.Profiling.Tracing.Transport;
+﻿using zipkin4net.Transport;
 using Microsoft.Owin.Testing;
 using Owin;
 using System;
 using System.Net.Http;
 using System.Threading.Tasks;
 
-namespace Criteo.Profiling.Tracing.Middleware.Tests.Helpers
+namespace zipkin4net.Middleware.Tests.Helpers
 {
     static class OwinHelper
     {
