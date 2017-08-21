@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Http;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using Criteo.Profiling.Tracing.Middleware;
+using Criteo.Profiling.Tracing.Transport.Http;
 using common;
 
 namespace frontend
