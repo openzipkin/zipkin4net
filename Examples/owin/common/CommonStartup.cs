@@ -1,6 +1,6 @@
-﻿using Criteo.Profiling.Tracing;
-using Criteo.Profiling.Tracing.Tracers.Zipkin;
-using Criteo.Profiling.Tracing.Transport.Http;
+﻿using zipkin4net;
+using zipkin4net.Tracers.Zipkin;
+using zipkin4net.Transport.Http;
 using Microsoft.Owin;
 using Microsoft.Owin.BuilderProperties;
 using Owin;
