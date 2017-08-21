@@ -31,11 +31,6 @@ namespace zipkin4net.Tracers.Zipkin
         /// </summary>
         internal static readonly TimeSpan TimeToLive = TimeSpan.FromMinutes(1);
 
-        [Obsolete("Please use ZipkinTracer(IZipkinSender sender, ISpanSerializer spanSerializer, IStatistics statistics)")]
-        public ZipkinTracer(IZipkinSender sender, IStatistics statistics = null) : this(sender, new ThriftSpanSerializer(), statistics)
-        {
-        }
-
         public ZipkinTracer(IZipkinSender sender, ISpanSerializer spanSerializer, IStatistics statistics = null)
         {
             if (sender == null) throw new ArgumentNullException("sender", "You have to specify a non-null sender for Zipkin tracer.");
