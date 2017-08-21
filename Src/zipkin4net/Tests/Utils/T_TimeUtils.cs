@@ -1,8 +1,8 @@
 ﻿using System;
-using Criteo.Profiling.Tracing.Utils;
+using zipkin4net.Utils;
 using NUnit.Framework;
 
-namespace Criteo.Profiling.Tracing.UTest.Utils
+namespace zipkin4net.UTest.Utils
 {
 
     [TestFixture]

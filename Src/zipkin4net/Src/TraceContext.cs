@@ -5,7 +5,7 @@ using System.Threading;
 using System.Runtime.Remoting.Messaging;
 #endif
 
-namespace Criteo.Profiling.Tracing
+namespace zipkin4net
 {
     internal static class TraceContext
     {

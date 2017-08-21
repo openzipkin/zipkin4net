@@ -1,4 +1,4 @@
-﻿namespace Criteo.Profiling.Tracing
+﻿namespace zipkin4net
 {
     public interface ILogger
     {

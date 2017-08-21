@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Net;
 
-namespace Criteo.Profiling.Tracing.Annotation
+namespace zipkin4net.Annotation
 {
     public sealed class LocalAddr : IAnnotation
     {

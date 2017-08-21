@@ -1,4 +1,4 @@
-﻿namespace Criteo.Profiling.Tracing.Annotation
+﻿namespace zipkin4net.Annotation
 {
     public sealed class WireRecv : IAnnotation
     {

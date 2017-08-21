@@ -1,15 +1,15 @@
-using System;
+﻿using System;
 using System.Linq;
 using System.Net;
 using System.Text;
-using Criteo.Profiling.Tracing.Tracers.Zipkin;
-using Criteo.Profiling.Tracing.Tracers.Zipkin.Thrift;
-using Criteo.Profiling.Tracing.Utils;
+using zipkin4net.Tracers.Zipkin;
+using zipkin4net.Tracers.Zipkin.Thrift;
+using zipkin4net.Utils;
 using NUnit.Framework;
-using BinaryAnnotation = Criteo.Profiling.Tracing.Tracers.Zipkin.BinaryAnnotation;
-using Span = Criteo.Profiling.Tracing.Tracers.Zipkin.Span;
+using BinaryAnnotation = zipkin4net.Tracers.Zipkin.BinaryAnnotation;
+using Span = zipkin4net.Tracers.Zipkin.Span;
 
-namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
+namespace zipkin4net.UTest.Tracers.Zipkin
 {
 
     [TestFixture]
@@ -287,7 +287,7 @@ namespace Criteo.Profiling.Tracing.UTest.Tracers.Zipkin
             span.SetAsComplete(endtime);
         }
 
-        private static void AssertSpanHasRequiredFields(Tracing.Tracers.Zipkin.Thrift.Span thriftSpan)
+        private static void AssertSpanHasRequiredFields(zipkin4net.Tracers.Zipkin.Thrift.Span thriftSpan)
         {
             Assert.IsNotNull(thriftSpan.Id);
             Assert.IsNotNull(thriftSpan.Trace_id);

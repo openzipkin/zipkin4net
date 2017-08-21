@@ -3,7 +3,7 @@ using System.Collections.Concurrent;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Criteo.Profiling.Tracing.Dispatcher
+namespace zipkin4net.Dispatcher
 {
     /// <summary>
     /// Dispatch messages asynchronously in order using a concurrent queue and a consumer task

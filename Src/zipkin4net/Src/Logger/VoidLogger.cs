@@ -1,4 +1,4 @@
-﻿namespace Criteo.Profiling.Tracing.Logger
+﻿namespace zipkin4net.Logger
 {
     internal class VoidLogger : ILogger
     {

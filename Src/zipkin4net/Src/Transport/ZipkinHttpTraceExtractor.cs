@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
-using Criteo.Profiling.Tracing.Utils;
+using zipkin4net.Utils;
 
-namespace Criteo.Profiling.Tracing.Transport
+namespace zipkin4net.Transport
 {
     /**
      * Extract B3 headers from HTTP headers.

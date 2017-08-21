@@ -1,6 +1,6 @@
 ﻿using NUnit.Framework;
 
-namespace Criteo.Profiling.Tracing.UTest
+namespace zipkin4net.UTest
 {
     [TestFixture]
     public class T_SpanState
