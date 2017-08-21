@@ -14,8 +14,8 @@
     <PackageReference Include="Microsoft.AspNetCore" Version="1.1.1" />
     <PackageReference Include="System.Net.Http" Version="4.3.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="1.1.1" />
-    <PackageReference Include="Criteo.Profiling.Tracing" Version="0.3.5" />
-    <PackageReference Include="Criteo.Profiling.Tracing.Middleware" Version="0.2" />
+    <PackageReference Include="Criteo.Profiling.Tracing" Version="0.4.3" />
+    <PackageReference Include="Criteo.Profiling.Tracing.Middleware" Version="0.3.1" />
   </ItemGroup>
 
   <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard1.6' ">
