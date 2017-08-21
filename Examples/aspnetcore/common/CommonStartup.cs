@@ -8,11 +8,11 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Criteo.Profiling.Tracing;
-using Criteo.Profiling.Tracing.Tracers.Zipkin;
-using Criteo.Profiling.Tracing.Transport;
-using Criteo.Profiling.Tracing.Transport.Http;
-using Criteo.Profiling.Tracing.Middleware;
+using zipkin4net;
+using zipkin4net.Tracers.Zipkin;
+using zipkin4net.Transport;
+using zipkin4net.Transport.Http;
+using zipkin4net.Middleware;
 using System.Net.Http;
 using System.Threading;
 
@@ -43,7 +43,7 @@ namespace common
             var lifetime = app.ApplicationServices.GetService<IApplicationLifetime>();
             lifetime.ApplicationStarted.Register(() => {
                 TraceManager.SamplingRate = 1.0f;
-                var logger = new TracingLogger(loggerFactory, "Criteo.Profiling.Tracing");
+                var logger = new TracingLogger(loggerFactory, "zipkin4net");
                 var httpSender = new HttpZipkinSender("http://localhost:9411", "application/json");
                 var tracer = new ZipkinTracer(httpSender, new JSONSpanSerializer());
                 TraceManager.RegisterTracer(tracer);
