@@ -8,7 +8,7 @@ This example was ported from similar examples, such as [Spring Boot](https://git
 
 # Implementation Overview
 
-Web requests are served by Kestrel, and tracing is automatically performed by [zipkin4net](https://github.com/criteo/zipkin4net), more specifically by the library [Criteo.Profiling.Tracing](https://github.com/criteo/zipkin4net/tree/master/zipkin4net/Criteo.Profiling.Tracing).
+Web requests are served by Kestrel, and tracing is automatically performed by [zipkin4net](https://github.com/criteo/zipkin4net), more specifically by the library [zipkin4net](/Src/zipkin4net/Src).
 
 # Pre-requisites
 
@@ -57,5 +57,5 @@ java -jar zipkin.jar
 ## Advanced setup
 
 If you want to use different ports that 8081 and 9000 for frontend and backend, you have to do two things:
-* Edit the [configuration](https://github.com/criteo/zipkin4net/blob/master/zipkin4net-example/frontend/appSettings.json) and change the callServiceUrl to the desired backend url
+* Edit the [configuration](/Examples/aspnetcore/frontend/appSettings.json) and change the callServiceUrl to the desired backend url
 * Launch frontend and backend with the ports you want (the parameter just after dotnet run)
