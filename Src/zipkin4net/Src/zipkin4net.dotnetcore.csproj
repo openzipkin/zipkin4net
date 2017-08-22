@@ -20,8 +20,8 @@
     <GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>
     <GenerateAssemblyFileVersionAttribute>false</GenerateAssemblyFileVersionAttribute>
     <PackageTags>Zipkin;Tracer;Tracing;Criteo;zipkin4net</PackageTags>
-    <PackageProjectUrl>https://github.com/criteo/zipkin4net</PackageProjectUrl>
-    <PackageLicenseUrl>https://github.com/criteo/zipkin4net/blob/master/LICENSE</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/openzipkin/zipkin4net</PackageProjectUrl>
+    <PackageLicenseUrl>https://github.com/openzipkin/zipkin4net/blob/master/LICENSE</PackageLicenseUrl>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(TargetFramework)' == 'netstandard1.5'">
