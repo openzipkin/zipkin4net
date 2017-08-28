@@ -5,7 +5,7 @@
     <Copyright>Copyright 2017, Criteo</Copyright>
     <VersionPrefix>0.1</VersionPrefix>
     <Authors>Criteo</Authors>
-    <TargetFramework>netcoreapp1.1</TargetFramework>
+    <TargetFramework>netcoreapp2.0</TargetFramework>
     <AssemblyName>zipkin4net.Benchmark</AssemblyName>
     <PackageId>zipkin4net.Benchmark</PackageId>
     <PackageTags>Zipkin;Tracer;Tracing;Criteo;Benchmark</PackageTags>
@@ -23,7 +23,7 @@
     <PackageReference Include="Newtonsoft.Json" Version="10.0.2" />
   </ItemGroup>
 
-  <PropertyGroup Condition=" '$(TargetFramework)' == 'netcoreapp1.1' ">
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'netcoreapp2.0' ">
     <DefineConstants>$(DefineConstants);NET_CORE</DefineConstants>
   </PropertyGroup>
 
