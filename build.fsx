@@ -27,11 +27,13 @@ Target "DotnetRestore" (fun _ ->
         })
 )
 
-let dotnetTestProject = {Project = "Src/zipkin4net/Tests/zipkin4net.Tests.dotnetcore.csproj" ; Framework = "netcoreapp1.0"}
+let dotnetTestProject = {Project = "Src/zipkin4net/Tests/zipkin4net.Tests.dotnetcore.csproj" ; Framework = "netcoreapp2.0"}
+
+let dotnetZipkin4netProject = {Project = "Src/zipkin4net/Src/zipkin4net.dotnetcore.csproj" ; Framework = "netstandard1.5"}
 
 let buildProjects = [
-    {Project = "Src/zipkin4net/Src/zipkin4net.dotnetcore.csproj" ; Framework = "netstandard1.5"}
-    {Project = "Src/zipkin4net/Benchmark/zipkin4net.Benchmark.dotnetcore.csproj" ; Framework = "netcoreapp1.1"}
+    dotnetZipkin4netProject
+    {Project = "Src/zipkin4net/Benchmark/zipkin4net.Benchmark.dotnetcore.csproj" ; Framework = "netcoreapp2.0"}
     dotnetTestProject
 ]
 
@@ -64,7 +66,7 @@ Target "DotnetTest" (fun _ ->
 )
 
 let packProjects = [
-    {Project = "Src/zipkin4net/Src/zipkin4net.dotnetcore.csproj" ; Framework = "netstandard1.5"}
+    dotnetZipkin4netProject
 ]
 
 Target "DotnetPackage" (fun _ ->
