@@ -55,12 +55,17 @@ let buildDotnetcore : Buildable seq -> unit =
                     })
 )
 
+let raiseWhenNot0 message status =
+    match status with 
+    | 0 -> ()
+    | _ -> failwith message
+
 let build buildTool = 
     let buildFromPath path = 
         ExecProcess (fun info ->
             info.FileName <- buildTool
             info.Arguments <- sprintf "/p:Configuration=Release %s" path
-            ) processTimeout |> ignore
+            ) processTimeout |> (raiseWhenNot0 "Build failed")
     function
     | Solution p -> buildFromPath p
     | Project { Path = p } -> buildFromPath p
@@ -81,13 +86,14 @@ let nugetRestore =
         ExecProcess (fun info ->
             info.FileName <- "nuget"
             info.Arguments <- sprintf "restore %s" path
-            ) processTimeout |> ignore
+            ) processTimeout |> (raiseWhenNot0 "Restore failed")
     function
     | Solution p -> restore p
     | Project { Path = p } -> restore p
 
 
 Target "Restore" (fun _ ->
+    nugetRestore (Solution "Src/zipkin4net/zipkin4net.sln")
     nugetRestore owinSolution
 )
 
@@ -116,7 +122,7 @@ Target "Test" (fun _ ->
     ExecProcess (fun info ->
         info.FileName <- fileName
         info.Arguments <- sprintf "Src/zipkin4net.middleware.owin/Tests/bin/Release/zipkin4net.middleware.owin.Tests.dll"
-        ) processTimeout |> ignore
+        ) processTimeout |> (raiseWhenNot0 "Test failed")
 )
 
 let dotnetcorePackProjects = [
