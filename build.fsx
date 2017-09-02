@@ -12,7 +12,29 @@ let outputFolder = __SOURCE_DIRECTORY__ </> "bin"
 let dotnetExePath = "dotnet"
 let nugetVersion = "1.0.0"
 
+let nunitConsolePath = __SOURCE_DIRECTORY__ </> "build-packages/NUnit.Runners.2.6.4/tools/nunit-console.exe"
+
 let processTimeout = TimeSpan.FromMinutes 5.
+
+let dotnetcoreTestProject = {Path = "Src/zipkin4net/Tests/zipkin4net.Tests.dotnetcore.csproj" ; Framework = "netcoreapp2.0"}
+let dotnetcoreZipkin4netProject = {Path = "Src/zipkin4net/Src/zipkin4net.dotnetcore.csproj" ; Framework = "netstandard1.5"}
+
+let dotnetcoreBuildProjects : Buildable list = [
+    Project dotnetcoreZipkin4netProject
+    Project {Path = "Src/zipkin4net/Benchmark/zipkin4net.Benchmark.dotnetcore.csproj" ; Framework = "netcoreapp2.0"}
+    Project dotnetcoreTestProject
+    Solution "Src/zipkin4net.middleware.aspnetcore/zipkin4net.middleware.aspnetcore.dotnetcore.sln"
+]
+
+let owinSolution = Solution "Src/zipkin4net.middleware.owin/zipkin4net.middleware.owin.sln"
+
+let dotnetcoreTestProjects = [
+    dotnetcoreTestProject
+]
+
+let [<Literal>] OwinMiddlewareTestDll = "Src/zipkin4net.middleware.owin/Tests/bin/Release/zipkin4net.middleware.owin.Tests.dll"
+
+// -----------------------------------------------------------------------------------
 
 Target "Clean" (fun _ ->
     let extractBinAndObjFromPath =
@@ -26,34 +48,21 @@ Target "Clean" (fun _ ->
     |> CleanDirs
 )
 
-let dotnetcoreTestProject = {Path = "Src/zipkin4net/Tests/zipkin4net.Tests.dotnetcore.csproj" ; Framework = "netcoreapp2.0"}
-
-let dotnetcoreZipkin4netProject = {Path = "Src/zipkin4net/Src/zipkin4net.dotnetcore.csproj" ; Framework = "netstandard1.5"}
-
-let dotnetcoreBuildProjects : Buildable list = [
-    Project dotnetcoreZipkin4netProject
-    Project {Path = "Src/zipkin4net/Benchmark/zipkin4net.Benchmark.dotnetcore.csproj" ; Framework = "netcoreapp2.0"}
-    Project dotnetcoreTestProject
-    Solution "Src/zipkin4net.middleware.aspnetcore/zipkin4net.middleware.aspnetcore.dotnetcore.sln"
-]
-
-let buildDotnetcore : Buildable seq -> unit = 
-    Seq.iter (fun buildable -> 
-            match buildable with
-            | Project proj ->
-                DotNetCli.Build (fun c ->
-                    { c with
-                        Project = proj.Path
-                        ToolPath = dotnetExePath
-                        AdditionalArgs = [ "-f " + proj.Framework ]
-                    })
-            | Solution path ->
-                DotNetCli.Build (fun c ->
-                    { c with
-                        Project = path
-                        ToolPath = dotnetExePath
-                    })
-)
+let buildDotnetcore buildable = 
+    match buildable with
+    | Project proj ->
+        DotNetCli.Build (fun c ->
+            { c with
+                Project = proj.Path
+                ToolPath = dotnetExePath
+                AdditionalArgs = [ "-f " + proj.Framework ]
+            })
+    | Solution path ->
+        DotNetCli.Build (fun c ->
+            { c with
+                Project = path
+                ToolPath = dotnetExePath
+            })
 
 let raiseWhenNot0 message status =
     match status with 
@@ -70,11 +79,9 @@ let build buildTool =
     | Solution p -> buildFromPath p
     | Project { Path = p } -> buildFromPath p
 
-let owinSolution = Solution "Src/zipkin4net.middleware.owin/zipkin4net.middleware.owin.sln"
-
 Target "Build" (fun _ ->
     dotnetcoreBuildProjects
-    |> buildDotnetcore
+    |> Seq.iter buildDotnetcore
     
     match isWindows with
     | true -> build "msbuild" owinSolution
@@ -97,39 +104,38 @@ Target "Restore" (fun _ ->
     nugetRestore owinSolution
 )
 
-let testDotnetcoreProject : ProjectAndFramework seq -> unit = 
-    Seq.iter (fun proj ->
-        DotNetCli.Test (fun c ->
-            { c with
-                Project = proj.Path
-                ToolPath = dotnetExePath
-                AdditionalArgs = [ "-f " + proj.Framework ; "--no-build" ]
-            })
-)
+let testDotnetcoreProject project = 
+    DotNetCli.Test (fun c ->
+        { c with
+            Project = project.Path
+            ToolPath = dotnetExePath
+            AdditionalArgs = [ "-f " + project.Framework ; "--no-build" ]
+        })
 
-let dotnetcoreTestProjects = [
-    dotnetcoreTestProject
-]
+let testWithNunit dllPath = 
+    let fileName, args = 
+        match isWindows with
+        | true -> nunitConsolePath, dllPath
+        | _ -> "mono", sprintf "%s %s" nunitConsolePath dllPath
+
+    ExecProcess (fun info ->
+        info.FileName <- fileName
+        info.Arguments <- args
+        ) processTimeout |> (raiseWhenNot0 "Test failed")
 
 Target "Test" (fun _ ->
     dotnetcoreTestProjects
-    |> testDotnetcoreProject
-    
-    let fileName = 
-        match isWindows with
-        | true -> "Src/zipkin4net.middleware.owin/packages/NUnit.Runners.2.6.4/tools/nunit-console.exe"
-        | _ -> "mono Src/zipkin4net.middleware.owin/packages/NUnit.Runners.2.6.4/tools/nunit-console.exe"
-    ExecProcess (fun info ->
-        info.FileName <- fileName
-        info.Arguments <- sprintf "Src/zipkin4net.middleware.owin/Tests/bin/Release/zipkin4net.middleware.owin.Tests.dll"
-        ) processTimeout |> (raiseWhenNot0 "Test failed")
+    |> Seq.iter testDotnetcoreProject
+
+    OwinMiddlewareTestDll
+    |> testWithNunit
 )
 
 let dotnetcorePackProjects = [
     dotnetcoreZipkin4netProject
 ]
 
-Target "DotnetcorePackage" (fun _ ->
+Target "Pack" (fun _ ->
     dotnetcorePackProjects
     |> Seq.iter (fun proj ->
         DotNetCli.Pack (fun c ->
@@ -145,6 +151,6 @@ Target "DotnetcorePackage" (fun _ ->
     ==> "Restore"
     ==> "Build"
     ==> "Test"
-    ==> "DotnetcorePackage"
+    ==> "Pack"
 
 RunTargetOrDefault "Test"
