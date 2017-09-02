@@ -7,7 +7,7 @@ dotnet: 2.0.0
 os:  
   - linux
 script:
-  - ./buildAndTest.sh
+  - ./build.sh
 notifications:
   webhooks:
     urls:
