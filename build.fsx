@@ -15,7 +15,6 @@ let nugetVersion = "1.0.0"
 let nunitConsolePath = __SOURCE_DIRECTORY__ </> "build-packages/NUnit.Runners.2.6.4/tools/nunit-console.exe"
 
 let processTimeout = TimeSpan.FromMinutes 5.
-
 let dotnetcoreTestProject = {Path = "Src/zipkin4net/Tests/zipkin4net.Tests.dotnetcore.csproj" ; Framework = "netcoreapp2.0"}
 let dotnetcoreZipkin4netProject = {Path = "Src/zipkin4net/Src/zipkin4net.dotnetcore.csproj" ; Framework = "netstandard1.5"}
 
@@ -25,14 +24,14 @@ let dotnetcoreBuildProjects : Buildable list = [
     Project dotnetcoreTestProject
     Solution "Src/zipkin4net.middleware.aspnetcore/zipkin4net.middleware.aspnetcore.dotnetcore.sln"
 ]
-
 let owinSolution = Solution "Src/zipkin4net.middleware.owin/zipkin4net.middleware.owin.sln"
 
 let dotnetcoreTestProjects = [
     dotnetcoreTestProject
 ]
-
 let [<Literal>] OwinMiddlewareTestDll = "Src/zipkin4net.middleware.owin/Tests/bin/Release/zipkin4net.middleware.owin.Tests.dll"
+
+let zipkinSolution = Solution "Src/zipkin4net/zipkin4net.sln"
 
 // -----------------------------------------------------------------------------------
 
@@ -100,7 +99,7 @@ let nugetRestore =
 
 
 Target "Restore" (fun _ ->
-    nugetRestore (Solution "Src/zipkin4net/zipkin4net.sln")
+    nugetRestore zipkinSolution
     nugetRestore owinSolution
 )
 
