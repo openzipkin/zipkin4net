@@ -152,9 +152,9 @@ namespace zipkin4net
                 return (CurrentSpan.Flags & SpanFlags.Sampled) == SpanFlags.Sampled;
             }
 
-            //Backward compatibility mode. If sample flag is not set,
-            //the fact that the trace exists means that it is sampled
-            return true;
+            //If sample flag is not set, do not sample the trace
+            //Avoid issues when B3 header is incomplete
+            return false;
         }
     }
 

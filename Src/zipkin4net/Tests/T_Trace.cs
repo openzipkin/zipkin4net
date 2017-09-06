@@ -115,7 +115,7 @@ namespace zipkin4net.UTest
         }
 
         [Test]
-        public void FlagUnsetShouldForwardForBackwardCompatibility()
+        public void FlagUnsetShouldNotForward()
         {
             var dispatcher = new Mock<IRecordDispatcher>();
             TraceManager.Start(new VoidLogger(), dispatcher.Object);
@@ -125,7 +125,7 @@ namespace zipkin4net.UTest
 
             trace.Record(Annotations.ClientRecv());
 
-            dispatcher.Verify(d => d.Dispatch(It.IsAny<Record>()), Times.Once());
+            dispatcher.Verify(d => d.Dispatch(It.IsAny<Record>()), Times.Never());
         }
 
         [Test]
