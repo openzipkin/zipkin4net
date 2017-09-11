@@ -8,6 +8,10 @@ type IsTestProject = bool
 type Buildable = 
     | Project of Project
     | Solution of Solution
+    member __.Path = 
+        match __ with
+        | Project p -> p.Path
+        | Solution s -> s.Path
 and Project = 
     | CoreProject of ProjectAndFramework * IsTestProject
     | ClassicProject of Path * IsTestProject
@@ -22,6 +26,10 @@ and Project =
 and Solution =
     | CoreSolution of Path
     | ClassicSolution of Path
+    member __.Path = 
+        match __ with
+        | CoreSolution p -> p
+        | ClassicSolution p -> p
 
 let outputFolder = __SOURCE_DIRECTORY__ </> "bin"
 let dotnetExePath = "dotnet"
@@ -29,7 +37,7 @@ let nugetVersion = "1.0.0"
 let nunitConsolePath = __SOURCE_DIRECTORY__ </> "build-packages/NUnit.ConsoleRunner.3.7.0/tools/nunit3-console.exe"
 let processTimeout = TimeSpan.FromMinutes 5.
 
-let versionMap = [("zipkin4net.dotnetcore.csproj", "netstandard1.5") ; ("common.dotnetcore.csproj", "netstandard2.0")] |> Map
+let versionMap = [("zipkin4net.dotnetcore.csproj", "netstandard1.5") ; ("zipkin4net.middleware.aspnetcore.dotnetcore.csproj", "netstandard1.6") ; ("common.dotnetcore.csproj", "netstandard2.0")] |> Map
 let classifyProject (path:string) = 
     let getDotnetCoreVersion (path:string) =
         let specificVersion = Map.tryFind (System.IO.Path.GetFileName path) versionMap
@@ -37,7 +45,7 @@ let classifyProject (path:string) =
         | None -> "netcoreapp2.0"
         | Some v -> v
     let isTest (path:string) = path.Contains("Tests")
-    if path.Contains("dotnetcore") then CoreProject ({Path = path ; FrameworkVersion = getDotnetCoreVersion path }, isTest path)
+    if path.Contains("netcore") then CoreProject ({Path = path ; FrameworkVersion = getDotnetCoreVersion path }, isTest path)
     else ClassicProject (path, isTest path)
 
 let classifySolution (path:string) = 
@@ -101,19 +109,27 @@ let buildClassic buildTool path =
 
 let buildClassicWithTool = if isWindows then (buildClassic "msbuild") else (buildClassic "xbuild")
 
+let buildProject = 
+    function
+    | CoreProject (projectAndFramework, _) -> buildCoreProject projectAndFramework
+    | ClassicProject (path, _) -> buildClassicWithTool path
+let buildSolution = 
+    function
+    | CoreSolution path -> buildCoreSolution path
+    | ClassicSolution path -> buildClassicWithTool path
 let build = 
     function
-    | Project (CoreProject (projectAndFramework, _)) -> buildCoreProject projectAndFramework
-    | Project (ClassicProject (path, _)) -> buildClassicWithTool path
-    | Solution (CoreSolution path) -> buildCoreSolution path
-    | Solution (ClassicSolution path) -> buildClassicWithTool path
+    | Project p -> buildProject p
+    | Solution s -> buildSolution s
 
 Target "Build" (fun _ ->
     if isWindows then
-        solutions |> List.iter (Solution >> build)
+        solutions |> List.iter buildSolution
     else 
-        let excluded = ["zipkin4net.Tests.csproj"] |> Set
-        projects |> List.filter (fun p -> not (excluded.Contains(p.Path))) |> List.iter (Project >> build)
+        let excluded = 
+            ["zipkin4net.Tests.csproj" ; "zipkin4net.dotnetcore.sln" ; "zipkin4net.middleware.aspnetcore.csproj"] |> Set
+        let buildables = (solutions |> List.map Solution) @ (projects |> List.map Project)
+        buildables |> List.filter (fun p -> excluded |> (Set.exists (fun e -> p.Path.Contains e) >> not)) |> List.iter build
 )
 
 let nugetRestore path = 
@@ -190,4 +206,4 @@ Target "Pack" (fun _ ->
     ==> "Test"
     ==> "Pack"
 
-RunTargetOrDefault "Test"
+RunTargetOrDefault "Build"
