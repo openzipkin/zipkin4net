@@ -161,7 +161,6 @@ let testWithNunit dllPath =
         match isWindows with
         | true -> nunitConsolePath, dllPath
         | _ -> "mono", sprintf "%s %s" nunitConsolePath dllPath
-
     ExecProcess (fun info ->
         info.FileName <- fileName
         info.Arguments <- args
@@ -178,7 +177,7 @@ let test =
     | CoreProject (projectAndFramework, _) -> testCoreProject projectAndFramework
     | ClassicProject (path, _) ->
          match tryGetProjectDll path with
-         | None -> invalidOp (sprintf "Cannot find test dll for project: %s" path)
+         | None ->  printfn "Cannot find test dll for project: %s" path
          | Some dll -> testWithNunit dll
 
 Target "Test" (fun _ ->
@@ -206,4 +205,4 @@ Target "Pack" (fun _ ->
     ==> "Test"
     ==> "Pack"
 
-RunTargetOrDefault "Build"
+RunTargetOrDefault "Test"
