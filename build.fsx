@@ -61,11 +61,7 @@ let solutions =
     |> Seq.map classifySolution
     |> Seq.toList
 
-let buildables = 
-    projects
-    |> Seq.map (Project)
-    |> Seq.append (Seq.map (Solution) solutions)
-    |> Seq.toList
+let buildables = (solutions |> List.map Solution) @ (projects |> List.map Project)
 
 // -----------------------------------------------------------------------------------
 
@@ -128,7 +124,6 @@ Target "Build" (fun _ ->
     else 
         let excluded = 
             ["zipkin4net.Tests.csproj" ; "zipkin4net.dotnetcore.sln" ; "zipkin4net.middleware.aspnetcore.csproj"] |> Set
-        let buildables = (solutions |> List.map Solution) @ (projects |> List.map Project)
         buildables |> List.filter (fun p -> excluded |> (Set.exists (fun e -> p.Path.Contains e) >> not)) |> List.iter build
 )
 
