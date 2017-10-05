@@ -95,6 +95,8 @@ namespace zipkin4net
             return new Trace(childState);
         }
 
+        public bool IsSampled => ShouldBeRecorded();
+
         /// <summary>
         /// Force this trace to be sent.
         /// </summary>
