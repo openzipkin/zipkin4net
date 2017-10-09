@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -53,6 +53,11 @@
     <Compile Include="Annotations.cs" />
     <Compile Include="Annotation\Addr.cs" />
     <Compile Include="Annotation\ClientAddr.cs" />
+    <Compile Include="Annotation\MessageAddr.cs" />
+    <Compile Include="Annotation\ConsumerStart.cs" />
+    <Compile Include="Annotation\ConsumerStop.cs" />
+    <Compile Include="Annotation\ProducerStart.cs" />
+    <Compile Include="Annotation\ProducerStop.cs" />
     <Compile Include="Annotation\ServerAddr.cs" />
     <Compile Include="Annotation\LocalOperationStart.cs" />
     <Compile Include="Annotation\LocalOperationStop.cs" />

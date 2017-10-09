@@ -118,6 +118,9 @@ namespace zipkin4net.UTest.Tracers.Zipkin
             AnnotationCorrectlyAdded(Annotations.WireRecv(), zipkinCoreConstants.WIRE_RECV, false, false);
             AnnotationCorrectlyAdded(Annotations.WireSend(), zipkinCoreConstants.WIRE_SEND, false, false);
             AnnotationCorrectlyAdded(Annotations.LocalOperationStart("Operation"), zipkinCoreConstants.LOCAL_COMPONENT, true, false);
+            AnnotationCorrectlyAdded(Annotations.ConsumerStart(), zipkinCoreConstants.MESSAGE_RECV, false, false);
+            AnnotationCorrectlyAdded(Annotations.ProducerStart(), zipkinCoreConstants.MESSAGE_SEND, false, false);
+            AnnotationCorrectlyAdded(Annotations.MessageAddr("service", new IPEndPoint(0, 1)), zipkinCoreConstants.MESSAGE_ADDR, true, false);
         }
 
         private static void AnnotationCorrectlyAdded(IAnnotation ann, string expectedValue, bool isBinaryAnnotation, bool spanCompleted)

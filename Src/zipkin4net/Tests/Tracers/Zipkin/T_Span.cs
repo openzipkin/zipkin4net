@@ -17,6 +17,8 @@ namespace zipkin4net.UTest.Tracers.Zipkin
             VerifySpanDurationComputedWhenSetAsComplete(Annotations.ServerRecv(), Annotations.ServerSend(), isRootSpan: true, isSpanStartedAndDurationSet: true);
             VerifySpanDurationComputedWhenSetAsComplete(Annotations.ServerRecv(), Annotations.ServerSend(), isRootSpan: false, isSpanStartedAndDurationSet: false);
             VerifySpanDurationComputedWhenSetAsComplete(Annotations.LocalOperationStart("Operation"), Annotations.LocalOperationStop(), isRootSpan: false, isSpanStartedAndDurationSet: true);
+            VerifySpanDurationComputedWhenSetAsComplete(Annotations.ProducerStart(), Annotations.ProducerStop(), isRootSpan: false, isSpanStartedAndDurationSet: false);
+            VerifySpanDurationComputedWhenSetAsComplete(Annotations.ConsumerStart(), Annotations.ConsumerStop(), isRootSpan: false, isSpanStartedAndDurationSet: false);
         }
 
         private static void VerifySpanDurationComputedWhenSetAsComplete(IAnnotation start, IAnnotation stop, bool isRootSpan, bool isSpanStartedAndDurationSet)
@@ -107,6 +109,10 @@ namespace zipkin4net.UTest.Tracers.Zipkin
             Assert.False(GetSpanDuration(offset, Annotations.ClientSend()).HasValue);
             Assert.False(GetSpanDuration(offset, Annotations.LocalOperationStart("Operation")).HasValue);
             Assert.False(GetSpanDuration(offset, Annotations.LocalOperationStop()).HasValue);
+            Assert.False(GetSpanDuration(offset, Annotations.ConsumerStart()).HasValue);
+            Assert.False(GetSpanDuration(offset, Annotations.ConsumerStop()).HasValue);
+            Assert.False(GetSpanDuration(offset, Annotations.ProducerStart()).HasValue);
+            Assert.False(GetSpanDuration(offset, Annotations.ProducerStop()).HasValue);
         }
 
 

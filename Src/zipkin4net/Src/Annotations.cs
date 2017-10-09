@@ -15,6 +15,10 @@ namespace zipkin4net
         private static readonly IAnnotation AnnServerSend = new ServerSend();
         private static readonly IAnnotation AnnWireSend = new WireSend();
         private static readonly IAnnotation AnnWireRecv = new WireRecv();
+        private static readonly IAnnotation AnnProducerStart = new ProducerStart();
+        private static readonly IAnnotation AnnProducerStop = new ProducerStop();
+        private static readonly IAnnotation AnnConsumerStart = new ConsumerStart();
+        private static readonly IAnnotation AnnConsumerStop = new ConsumerStop();
         private static readonly IAnnotation AnnLocalOperationStop = new LocalOperationStop();
 
         public static IAnnotation ClientRecv()
@@ -45,6 +49,31 @@ namespace zipkin4net
         public static IAnnotation WireRecv()
         {
             return AnnWireRecv;
+        }
+
+        public static IAnnotation ProducerStart()
+        {
+            return AnnProducerStart;
+        }
+
+        public static IAnnotation ProducerStop()
+        {
+            return AnnProducerStop;
+        }
+
+        public static IAnnotation ConsumerStart()
+        {
+            return AnnConsumerStart;
+        }
+
+        public static IAnnotation ConsumerStop()
+        {
+            return AnnConsumerStop;
+        }
+
+        public static IAnnotation MessageAddr(string serviceName, IPEndPoint endPoint)
+        {
+            return new MessageAddr(serviceName, endPoint);
         }
 
         public static IAnnotation LocalOperationStart(string name)
