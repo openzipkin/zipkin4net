@@ -19,3 +19,4 @@ logs/
 TestResult.xml
 build-packages
 .fake
+.vs
