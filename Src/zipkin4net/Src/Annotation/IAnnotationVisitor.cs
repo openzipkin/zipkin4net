@@ -8,6 +8,11 @@
         void Visit(ServerSend serverSend);
         void Visit(WireSend wireSend);
         void Visit(WireRecv wireRecv);
+        void Visit(ProducerStart producerStart);
+        void Visit(ProducerStop producerStop);
+        void Visit(ConsumerStart consumerStart);
+        void Visit(ConsumerStop consumerStop);
+        void Visit(MessageAddr messageAddr);
         void Visit(Rpc rpc);
         void Visit(ServiceName serviceName);
         void Visit(LocalAddr localAddr);
