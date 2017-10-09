@@ -21,6 +21,11 @@ namespace zipkin4net.UTest
             Assert.IsInstanceOf<Event>(Annotations.Event(""));
             Assert.IsInstanceOf<ClientAddr>(Annotations.ClientAddr(null));
             Assert.IsInstanceOf<ServerAddr>(Annotations.ServerAddr(null, null));
+            Assert.IsInstanceOf<MessageAddr>(Annotations.MessageAddr(null, null));
+            Assert.IsInstanceOf<ConsumerStart>(Annotations.ConsumerStart());
+            Assert.IsInstanceOf<ConsumerStop>(Annotations.ConsumerStop());
+            Assert.IsInstanceOf<ProducerStart>(Annotations.ProducerStart());
+            Assert.IsInstanceOf<ProducerStop>(Annotations.ProducerStop());
         }
 
     }

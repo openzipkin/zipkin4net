@@ -49,6 +49,31 @@ namespace zipkin4net.Tracers.Zipkin
             AddTimestampedAnnotation(zipkinCoreConstants.WIRE_RECV);
         }
 
+        public void Visit(ProducerStart producerStart)
+        {
+            AddTimestampedAnnotation(zipkinCoreConstants.MESSAGE_SEND);
+        }
+
+        public void Visit(ProducerStop producerStop)
+        {
+            _span.SetAsComplete(_record.Timestamp);
+        }
+
+        public void Visit(ConsumerStart consumerStart)
+        {
+            AddTimestampedAnnotation(zipkinCoreConstants.MESSAGE_RECV);
+        }
+
+        public void Visit(ConsumerStop consumerStop)
+        {
+            _span.SetAsComplete(_record.Timestamp);
+        }
+
+        public void Visit(MessageAddr messageAddr)
+        {
+            AddBinaryAnnotation(zipkinCoreConstants.MESSAGE_ADDR, true, messageAddr.ServiceName, messageAddr.Endpoint);
+        }
+
         public void Visit(Event ev)
         {
             AddTimestampedAnnotation(ev.EventName);
