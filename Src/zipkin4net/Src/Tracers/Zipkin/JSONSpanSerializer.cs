@@ -9,7 +9,7 @@ namespace zipkin4net.Tracers.Zipkin
     public class JSONSpanSerializer : ISpanSerializer
     {
         private const char openingBrace = '{';
-        private const char closingBrace = '}';        
+        private const char closingBrace = '}';
         internal const char comma = ',';
         private const string annotations = "annotations";
         private const string binaryAnnotations = "binaryAnnotations";
@@ -26,7 +26,7 @@ namespace zipkin4net.Tracers.Zipkin
         private const string ipv4 = "ipv4";
         private const string port = "port";
         private const string serviceName = "serviceName";
-        
+
 
         public void SerializeTo(Stream stream, Span span)
         {
@@ -36,7 +36,7 @@ namespace zipkin4net.Tracers.Zipkin
                 SerializeSpan(writer, span);
                 writer.Write(WriterExtensions.closingBracket);
             }
-            
+
         }
 
         private void SerializeSpan(StreamWriter writer, Span span)
@@ -44,8 +44,12 @@ namespace zipkin4net.Tracers.Zipkin
             var serviceName = SerializerUtils.GetServiceNameOrDefault(span);
             var endPoint = span.Endpoint ?? SerializerUtils.DefaultEndPoint;
             writer.Write(openingBrace);
+            writer.WriteField(id, NumberUtils.EncodeLongToLowerHexString(span.SpanState.SpanId));
+            writer.Write(comma);
+            writer.WriteField(name, span.Name ?? SerializerUtils.DefaultRpcMethodName);
             if (span.Annotations.Count != 0)
             {
+                writer.Write(comma);
                 writer.WriteList(
                     SerializeAnnotation,
                     annotations,
@@ -68,12 +72,8 @@ namespace zipkin4net.Tracers.Zipkin
             writer.Write(comma);
             writer.WriteField(debug, false);
             writer.Write(comma);
-            writer.WriteField(id, NumberUtils.EncodeLongToLowerHexString(span.SpanState.SpanId));
-            writer.Write(comma);
-            writer.WriteField(name, span.Name ?? SerializerUtils.DefaultRpcMethodName);
-            writer.Write(comma);
             var hexTraceIdHigh = TraceManager.Trace128Bits ? NumberUtils.EncodeLongToLowerHexString(span.SpanState.TraceIdHigh) : "";
-            writer.WriteField(traceId, 
+            writer.WriteField(traceId,
                               hexTraceIdHigh
                               + NumberUtils.EncodeLongToLowerHexString(span.SpanState.TraceId));
 
