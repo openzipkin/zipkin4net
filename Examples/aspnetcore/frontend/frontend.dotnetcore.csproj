@@ -18,8 +18,11 @@
     <PackageReference Include="Microsoft.AspNetCore" Version="2.0.0" />
     <PackageReference Include="System.Net.Http" Version="4.3.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="2.0.0" />
-    <PackageReference Include="zipkin4net" Version="1.0.0" />
-    <PackageReference Include="zipkin4net.middleware.aspnetcore" Version="1.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../../../Src/zipkin4net/Src/zipkin4net.dotnetcore.csproj" />
+    <ProjectReference Include="../../../Src/zipkin4net.middleware.aspnetcore/Src/zipkin4net.middleware.aspnetcore.dotnetcore.csproj" />
   </ItemGroup>
 
   <PropertyGroup Condition=" '$(TargetFramework)' == 'netcoreapp1.0' ">
