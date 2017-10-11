@@ -63,6 +63,8 @@ namespace zipkin4net.Tracers.Zipkin
         /// </summary>
         public TimeSpan? Duration { get; private set; }
 
+        private const double MinimumDuration = 0.001;
+
 
         public Span(SpanState spanState, DateTime spanCreated)
         {
@@ -116,7 +118,16 @@ namespace zipkin4net.Tracers.Zipkin
 
             SpanStarted = startTime;
             TimeSpan? duration = endTime.Subtract(startTime);
-            Duration = duration.Value.TotalMilliseconds > 0 ? duration : null;
+            var durationValue = duration.Value.TotalMilliseconds;
+
+            if (durationValue <= 0)
+            {
+                Duration = null;
+            }
+            else
+            {
+                Duration = durationValue < MinimumDuration ? TimeSpan.FromTicks(TimeSpan.TicksPerMillisecond / 1000) : duration;
+            }
         }
 
         private bool TryGetLocalComponent(out BinaryAnnotation localComponentBinAnnotation)
