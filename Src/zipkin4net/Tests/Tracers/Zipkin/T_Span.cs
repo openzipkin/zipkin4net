@@ -78,6 +78,21 @@ namespace zipkin4net.UTest.Tracers.Zipkin
             Assert.AreEqual(3 * offset, span.Duration.Value.TotalMilliseconds);
         }
 
+        [Test]
+        public void MinimumDurationShouldBeAMicrosecond()
+        {
+            var spanState = new SpanState(1, null, 2, SpanFlags.None);
+            var span = new Span(spanState, TimeUtils.UtcNow);
+
+            var annotationTime = span.SpanCreated;
+            var recordServerRecv = new Record(spanState, annotationTime, Annotations.ServerRecv());
+            recordServerRecv.Annotation.Accept(new ZipkinAnnotationVisitor(recordServerRecv, span));
+            var recordServerSend = new Record(spanState, annotationTime.AddTicks(1), Annotations.ServerSend());
+            recordServerSend.Annotation.Accept(new ZipkinAnnotationVisitor(recordServerSend, span));
+            Assert.True(span.Duration.HasValue);
+            Assert.AreEqual(0.001, span.Duration.Value.TotalMilliseconds);
+        }
+
         [TestCase(-200, false)]
         [TestCase(-1, false)]
         [TestCase(0, false)]
