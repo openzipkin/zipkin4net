@@ -60,7 +60,7 @@ namespace zipkin4net.UTest.Tracers.Zipkin
         [Test]
         public void ClientDurationIsPreferredOverServer()
         {
-            var spanState = new SpanState(1, 0, 2, SpanFlags.None);
+            var spanState = new SpanState(1, null, 2, SpanFlags.None);
             var span = new Span(spanState, TimeUtils.UtcNow);
             const int offset = 10;
 
