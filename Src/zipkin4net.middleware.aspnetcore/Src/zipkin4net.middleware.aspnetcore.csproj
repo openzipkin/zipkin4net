@@ -32,7 +32,12 @@
   <ItemGroup>
     <Reference Include="Microsoft.AspNetCore" Version="1.1.1" />
     <Reference Include="Microsoft.Extensions.Logging" Version="1.1.1" />
-    <Reference Include="Criteo.Profiling.Tracing" Version="0.4.3" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\zipkin4net\Src\zipkin4net.csproj">
+      <Project>{48712463-66ff-4c76-b63d-097b57a1477f}</Project>
+      <Name>zipkin4net</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="TracingMiddleware.cs" />

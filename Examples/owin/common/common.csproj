@@ -33,9 +33,6 @@
     <Reference Include="apache-thrift-netcore, Version=0.9.3.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\apache-thrift-netcore.0.9.3.1\lib\net35\apache-thrift-netcore.dll</HintPath>
     </Reference>
-    <Reference Include="zipkin4net, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>$(SolutionDir)\packages\zipkin4net.1.0.0\lib\net45\zipkin4net.dll</HintPath>
-    </Reference>
     <Reference Include="Microsoft.Owin, Version=3.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>$(SolutionDir)\packages\Microsoft.Owin.3.1.0\lib\net45\Microsoft.Owin.dll</HintPath>
     </Reference>
@@ -69,6 +66,10 @@
     <ProjectReference Include="..\..\..\Src\zipkin4net.middleware.owin\Src\zipkin4net.middleware.owin.csproj">
       <Project>{6a57c709-4443-4735-94cf-19de60b00f59}</Project>
       <Name>zipkin4net.middleware.owin</Name>
+    </ProjectReference>
+	<ProjectReference Include="..\..\..\Src\zipkin4net\Src\zipkin4net.csproj">
+      <Project>{48712463-66ff-4c76-b63d-097b57a1477f}</Project>
+      <Name>zipkin4net</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
