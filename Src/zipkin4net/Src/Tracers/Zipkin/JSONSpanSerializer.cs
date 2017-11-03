@@ -46,7 +46,7 @@ namespace zipkin4net.Tracers.Zipkin
             writer.Write(openingBrace);
             writer.WriteField(id, NumberUtils.EncodeLongToLowerHexString(span.SpanState.SpanId));
             writer.Write(comma);
-            writer.WriteField(name, span.Name == null ? SerializerUtils.ToEscaped(span.Name) : SerializerUtils.DefaultRpcMethodName);
+            writer.WriteField(name, span.Name != null ? SerializerUtils.ToEscaped(span.Name) : SerializerUtils.DefaultRpcMethodName);
             if (span.Annotations.Count != 0)
             {
                 writer.Write(comma);
@@ -112,7 +112,7 @@ namespace zipkin4net.Tracers.Zipkin
             writer.Write(openingBrace);
             writer.WriteField(timestamp, annotation.Timestamp.ToUnixTimestamp());
             writer.Write(comma);
-            writer.WriteField(value, annotation.Value);
+            writer.WriteField(value, SerializerUtils.ToEscaped(annotation.Value));
             writer.Write(comma);
             writer.WriteAnchor(endpoint);
             SerializeEndPoint(writer, endPoint, serviceName);
