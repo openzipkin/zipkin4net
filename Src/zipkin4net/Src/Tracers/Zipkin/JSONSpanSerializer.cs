@@ -46,7 +46,7 @@ namespace zipkin4net.Tracers.Zipkin
             writer.Write(openingBrace);
             writer.WriteField(id, NumberUtils.EncodeLongToLowerHexString(span.SpanState.SpanId));
             writer.Write(comma);
-            writer.WriteField(name, span.Name ?? SerializerUtils.DefaultRpcMethodName);
+            writer.WriteField(name, span.Name == null ? SerializerUtils.ToEscaped(span.Name) : SerializerUtils.DefaultRpcMethodName);
             if (span.Annotations.Count != 0)
             {
                 writer.Write(comma);
@@ -100,7 +100,7 @@ namespace zipkin4net.Tracers.Zipkin
             writer.Write(openingBrace);
             writer.WriteField(key, binaryAnnotation.Key);
             writer.Write(comma);
-            writer.WriteField(value, Encoding.UTF8.GetString(binaryAnnotation.Value));
+            writer.WriteField(value, SerializerUtils.ToEscaped(Encoding.UTF8.GetString(binaryAnnotation.Value)));
             writer.Write(comma);
             writer.WriteAnchor(endpoint);
             SerializeEndPoint(writer, endPoint, serviceName);
@@ -126,7 +126,7 @@ namespace zipkin4net.Tracers.Zipkin
             writer.Write(comma);
             writer.WriteField(port, (short)endPoint.Port);
             writer.Write(comma);
-            writer.WriteField(JSONSpanSerializer.serviceName, serviceName);
+            writer.WriteField(JSONSpanSerializer.serviceName, SerializerUtils.ToEscaped(serviceName));
             writer.Write(closingBrace);
         }
     }
