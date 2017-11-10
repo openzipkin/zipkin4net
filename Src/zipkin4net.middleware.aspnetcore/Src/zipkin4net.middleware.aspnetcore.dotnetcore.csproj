@@ -1,14 +1,13 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard1.6</TargetFramework>
+    <TargetFrameworks>netstandard1.6;net461</TargetFrameworks>
     <AssemblyName>zipkin4net.middleware.aspnetcore</AssemblyName>
     <PackageId>zipkin4net.middleware.aspnetcore</PackageId>
     <Description>Asp.net core middleware for zipkin4net</Description>
     <Copyright>Copyright 2017, Criteo</Copyright>
     <VersionPrefix>1.1.0</VersionPrefix>
     <Authors>Criteo</Authors>
-    <TargetFrameworks>net461;netstandard1.6</TargetFrameworks>
     <PackageTags>Zipkin;Tracer;Tracing;Criteo;Asp.net core</PackageTags>
     <PackageReleaseNotes>Asp.net core middleware for zipkin4net</PackageReleaseNotes>
     <PackageProjectUrl>https://github.com/openzipkin/zipkin4net</PackageProjectUrl>
