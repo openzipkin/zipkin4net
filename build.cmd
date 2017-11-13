@@ -1,5 +1,7 @@
 @echo off
 cls
 
-nuget restore packages.config -PackagesDirectory build-packages
-build-packages\FAKE.4.63.0\tools\FAKE.exe build.fsx %*
+dotnet restore "zipkin4net.dotnetcore.sln"
+dotnet build "zipkin4net.dotnetcore.sln"
+dotnet test "Src/zipkin4net/Tests/zipkin4net.Tests.dotnetcore.csproj"
+dotnet test "Src/zipkin4net.middleware.owin/Tests/zipkin4net.middleware.owin.Tests.dotnetcore.csproj"
