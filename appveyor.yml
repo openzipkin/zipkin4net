@@ -1,20 +1,32 @@
-version: '1.0.{build}'
+version: '{build}'
+pull_requests:
+  do_not_increment_build_number: true
+nuget:
+  disable_publish_on_pr: true
 configuration:
-- Debug
 - Release
-platform: Any CPU
+artifacts:  
+- path: .\artifacts\*.nupkg
+  name: NuGet
 environment:
   DOTNET_CLI_TELEMETRY_OPTOUT: 1
-init:
-- ps: $Env:LABEL = "CI" + $Env:APPVEYOR_BUILD_NUMBER.PadLeft(5, "0")
 before_build:
 - appveyor-retry dotnet restore zipkin4net.dotnetcore.sln --verbosity Minimal
 build_script:
-- dotnet build "zipkin4net.dotnetcore.sln" -c %CONFIGURATION% --version-suffix %LABEL%
+- dotnet build "zipkin4net.dotnetcore.sln" -c %CONFIGURATION%
 after_build:
-- dotnet pack "zipkin4net.dotnetcore.sln" -c %CONFIGURATION% --no-build --version-suffix %LABEL% -o artifacts
+- dotnet pack /p:PackageVersion=%APPVEYOR_REPO_TAG_NAME% "Src\zipkin4net\Src\zipkin4net.dotnetcore.csproj" -c %CONFIGURATION% --no-build -o %APPVEYOR_BUILD_FOLDER%\artifacts
+- dotnet pack /p:PackageVersion=%APPVEYOR_REPO_TAG_NAME% "Src\zipkin4net.middleware.aspnetcore\Src\zipkin4net.middleware.aspnetcore.dotnetcore.csproj" -c %CONFIGURATION% --no-build -o %APPVEYOR_BUILD_FOLDER%\artifacts
 test_script:
 - dotnet test "Src/zipkin4net/Tests/zipkin4net.Tests.dotnetcore.csproj" -c %CONFIGURATION%
 - dotnet test "Src/zipkin4net.middleware.owin/Tests/zipkin4net.middleware.owin.Tests.dotnetcore.csproj" -c %CONFIGURATION%
 cache:
 - '%USERPROFILE%\.nuget\packages'
+deploy:
+- provider: NuGet
+  server: https://www.myget.org/F/zipkin4net/api/v3/index.json
+  api_key:
+    secure: 7W7+59wfbyDsQCbZNSe/9O4GgN9cPna6QMc2ZA/be3HyQ0xXLnmwLqrxSw8HMmPt
+  on:
+    branch: master
+    appveyor_repo_tag: true
