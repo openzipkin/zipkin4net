@@ -24,9 +24,9 @@ cache:
 - '%USERPROFILE%\.nuget\packages'
 deploy:
 - provider: NuGet
-  server: https://www.myget.org/F/zipkin4net/api/v3/index.json
+  name: production
   api_key:
-    secure: 7W7+59wfbyDsQCbZNSe/9O4GgN9cPna6QMc2ZA/be3HyQ0xXLnmwLqrxSw8HMmPt
+    secure: Q+PmM3QKYduzOcG0CdSEEeowv+0H3dUecVOwJE22j7CwgO4W7NCkmb+TPLbPvfII
   on:
     branch: master
     appveyor_repo_tag: true
