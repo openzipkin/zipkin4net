@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26730.15
+VisualStudioVersion = 15.0.27130.2010
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "zipkin4net.dotnetcore", "Src\zipkin4net\Src\zipkin4net.dotnetcore.csproj", "{537FF480-331E-4567-AA77-1BAF43F205CB}"
 EndProject
@@ -26,6 +26,10 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "example.owin.frontend.dotnetcore", "Examples\owin\frontend\example.owin.frontend.dotnetcore.csproj", "{F92CE013-4974-45D6-973B-0E03D49CE405}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "example.owin.common.dotnetcore", "Examples\owin\common\example.owin.common.dotnetcore.csproj", "{6C3CEF75-174F-436B-B252-F2F339521307}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "examples", "examples", "{DD8D68DE-B823-422F-B22B-E28B8FA1397E}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{8DC9F862-EC74-4F2B-BAB1-C445C76E6EC6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -84,6 +88,13 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{5BCC39BF-CCB1-450C-8831-389A4B935A4A} = {8DC9F862-EC74-4F2B-BAB1-C445C76E6EC6}
+		{6FFC4FC6-725F-4463-922C-79DCC48DF3D7} = {8DC9F862-EC74-4F2B-BAB1-C445C76E6EC6}
+		{CB09552F-2BE0-453F-8F1E-A3B51CC9667D} = {DD8D68DE-B823-422F-B22B-E28B8FA1397E}
+		{F92CE013-4974-45D6-973B-0E03D49CE405} = {DD8D68DE-B823-422F-B22B-E28B8FA1397E}
+		{6C3CEF75-174F-436B-B252-F2F339521307} = {DD8D68DE-B823-422F-B22B-E28B8FA1397E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {624F3E6A-F976-434B-9D83-591B0F35D42B}

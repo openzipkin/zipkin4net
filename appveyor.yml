@@ -15,8 +15,9 @@ before_build:
 build_script:
 - dotnet build "zipkin4net.dotnetcore.sln" -c %CONFIGURATION%
 after_build:
-- dotnet pack /p:PackageVersion="%APPVEYOR_REPO_TAG_NAME%" "Src\zipkin4net\Src\zipkin4net.dotnetcore.csproj" -c %CONFIGURATION% --no-build -o %APPVEYOR_BUILD_FOLDER%\artifacts
-- dotnet pack /p:PackageVersion="%APPVEYOR_REPO_TAG_NAME%" "Src\zipkin4net.middleware.aspnetcore\Src\zipkin4net.middleware.aspnetcore.dotnetcore.csproj" -c %CONFIGURATION% --no-build -o %APPVEYOR_BUILD_FOLDER%\artifacts
+- dotnet pack /p:PackageVersion="%APPVEYOR_REPO_TAG_NAME%" "Src\zipkin4net\Src\zipkin4net.dotnetcore.csproj" -c %CONFIGURATION% --no-build --no-restore -o %APPVEYOR_BUILD_FOLDER%\artifacts
+- dotnet pack /p:PackageVersion="%APPVEYOR_REPO_TAG_NAME%" "Src\zipkin4net.middleware.aspnetcore\Src\zipkin4net.middleware.aspnetcore.dotnetcore.csproj" -c %CONFIGURATION% --no-build --no-restore -o %APPVEYOR_BUILD_FOLDER%\artifacts
+- dotnet pack /p:PackageVersion="%APPVEYOR_REPO_TAG_NAME%" "Src\zipkin4net.middleware.owin\Src\zipkin4net.middleware.owin.dotnetcore.csproj" -c %CONFIGURATION% --no-build --no-restore -o %APPVEYOR_BUILD_FOLDER%\artifacts
 test_script:
 - dotnet test "Src/zipkin4net/Tests/zipkin4net.Tests.dotnetcore.csproj" -c %CONFIGURATION%
 - dotnet test "Src/zipkin4net.middleware.owin/Tests/zipkin4net.middleware.owin.Tests.dotnetcore.csproj" -c %CONFIGURATION%
