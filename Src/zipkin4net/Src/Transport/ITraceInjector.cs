@@ -9,6 +9,7 @@ namespace zipkin4net.Transport
     * a trace. It can for example be used to propagate
     * B3 headers in http headers.
     */
+    [Obsolete("Please use Propagation.IPropagation instead")]
     public interface ITraceInjector
     {
         bool Inject<TE>(Trace trace, TE carrier, Action<TE, string, string> injector);
@@ -21,6 +22,7 @@ namespace zipkin4net.Transport
     * a trace. It can for example be used to propagate
     * B3 headers in http headers.
     */
+    [Obsolete("Please use Propagation.IPropagation instead")]
     public interface ITraceInjector<in TE>
     {
         bool Inject(Trace trace, TE carrier);
