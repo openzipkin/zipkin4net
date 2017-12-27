@@ -3,6 +3,8 @@ using zipkin4net.Tracers;
 using NSubstitute;
 using NUnit.Framework;
 using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -52,10 +54,10 @@ namespace zipkin4net.Middleware.Tests
             var urlToCall = new Uri("http://testserver/api/values?foo=bar");
             var serviceName = "OwinTest";
 
-            Func<HttpClient, Task> clientCall = async (client) =>
+            Func<HttpClient, Task<string>> clientCall = async (client) =>
             {
                 var response = await client.GetAsync(urlToCall);
-                var result = await response.Content.ReadAsStringAsync();
+                return await response.Content.ReadAsStringAsync();
             };
 
             //Act
@@ -68,14 +70,14 @@ namespace zipkin4net.Middleware.Tests
 
             if (!IsRunningOnMono)
             {
-                Assert.That(records.Any(r => r.Annotation is ServerRecv), Is.True.After(DelayInMilliseconds, PollingInterval));
-                Assert.That(records.Any(r => r.Annotation is ServerSend), Is.True.After(DelayInMilliseconds, PollingInterval));
-                Assert.That(records.Any(r => r.Annotation is Rpc && ((Rpc)r.Annotation).Name == "GET"), Is.True.After(DelayInMilliseconds, PollingInterval));
-                Assert.That(records.Any(r => r.Annotation is ServiceName && ((ServiceName)r.Annotation).Service == serviceName), Is.True.After(DelayInMilliseconds, PollingInterval));
+                AssertAnnotationReceived<ServerRecv>(records);
+                AssertAnnotationReceived<ServerSend>(records);
+                AssertAnnotationReceived<Rpc>(records, rpc => rpc.Name == "GET");
+                AssertAnnotationReceived<ServiceName>(records, serviceNameAnnotation => serviceNameAnnotation.Service == serviceName);
             }
-            Assert.That(records.Any(r => r.Annotation is TagAnnotation && has("http.host", urlToCall.Host, (TagAnnotation)r.Annotation)), Is.True.After(DelayInMilliseconds, PollingInterval));
-            Assert.That(records.Any(r => r.Annotation is TagAnnotation && has("http.url", urlToCall.AbsoluteUri, (TagAnnotation)r.Annotation)), Is.True.After(DelayInMilliseconds, PollingInterval));
-            Assert.That(records.Any(r => r.Annotation is TagAnnotation && has("http.path", urlToCall.AbsolutePath, (TagAnnotation)r.Annotation)), Is.True.After(DelayInMilliseconds, PollingInterval));
+            AssertAnnotationReceived<TagAnnotation>(records, tag => has("http.host", urlToCall.Host, tag));
+            AssertAnnotationReceived<TagAnnotation>(records, tag => has("http.url", urlToCall.AbsoluteUri, tag));
+            AssertAnnotationReceived<TagAnnotation>(records, tag => has("http.path", urlToCall.AbsolutePath, tag));
         }
 
         [Test]
@@ -85,14 +87,15 @@ namespace zipkin4net.Middleware.Tests
             var urlToCall = new Uri("http://testserver/api/values");
             var serviceName = "OwinTest";
 
-            Func<HttpClient, Task> clientCall = async (client) =>
+            Func<HttpClient, Task<string>> clientCall = async (client) =>
             {
                 var response = await client.PostAsync(urlToCall, new StringContent(""));
-                var result = await response.Content.ReadAsStringAsync();
+                return await response.Content.ReadAsStringAsync();
             };
 
             //Act
-            await Call(DefaultStartup(serviceName, _traceExtractor), clientCall);
+            var responseContent = await Call(DefaultStartup(serviceName, _traceExtractor), clientCall);
+            Assert.IsNotEmpty(responseContent);
 
             //Assert
             Trace trace = null;
@@ -101,14 +104,25 @@ namespace zipkin4net.Middleware.Tests
             var records = _tracer.Records;
             if (!IsRunningOnMono)
             {
-                Assert.That(records.Any(r => r.Annotation is ServerRecv), Is.True.After(DelayInMilliseconds, PollingInterval));
-                Assert.That(records.Any(r => r.Annotation is ServerSend), Is.True.After(DelayInMilliseconds, PollingInterval));
-                Assert.That(records.Any(r => r.Annotation is Rpc && ((Rpc)r.Annotation).Name == "POST"), Is.True.After(DelayInMilliseconds, PollingInterval));
-                Assert.That(records.Any(r => r.Annotation is ServiceName && ((ServiceName)r.Annotation).Service == serviceName), Is.True.After(DelayInMilliseconds, PollingInterval));
+                AssertAnnotationReceived<ServerRecv>(records);
+                AssertAnnotationReceived<ServerSend>(records);
+                AssertAnnotationReceived<Rpc>(records, rpc => rpc.Name == "POST");
+                AssertAnnotationReceived<ServiceName>(records, serviceNameAnnotation => serviceNameAnnotation.Service == serviceName);
             }
-            Assert.That(records.Any(r => r.Annotation is TagAnnotation && has("http.host", urlToCall.Host, (TagAnnotation)r.Annotation)), Is.True.After(DelayInMilliseconds, PollingInterval));
-            Assert.That(records.Any(r => r.Annotation is TagAnnotation && has("http.url", urlToCall.AbsoluteUri, (TagAnnotation)r.Annotation)), Is.True.After(DelayInMilliseconds, PollingInterval));
-            Assert.That(records.Any(r => r.Annotation is TagAnnotation && has("http.path", urlToCall.AbsolutePath, (TagAnnotation)r.Annotation)), Is.True.After(DelayInMilliseconds, PollingInterval));
+            AssertAnnotationReceived<TagAnnotation>(records, tag => has("http.host", urlToCall.Host, tag));
+            AssertAnnotationReceived<TagAnnotation>(records, tag => has("http.url", urlToCall.AbsoluteUri, tag));
+            AssertAnnotationReceived<TagAnnotation>(records, tag => has("http.path", urlToCall.AbsolutePath, tag));
+        }
+
+        private static void AssertAnnotationReceived<T>(IEnumerable<Record> records)
+        {
+            AssertAnnotationReceived<T>(records, annotation => true);
+        }
+
+        private static void AssertAnnotationReceived<T>(IEnumerable<Record> records, Func<T, bool> assertionOnAnnotation)
+        {
+            Assert.That(records.Any(r => r.Annotation is T && assertionOnAnnotation((T) r.Annotation)), Is.True.After(DelayInMilliseconds, PollingInterval),
+                $"Didn't get {typeof(T)} annotation within 5s. Annotations: {records}");
         }
     }
 }
