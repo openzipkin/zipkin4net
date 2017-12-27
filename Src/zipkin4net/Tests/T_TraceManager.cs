@@ -63,7 +63,7 @@ namespace zipkin4net.UTest
             tracerThatThrow.Setup(tracer1 => tracer1.Record(It.IsAny<Record>())).Throws(new Exception(errorMessage));
             TraceManager.RegisterTracer(tracerThatThrow.Object);
 
-            var record = new Record(new SpanState(0, null, 1, SpanFlags.None), TimeUtils.UtcNow, Annotations.ClientRecv());
+            var record = new Record(new SpanState(0, null, 1, isSampled: null, isDebug: false), TimeUtils.UtcNow, Annotations.ClientRecv());
 
             Assert.DoesNotThrow(() => TraceManager.Push(record));
 
@@ -81,7 +81,7 @@ namespace zipkin4net.UTest
             var tracerThatDontThrow = new Mock<ITracer>();
             TraceManager.RegisterTracer(tracerThatDontThrow.Object); // on the assumption that tracer registration order is preserved
 
-            var record = new Record(new SpanState(0, null, 1, SpanFlags.None), TimeUtils.UtcNow, Annotations.ClientRecv());
+            var record = new Record(new SpanState(0, null, 1, isSampled: null, isDebug: false), TimeUtils.UtcNow, Annotations.ClientRecv());
             TraceManager.Push(record);
 
             tracerThatThrows.Verify(t => t.Record(It.IsAny<Record>()));
