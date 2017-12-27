@@ -1,8 +1,22 @@
-[![Gitter chat](http://img.shields.io/badge/gitter-join%20chat%20%E2%86%92-brightgreen.svg)](https://gitter.im/openzipkin/zipkin) [![Build Status](https://travis-ci.org/openzipkin/zipkin4net.svg?branch=master)](https://travis-ci.org/openzipkin/zipkin4net)
+[![Gitter chat](http://img.shields.io/badge/gitter-join%20chat%20%E2%86%92-brightgreen.svg)](https://gitter.im/openzipkin/zipkin)
+
 
 # Zipkin4net
 
 A .NET client library for [Zipkin](http://zipkin.io).
+
+## Build status
+
+[windows-build-badge]: https://travis-ci.org/openzipkin/zipkin4net.svg?branch=master
+[windows-build]: https://ci.appveyor.com/project/fedj/zipkin4net
+
+[linux-build-badge]: https://travis-ci.org/openzipkin/zipkin4net.svg?branch=master
+[linux-build]: https://travis-ci.org/openzipkin/zipkin4net
+
+|Linux|Windows|
+|:------:|:------:|
+|[![][linux-build-badge]][linux-build]|[![][windows-build-badge]][windows-build]|
+
 
 ## What it provides
 
