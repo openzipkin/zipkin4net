@@ -7,11 +7,11 @@ namespace zipkin4net
     {
         private const string DatetimeFormat = "MMdd HH:mm:ss.fff";
 
-        private readonly SpanState _spanState;
+        private readonly ITraceContext _spanState;
         private readonly DateTime _timestamp;
         private readonly IAnnotation _annotation;
 
-        public Record(SpanState spanState, DateTime timestamp, IAnnotation annotation)
+        public Record(ITraceContext spanState, DateTime timestamp, IAnnotation annotation)
         {
             _spanState = spanState;
             _timestamp = timestamp;
@@ -28,7 +28,7 @@ namespace zipkin4net
             get { return _annotation; }
         }
 
-        public SpanState SpanState
+        public ITraceContext SpanState
         {
             get { return _spanState; }
         }

@@ -53,7 +53,7 @@ namespace zipkin4net.UTest.Transport
 
         private static void CheckSetHeadersThenGetTrace_Dict(long? parentSpanId)
         {
-            var spanState = new SpanState(2, 1, parentSpanId, 2, SpanFlags.None);
+            var spanState = new SpanState(2, 1, parentSpanId, 2, isSampled: null, isDebug: false);
             var originalTrace = Trace.CreateFromId(spanState);
 
             var headers = new Dictionary<string, string>();
@@ -69,7 +69,7 @@ namespace zipkin4net.UTest.Transport
 
         private static void CheckSetHeadersThenGetTrace_NVC(long? parentSpanId)
         {
-            var spanState = new SpanState(2, 1, parentSpanId, 2, SpanFlags.None);
+            var spanState = new SpanState(2, 1, parentSpanId, 2, isSampled: null, isDebug: false);
             var originalTrace = Trace.CreateFromId(spanState);
 
             var headers = new NameValueCollection();

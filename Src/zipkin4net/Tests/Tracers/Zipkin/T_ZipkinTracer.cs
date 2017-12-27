@@ -69,7 +69,7 @@ namespace zipkin4net.UTest.Tracers.Zipkin
         {
             var now = TimeUtils.UtcNow;
 
-            var firstSpanState = new SpanState(traceId: 1, parentSpanId: 0, spanId: 4874542152, flags: SpanFlags.None);
+            var firstSpanState = new SpanState(traceId: 1, parentSpanId: 0, spanId: 4874542152, isSampled: null, isDebug: false);
             var record = new Record(firstSpanState, now, Annotations.ServerRecv());
 
             _tracer.Record(record);
@@ -81,7 +81,7 @@ namespace zipkin4net.UTest.Tracers.Zipkin
 
             _spanSender.Verify(sender => sender.Send(It.IsAny<byte[]>()), Times.Never());
 
-            var newerSpanState = new SpanState(traceId: 2, parentSpanId: 0, spanId: 9988415021, flags: SpanFlags.None);
+            var newerSpanState = new SpanState(traceId: 2, parentSpanId: 0, spanId: 9988415021, isSampled: null, isDebug: false);
             var newerRecord = new Record(newerSpanState, futureTime, Annotations.ServerRecv());
             _tracer.Record(newerRecord); // creates a second span
 

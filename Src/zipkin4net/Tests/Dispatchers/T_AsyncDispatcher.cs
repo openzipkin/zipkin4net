@@ -26,7 +26,7 @@ namespace zipkin4net.UTest.Dispatchers
         {
             var sync = new ManualResetEvent(false);
 
-            var record = new Record(new SpanState(1, 0, 1, SpanFlags.None), TimeUtils.UtcNow, Annotations.ClientRecv());
+            var record = new Record(new SpanState(1, 0, 1, isSampled: null, isDebug: false), TimeUtils.UtcNow, Annotations.ClientRecv());
 
             Record dispatchedRecord = null;
 
@@ -49,7 +49,7 @@ namespace zipkin4net.UTest.Dispatchers
         {
             var sync = new ManualResetEvent(false);
 
-            var record = new Record(new SpanState(1, 0, 1, SpanFlags.None), TimeUtils.UtcNow, Annotations.ClientRecv());
+            var record = new Record(new SpanState(1, 0, 1, isSampled: null, isDebug: false), TimeUtils.UtcNow, Annotations.ClientRecv());
 
             int recordsDispatched = 0;
 
@@ -77,8 +77,8 @@ namespace zipkin4net.UTest.Dispatchers
         {
             var sync = new CountdownEvent(2);
             var traceId = 1;
-            var firstRecord = new Record(new SpanState(traceId, 0, 1, SpanFlags.None), TimeUtils.UtcNow, Annotations.ClientRecv());
-            var secondRecord = new Record(new SpanState(traceId, 0, 1, SpanFlags.None), TimeUtils.UtcNow, Annotations.ClientRecv());
+            var firstRecord = new Record(new SpanState(traceId, 0, 1, isSampled: null, isDebug: false), TimeUtils.UtcNow, Annotations.ClientRecv());
+            var secondRecord = new Record(new SpanState(traceId, 0, 1, isSampled: null, isDebug: false), TimeUtils.UtcNow, Annotations.ClientRecv());
 
             var queue = new ConcurrentQueue<Record>();
 
@@ -109,7 +109,7 @@ namespace zipkin4net.UTest.Dispatchers
         [Ignore("Flaky on loaded jenkins slaves")]
         public void DispatcherShouldNotEnqueueMessagesInfinitely()
         {
-            var record = new Record(new SpanState(1, 0, 1, SpanFlags.None), TimeUtils.UtcNow, Annotations.ClientRecv());
+            var record = new Record(new SpanState(1, 0, 1, isSampled: null, isDebug: false), TimeUtils.UtcNow, Annotations.ClientRecv());
             var logger = new Mock<ILogger>();
 
             const int maxCapacity = 10;

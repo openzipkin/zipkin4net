@@ -30,7 +30,7 @@ namespace zipkin4net.UTest.Tracers.Zipkin
             long? parentId = 0;
             if (isRootSpan)
                 parentId = null;
-            var spanState = new SpanState(1, parentId, 2, SpanFlags.None);
+            var spanState = new SpanState(1, parentId, 2, isSampled: null, isDebug: false);
             var spanCreatedTimestamp = TimeUtils.UtcNow;
             var span = new Span(spanState, spanCreatedTimestamp);
 
@@ -62,7 +62,7 @@ namespace zipkin4net.UTest.Tracers.Zipkin
         [Test]
         public void ClientDurationIsPreferredOverServer()
         {
-            var spanState = new SpanState(1, null, 2, SpanFlags.None);
+            var spanState = new SpanState(1, null, 2, isSampled: null, isDebug: false);
             var span = new Span(spanState, TimeUtils.UtcNow);
             const int offset = 10;
 
@@ -83,7 +83,7 @@ namespace zipkin4net.UTest.Tracers.Zipkin
         [Test]
         public void MinimumDurationShouldBeAMicrosecond()
         {
-            var spanState = new SpanState(1, null, 2, SpanFlags.None);
+            var spanState = new SpanState(1, null, 2, isSampled: null, isDebug: false);
             var span = new Span(spanState, TimeUtils.UtcNow);
 
             var annotationTime = span.SpanCreated;
@@ -133,7 +133,7 @@ namespace zipkin4net.UTest.Tracers.Zipkin
 
         private static TimeSpan? GetSpanDuration(int offset, IAnnotation firstAnnotation, IAnnotation secondAnnotation = null)
         {
-            var spanState = new SpanState(1, 0, 2, SpanFlags.None);
+            var spanState = new SpanState(1, 0, 2, isSampled: null, isDebug: false);
             var span = new Span(spanState, TimeUtils.UtcNow);
 
             var annotationTime = TimeUtils.UtcNow;

@@ -14,7 +14,7 @@ namespace zipkin4net.UTest.Tracers.Zipkin
     internal class T_ZipkinAnnotationVisitor
     {
 
-        private static readonly SpanState SpanState = new SpanState(1, 0, 2, SpanFlags.None);
+        private static readonly SpanState SpanState = new SpanState(1, 0, 2, isSampled: null, isDebug: false);
 
         [Test]
         public void RpcNameAnnotationChangesSpanName()

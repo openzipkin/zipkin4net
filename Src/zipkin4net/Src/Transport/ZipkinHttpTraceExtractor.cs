@@ -49,7 +49,7 @@ namespace zipkin4net.Transport
 
             try
             {
-				var traceIdHigh = ExtractTraceIdHigh(encodedTraceId);
+                var traceIdHigh = ExtractTraceIdHigh(encodedTraceId);
                 var traceId = ExtractTraceId(encodedTraceId);
                 var spanId = NumberUtils.DecodeHexString(encodedSpanId);
                 var parentSpanId = string.IsNullOrWhiteSpace(encodedParentSpanId) ? null : (long?)NumberUtils.DecodeHexString(encodedParentSpanId);
@@ -65,9 +65,15 @@ namespace zipkin4net.Transport
                         flags = flags | SpanFlags.Sampled;
                     }
                 }
+                else
+                {
+                    if ((flags & SpanFlags.SamplingKnown) == SpanFlags.SamplingKnown)
+                    {
+                        sampled = (flags & SpanFlags.Sampled) == SpanFlags.Sampled;
+                    }
+                }
 
-
-                var state = new SpanState(traceIdHigh, traceId, parentSpanId, spanId, flags);
+                var state = new SpanState(traceIdHigh, traceId, parentSpanId, spanId, sampled, (flags & SpanFlags.Debug) == SpanFlags.Debug);
                 trace = Trace.CreateFromId(state);
                 return true;
             }
