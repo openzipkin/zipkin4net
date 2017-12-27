@@ -92,14 +92,14 @@ Zipkin is designed to handle complete spans. However, an incorrect usage of the 
 
 - ServerRecv and ServerSend annotations
 - ClientSend and ClientRecv annotations
-- LocalComponentStart and LocalComponentStop annotations
+- LocalOperationStart and LocalOperationStop annotations
 
 ### When are my traces/spans sent?
 
 A span is sent asynchronously to the zipkin collector when one of the following annotation is recorded:
 - ServerSend
 - ClientRecv
-- LocalComponentStop
+- LocalOperationStop
 
 with the matching opening annotation specified above (matching means same (traceId, spanId, parentSpanId)).
 

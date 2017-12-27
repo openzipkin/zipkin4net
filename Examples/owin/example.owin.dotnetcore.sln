@@ -1,0 +1,49 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.26730.15
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "example.owin.backend.dotnetcore", "backend\example.owin.backend.dotnetcore.csproj", "{D2FB6E3F-D332-442A-84C3-8CF565620EF0}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "example.owin.common.dotnetcore", "common\example.owin.common.dotnetcore.csproj", "{36E668EE-6679-4A5E-83DC-05C97DB77D91}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "example.owin.frontend.dotnetcore", "frontend\example.owin.frontend.dotnetcore.csproj", "{E991417B-CE7F-4BAA-AB5C-70E605F8E34E}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "zipkin4net.middleware.owin.dotnetcore", "..\..\Src\zipkin4net.middleware.owin\Src\zipkin4net.middleware.owin.dotnetcore.csproj", "{F847B86D-306A-43F7-901E-D3E25642CCA7}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "zipkin4net.dotnetcore", "..\..\Src\zipkin4net\Src\zipkin4net.dotnetcore.csproj", "{CE163FEB-99D2-41B3-8EB4-763E62383309}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D2FB6E3F-D332-442A-84C3-8CF565620EF0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D2FB6E3F-D332-442A-84C3-8CF565620EF0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D2FB6E3F-D332-442A-84C3-8CF565620EF0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D2FB6E3F-D332-442A-84C3-8CF565620EF0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{36E668EE-6679-4A5E-83DC-05C97DB77D91}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{36E668EE-6679-4A5E-83DC-05C97DB77D91}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{36E668EE-6679-4A5E-83DC-05C97DB77D91}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{36E668EE-6679-4A5E-83DC-05C97DB77D91}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E991417B-CE7F-4BAA-AB5C-70E605F8E34E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E991417B-CE7F-4BAA-AB5C-70E605F8E34E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E991417B-CE7F-4BAA-AB5C-70E605F8E34E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E991417B-CE7F-4BAA-AB5C-70E605F8E34E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F847B86D-306A-43F7-901E-D3E25642CCA7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F847B86D-306A-43F7-901E-D3E25642CCA7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F847B86D-306A-43F7-901E-D3E25642CCA7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F847B86D-306A-43F7-901E-D3E25642CCA7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CE163FEB-99D2-41B3-8EB4-763E62383309}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CE163FEB-99D2-41B3-8EB4-763E62383309}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CE163FEB-99D2-41B3-8EB4-763E62383309}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CE163FEB-99D2-41B3-8EB4-763E62383309}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {3A58B285-6049-485C-A856-93D1C953C496}
+	EndGlobalSection
+EndGlobal
