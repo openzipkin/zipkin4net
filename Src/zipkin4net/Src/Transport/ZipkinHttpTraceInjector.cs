@@ -1,73 +1,56 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.Globalization;
-using zipkin4net.Utils;
+using zipkin4net.Propagation;
 
 namespace zipkin4net.Transport
 {
     /**
      * Inject B3 headers into HTTP headers.
      */
+    [Obsolete("Please use Propagation.IPropagation instead")]
     public class ZipkinHttpTraceInjector : ITraceInjector<NameValueCollection>, ITraceInjector<IDictionary<string, string>>, ITraceInjector
     {
-        public bool Inject<TE>(Trace trace, TE carrier, Action<TE, string, string> injector)
+        private class ZipkinHttpTraceInjectorSetter<C> : ISetter<C, string>
         {
-            var spanState = trace.CurrentSpan;
+            private readonly Action<C, string, string> _injector;
 
-            injector(carrier, ZipkinHttpHeaders.TraceId, SerializeTraceId(spanState));
-            injector(carrier, ZipkinHttpHeaders.SpanId, NumberUtils.EncodeLongToLowerHexString(spanState.SpanId));
-            if (spanState.ParentSpanId != null)
+            internal ZipkinHttpTraceInjectorSetter(Action<C, string, string> injector)
             {
-                // Cannot be null in theory, the root span must have been created on request receive hence further RPC calls are necessary children
-                injector(carrier, ZipkinHttpHeaders.ParentSpanId, NumberUtils.EncodeLongToLowerHexString(spanState.ParentSpanId.Value));
+                _injector = injector;
             }
-            injector(carrier, ZipkinHttpHeaders.Flags, ((long)GetFlags(spanState.Sampled, spanState.Debug)).ToString(CultureInfo.InvariantCulture));
 
-            // Add "Sampled" header for compatibility with Finagle
-            if (spanState.Sampled.HasValue)
+            public void Put(C carrier, string key, string value)
             {
-                injector(carrier, ZipkinHttpHeaders.Sampled, spanState.Sampled.Value ? "1" : "0");
+                _injector(carrier, key, value);
             }
-            return true;
         }
 
-        private static SpanFlags GetFlags(bool? isSampled, bool isDebug)
+        private static ISetter<NameValueCollection, string> NameValueCollectionSetter = new ZipkinHttpTraceInjectorSetter<NameValueCollection>((c, key, value) => c[key] = value);
+        private static ISetter<IDictionary<string, string>, string> DictionarySetter = new ZipkinHttpTraceInjectorSetter<IDictionary<string, string>>((c, key, value) => c[key] = value);
+
+        private static readonly IInjector<NameValueCollection> NameValueCollectionInjector = Propagations.B3String.Injector(NameValueCollectionSetter);
+        private static readonly IInjector<IDictionary<string, string>> DictionaryInjector = Propagations.B3String.Injector(DictionarySetter);
+
+
+        public bool Inject<TE>(Trace trace, TE carrier, Action<TE, string, string> injector)
         {
-            var flags = SpanFlags.None;
-            if (isSampled.HasValue)
-            {
-                flags |= SpanFlags.SamplingKnown;
-                if (isSampled.Value)
-                {
-                    flags |= SpanFlags.Sampled;
-                }
-            }
-            if (isDebug)
-            {
-                flags |= SpanFlags.Debug;
-            }
-            return flags;
+            var traceContext = trace.CurrentSpan;
+            var b3Injector = Propagations.B3String.Injector(new ZipkinHttpTraceInjectorSetter<TE>(injector));
+            b3Injector.Inject(traceContext, carrier);
+            return true;
         }
 
         public bool Inject(Trace trace, NameValueCollection carrier)
         {
-            return Inject(trace, carrier, (c, key, value) => c[key] = value);
+            NameValueCollectionInjector.Inject(trace.CurrentSpan, carrier);
+            return true;
         }
 
         public bool Inject(Trace trace, IDictionary<string, string> carrier)
         {
-            return Inject(trace, carrier, (c, key, value) => c[key] = value);
-        }
-
-        private static string SerializeTraceId(ITraceContext spanState)
-        {
-            var hexTraceId = NumberUtils.EncodeLongToLowerHexString(spanState.TraceId);
-            if (spanState.TraceIdHigh == SpanState.NoTraceIdHigh)
-            {
-                return hexTraceId;
-            }
-            return NumberUtils.EncodeLongToLowerHexString(spanState.TraceIdHigh) + hexTraceId;
+            DictionaryInjector.Inject(trace.CurrentSpan, carrier);
+            return true;
         }
     }
 }

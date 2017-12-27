@@ -9,6 +9,7 @@ namespace zipkin4net.Transport
     * to extract B3 headers from HTTP headers to recreate a trace
     * object.
     */
+    [Obsolete("Please use Propagation.IPropagation instead")]
     public interface ITraceExtractor
     {
         bool TryExtract<TE>(TE carrier, Func<TE, string, string> extractor, out Trace trace);
@@ -21,6 +22,7 @@ namespace zipkin4net.Transport
     * to extract B3 headers from HTTP headers to recreate a trace
     * object.
     */
+    [Obsolete("Please use Propagation.IPropagation instead")]
     public interface ITraceExtractor<in TE>
     {
         bool TryExtract(TE carrier, out Trace trace);
