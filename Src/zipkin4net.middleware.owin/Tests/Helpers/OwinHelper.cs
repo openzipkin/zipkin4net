@@ -9,13 +9,13 @@ namespace zipkin4net.Middleware.Tests.Helpers
 {
     static class OwinHelper
     {
-        internal static async Task Call(Action<IAppBuilder> startup, Func<HttpClient, Task> clientCall)
+        internal static async Task<string> Call(Action<IAppBuilder> startup, Func<HttpClient, Task<string>> clientCall)
         {
             using (var server = TestServer.Create(startup))
             {
                 using (var client = new HttpClient(server.Handler))
                 {
-                    await clientCall(client);
+                    return await clientCall(client);
                 }
             }
         }
