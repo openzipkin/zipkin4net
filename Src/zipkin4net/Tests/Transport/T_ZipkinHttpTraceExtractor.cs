@@ -66,7 +66,8 @@ namespace zipkin4net.UTest.Transport
             Assert.AreEqual(1L, trace.CurrentSpan.TraceId);
             Assert.AreEqual(SpanState.NoTraceIdHigh, trace.CurrentSpan.TraceIdHigh);
             Assert.AreEqual(250, trace.CurrentSpan.SpanId);
-            Assert.AreEqual(SpanFlags.None, trace.CurrentSpan.Flags);
+            Assert.IsNull(trace.CurrentSpan.Sampled);
+            Assert.IsFalse(trace.CurrentSpan.Debug);
 
             var expectedParentSpanId = (encodedParentSpanId == null) ? (long?)null : 0L;
             Assert.AreEqual(expectedParentSpanId, trace.CurrentSpan.ParentSpanId);
@@ -82,19 +83,19 @@ namespace zipkin4net.UTest.Transport
             _mockLogger.Verify(logger => logger.LogWarning(It.Is<string>(s => s.Contains("Couldn't parse trace context. Trace is ignored"))), Times.Once());
         }
 
-        [TestCase(null, "0", SamplingStatus.NotSampled)]
-        [TestCase(null, "1", SamplingStatus.Sampled)]
-        [TestCase("0", "1", SamplingStatus.Sampled)]
-        [TestCase("2", "1", SamplingStatus.Sampled)]
-        [TestCase("6", "1", SamplingStatus.Sampled)]
-        [TestCase("0", "0", SamplingStatus.NotSampled)]
-        [TestCase("2", "0", SamplingStatus.NotSampled)]
-        [TestCase("6", "0", SamplingStatus.NotSampled)]
-        [TestCase("0", null, SamplingStatus.NoDecision)]
-        [TestCase("2", null, SamplingStatus.NotSampled)]
-        [TestCase("6", null, SamplingStatus.Sampled)]
+        [TestCase(null, "0", false)]
+        [TestCase(null, "1", true)]
+        [TestCase("0", "1", true)]
+        [TestCase("2", "1", true)]
+        [TestCase("6", "1", true)]
+        [TestCase("0", "0", false)]
+        [TestCase("2", "0", false)]
+        [TestCase("6", "0", false)]
+        [TestCase("0", null, null)]
+        [TestCase("2", null, false)]
+        [TestCase("6", null, true)]
         [Description("If present Sampled header value overrides Flags header")]
-        public void SampledHeaderIfPresentOverridesFlags(string flagsStr, string sampledStr, SamplingStatus expectedStatus)
+        public void SampledHeaderIfPresentOverridesFlags(string flagsStr, string sampledStr, bool? expectedSampled)
         {
             var headers = new Dictionary<string, string>
             {
@@ -112,7 +113,7 @@ namespace zipkin4net.UTest.Transport
             Trace trace;
             Assert.True(_extractor.TryExtract(headers, out trace));
 
-            Assert.AreEqual(expectedStatus, trace.CurrentSpan.SamplingStatus);
+            Assert.AreEqual(expectedSampled, trace.CurrentSpan.Sampled);
         }
     }
 }

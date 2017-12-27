@@ -17,7 +17,7 @@ namespace zipkin4net.Tracers.Zipkin
     {
         public IStatistics Statistics { get; private set; }
 
-        private readonly ConcurrentDictionary<SpanState, Span> _spanMap = new ConcurrentDictionary<SpanState, Span>();
+        private readonly ConcurrentDictionary<ITraceContext, Span> _spanMap = new ConcurrentDictionary<ITraceContext, Span>();
         private readonly IZipkinSender _spanSender;
         private readonly ISpanSerializer _spanSerializer;
 
@@ -66,7 +66,7 @@ namespace zipkin4net.Tracers.Zipkin
             return span;
         }
 
-        private void RemoveThenLogSpan(SpanState spanState)
+        private void RemoveThenLogSpan(ITraceContext spanState)
         {
             Span spanToLog;
             if (_spanMap.TryRemove(spanState, out spanToLog))

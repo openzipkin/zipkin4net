@@ -4,7 +4,7 @@ using System.Globalization;
 namespace zipkin4net
 {
     [Serializable]
-    public sealed class SpanState : IEquatable<SpanState>
+    public sealed class SpanState : IEquatable<SpanState>, ITraceContext
     {
         public long TraceIdHigh { get; private set; }
 
@@ -16,40 +16,70 @@ namespace zipkin4net
 
         internal const long NoTraceIdHigh = 0;
 
+        [Obsolete("Please use Sampled method instead")]
         public SamplingStatus SamplingStatus
         {
             get
             {
-                if (!Flags.HasFlag(SpanFlags.SamplingKnown)) return SamplingStatus.NoDecision;
-
-                return Flags.HasFlag(SpanFlags.Sampled) ? SamplingStatus.Sampled : SamplingStatus.NotSampled;
+                if (Sampled.HasValue)
+                {
+                    return Sampled.Value ? SamplingStatus.Sampled : SamplingStatus.NotSampled;
+                }
+                return SamplingStatus.NoDecision;
             }
         }
 
         /// <summary>
         /// Allows for several options (e.g. debug mode, sampling)
         /// </summary>
+        [Obsolete("Please use Sampled and Debug method instead")]
         public SpanFlags Flags { get; private set; }
 
+
+        [Obsolete("Please use SpanState(long traceId, long? parentSpanId, long spanId, bool? isSampled, bool isDebug)")]
         public SpanState(long traceId, long? parentSpanId, long spanId, SpanFlags flags)
-            : this(NoTraceIdHigh, traceId, parentSpanId, spanId, flags)
+                    : this(NoTraceIdHigh, traceId, parentSpanId, spanId, flags)
         { }
 
+        [Obsolete("Please use SpanState(long traceIdHigh, long traceId, long? parentSpanId, long spanId, bool? isSampled, bool isDebug)")]
         public SpanState(long traceIdHigh, long traceId, long? parentSpanId, long spanId, SpanFlags flags)
+            : this(traceIdHigh, traceId, parentSpanId, spanId,
+                flags.HasFlag(SpanFlags.SamplingKnown) ? flags.HasFlag(SpanFlags.Sampled) : (bool?)null,
+                flags.HasFlag(SpanFlags.Debug))
+        {
+            Flags = flags;
+        }
+
+        public SpanState(long traceId, long? parentSpanId, long spanId, bool? isSampled, bool isDebug)
+            : this(NoTraceIdHigh, traceId, parentSpanId, spanId, isSampled, isDebug)
+        {
+        }
+
+        public SpanState(long traceIdHigh, long traceId, long? parentSpanId, long spanId, bool? isSampled, bool isDebug)
         {
             TraceIdHigh = traceIdHigh;
             TraceId = traceId;
             ParentSpanId = parentSpanId;
             SpanId = spanId;
-            Flags = flags;
+            Sampled = isSampled;
+            Debug = isDebug;
+#pragma warning disable 618
+            Flags = GetFlagsForBackwardCompatibility(isSampled, isDebug);
+#pragma warning restore 618
         }
 
-        /// <summary>
-        /// Indicate that this span is relevant and should be sent.
-        /// </summary>
-        internal void SetSampled()
+        private static SpanFlags GetFlagsForBackwardCompatibility(bool? isSampled, bool isDebug)
         {
-            Flags = Flags | SpanFlags.SamplingKnown | SpanFlags.Sampled;
+            var flags = SpanFlags.None;
+            if (isSampled.HasValue)
+            {
+                flags |= SpanFlags.SamplingKnown & SpanFlags.Sampled;
+            }
+            if (isDebug)
+            {
+                flags |= SpanFlags.Debug;
+            }
+            return flags;
         }
 
         public bool Equals(SpanState other)
@@ -87,6 +117,9 @@ namespace zipkin4net
             return string.Format("{0}{1}.{2}<:{3}", TraceIdHigh == SpanState.NoTraceIdHigh ? "" : TraceIdHigh.ToString(), TraceId, SpanId, ParentSpanId.HasValue ? ParentSpanId.Value.ToString(CultureInfo.InvariantCulture) : "_");
         }
 
+        public bool? Sampled { get; private set; }
+
+        public bool Debug { get; private set; }
     }
 
     [Flags]

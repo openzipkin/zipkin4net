@@ -32,7 +32,7 @@ namespace zipkin4net
             }
         }
 
-        public SpanState CurrentSpan { get; private set; }
+        public ITraceContext CurrentSpan { get; private set; }
 
         /// <summary>
         /// Returns the trace id. It represents the correlation id
@@ -57,13 +57,7 @@ namespace zipkin4net
 
             var isSampled = TraceManager.Sampler.Sample(traceId);
 
-            var flags = SpanFlags.SamplingKnown;
-            if (isSampled)
-            {
-                flags = flags | SpanFlags.Sampled;
-            }
-
-            CurrentSpan = new SpanState(traceIdHigh: traceIdHigh, traceId: traceId, parentSpanId: null, spanId: spanId, flags: flags);
+            CurrentSpan = new SpanState(traceIdHigh: traceIdHigh, traceId: traceId, parentSpanId: null, spanId: spanId, isSampled: isSampled, isDebug: false);
             CorrelationId = NumberUtils.LongToGuid(traceId);
         }
 
@@ -72,12 +66,12 @@ namespace zipkin4net
         /// </summary>
         /// <param name="spanState"></param>
         /// <returns></returns>
-        public static Trace CreateFromId(SpanState spanState)
+        public static Trace CreateFromId(ITraceContext spanState)
         {
             return new Trace(spanState);
         }
 
-        private Trace(SpanState spanState)
+        private Trace(ITraceContext spanState)
         {
             CurrentSpan = spanState;
             CorrelationId = NumberUtils.LongToGuid(CurrentSpan.TraceId);
@@ -91,7 +85,7 @@ namespace zipkin4net
         /// <returns></returns>
         public Trace Child()
         {
-            var childState = new SpanState(traceIdHigh: CurrentSpan.TraceIdHigh, traceId: CurrentSpan.TraceId, parentSpanId: CurrentSpan.SpanId, spanId: RandomUtils.NextLong(), flags: CurrentSpan.Flags);
+            var childState = new SpanState(traceIdHigh: CurrentSpan.TraceIdHigh, traceId: CurrentSpan.TraceId, parentSpanId: CurrentSpan.SpanId, spanId: RandomUtils.NextLong(), isSampled: CurrentSpan.Sampled, isDebug: CurrentSpan.Debug);
             return new Trace(childState);
         }
 
@@ -102,7 +96,7 @@ namespace zipkin4net
         /// </summary>
         public void ForceSampled()
         {
-            CurrentSpan.SetSampled();
+            CurrentSpan = new SpanState(traceIdHigh: CurrentSpan.TraceIdHigh, traceId: CurrentSpan.TraceId, parentSpanId: CurrentSpan.SpanId, spanId: RandomUtils.NextLong(), isSampled: true, isDebug: CurrentSpan.Debug);
         }
 
         internal void RecordAnnotation(IAnnotation annotation)
@@ -147,14 +141,7 @@ namespace zipkin4net
 
         private bool ShouldBeRecorded()
         {
-            if ((CurrentSpan.Flags & SpanFlags.SamplingKnown) == SpanFlags.SamplingKnown)
-            {
-                return (CurrentSpan.Flags & SpanFlags.Sampled) == SpanFlags.Sampled;
-            }
-
-            //If sample flag is not set, do not sample the trace
-            //Avoid issues when B3 header is incomplete
-            return false;
+            return CurrentSpan.Sampled ?? false;
         }
     }
 

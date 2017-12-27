@@ -13,7 +13,7 @@ namespace zipkin4net.Tracers.Zipkin
     /// </summary>
     public class Span
     {
-        public SpanState SpanState { get; private set; }
+        public ITraceContext SpanState { get; private set; }
 
         public ICollection<ZipkinAnnotation> Annotations { get; private set; }
 
@@ -66,7 +66,7 @@ namespace zipkin4net.Tracers.Zipkin
         private const double MinimumDuration = 0.001;
 
 
-        public Span(SpanState spanState, DateTime spanCreated)
+        public Span(ITraceContext spanState, DateTime spanCreated)
         {
             Annotations = new List<ZipkinAnnotation>();
             BinaryAnnotations = new List<BinaryAnnotation>();

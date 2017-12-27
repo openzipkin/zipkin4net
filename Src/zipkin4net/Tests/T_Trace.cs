@@ -1,11 +1,9 @@
 ﻿using System;
-using System.IO;
 #if !NET_CORE
 using System.Runtime.Serialization.Formatters.Binary;
 #endif
 using zipkin4net.Dispatcher;
 using zipkin4net.Logger;
-using zipkin4net.Utils;
 using Moq;
 using NUnit.Framework;
 
@@ -36,7 +34,8 @@ namespace zipkin4net.UTest
             Assert.AreEqual(parentTrace.CurrentSpan.SpanId, childTrace.CurrentSpan.ParentSpanId);
 
             // Flags should be copied
-            Assert.AreEqual(parentTrace.CurrentSpan.Flags, childTrace.CurrentSpan.Flags);
+            Assert.AreEqual(parentTrace.CurrentSpan.Sampled, childTrace.CurrentSpan.Sampled);
+            Assert.AreEqual(parentTrace.CurrentSpan.Debug, childTrace.CurrentSpan.Debug);
 
             // Child cannot have the same span id
             Assert.AreNotEqual(parentTrace.CurrentSpan.SpanId, childTrace.CurrentSpan.SpanId);
@@ -74,16 +73,16 @@ namespace zipkin4net.UTest
         }
 
 
-        [TestCase(SpanFlags.SamplingKnown)]
-        [TestCase(SpanFlags.None)]
-        [TestCase(SpanFlags.SamplingKnown | SpanFlags.Sampled)]
-        public void TraceSamplingForced(SpanFlags initialFlags)
+        [TestCase(false)]
+        [TestCase(null)]
+        [TestCase(true)]
+        public void TraceSamplingForced(bool? isSampled)
         {
-            var spanState = new SpanState(1, 0, 1, initialFlags);
+            var spanState = new SpanState(1, 0, 1, isSampled: isSampled, isDebug: false);
             var trace = Trace.CreateFromId(spanState);
             trace.ForceSampled();
 
-            Assert.AreEqual(SamplingStatus.Sampled, trace.CurrentSpan.SamplingStatus);
+            Assert.IsTrue(trace.CurrentSpan.Sampled);
         }
 
         [Test]
@@ -92,7 +91,7 @@ namespace zipkin4net.UTest
             var dispatcher = new Mock<IRecordDispatcher>();
             TraceManager.Start(new VoidLogger(), dispatcher.Object);
 
-            var spanState = new SpanState(1, 0, 1, SpanFlags.SamplingKnown | SpanFlags.Sampled);
+            var spanState = new SpanState(1, 0, 1, isSampled: true, isDebug: false);
             var trace = Trace.CreateFromId(spanState);
 
             trace.Record(Annotations.ClientRecv());
@@ -106,7 +105,7 @@ namespace zipkin4net.UTest
             var dispatcher = new Mock<IRecordDispatcher>();
             TraceManager.Start(new VoidLogger(), dispatcher.Object);
 
-            var spanState = new SpanState(1, 0, 1, SpanFlags.SamplingKnown);
+            var spanState = new SpanState(1, 0, 1, isSampled: false, isDebug: false);
             var trace = Trace.CreateFromId(spanState);
 
             trace.Record(Annotations.ClientRecv());
@@ -120,7 +119,7 @@ namespace zipkin4net.UTest
             var dispatcher = new Mock<IRecordDispatcher>();
             TraceManager.Start(new VoidLogger(), dispatcher.Object);
 
-            var spanState = new SpanState(1, 0, 1, SpanFlags.None);
+            var spanState = new SpanState(1, 0, 1, isSampled: null, isDebug: false);
             var trace = Trace.CreateFromId(spanState);
 
             trace.Record(Annotations.ClientRecv());
