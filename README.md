@@ -1,4 +1,4 @@
-[![Gitter chat](http://img.shields.io/badge/gitter-join%20chat%20%E2%86%92-brightgreen.svg)](https://gitter.im/openzipkin/zipkin) [![Build Status](https://travis-ci.org/criteo/zipkin4net.svg?branch=master)](https://travis-ci.org/criteo/zipkin4net)
+[![Gitter chat](http://img.shields.io/badge/gitter-join%20chat%20%E2%86%92-brightgreen.svg)](https://gitter.im/openzipkin/zipkin) [![Build Status](https://travis-ci.org/openzipkin/zipkin4net.svg?branch=master)](https://travis-ci.org/openzipkin/zipkin4net)
 
 # Zipkin4net
 
