@@ -1,5 +1,4 @@
-﻿using zipkin4net.Transport;
-using Microsoft.Owin.Testing;
+﻿using Microsoft.Owin.Testing;
 using Owin;
 using System;
 using System.Net.Http;
@@ -19,12 +18,12 @@ namespace zipkin4net.Middleware.Tests.Helpers
                 }
             }
         }
-        internal static Action<IAppBuilder> DefaultStartup(string serviceName, ITraceExtractor traceExtractor)
+        internal static Action<IAppBuilder> DefaultStartup(string serviceName)
         {
             return
                 app =>
                 {
-                    app.UseZipkinTracer(serviceName, traceExtractor);
+                    app.UseZipkinTracer(serviceName);
 
                     app.Run(async context =>
                     {
