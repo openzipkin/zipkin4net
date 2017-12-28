@@ -3,6 +3,8 @@ using zipkin4net.Transport;
 
 namespace zipkin4net.Propagation
 {
+    public delegate K KeyFactory<K>(string key);
+    
     internal class B3Propagation<K> : IPropagation<K>
     {
         internal readonly K TraceIdKey;
@@ -11,22 +13,22 @@ namespace zipkin4net.Propagation
         internal readonly K SampledKey;
         internal readonly K DebugKey;
 
-        internal B3Propagation(IKeyFactory<K> keyFactory)
+        internal B3Propagation(KeyFactory<K> keyFactory)
         {
-            TraceIdKey = keyFactory.Create(ZipkinHttpHeaders.TraceId);
-            SpanIdKey = keyFactory.Create(ZipkinHttpHeaders.SpanId);
-            ParentSpanIdKey = keyFactory.Create(ZipkinHttpHeaders.ParentSpanId);
-            SampledKey = keyFactory.Create(ZipkinHttpHeaders.Sampled);
-            DebugKey = keyFactory.Create(ZipkinHttpHeaders.Flags);
+            TraceIdKey = keyFactory(ZipkinHttpHeaders.TraceId);
+            SpanIdKey = keyFactory(ZipkinHttpHeaders.SpanId);
+            ParentSpanIdKey = keyFactory(ZipkinHttpHeaders.ParentSpanId);
+            SampledKey = keyFactory(ZipkinHttpHeaders.Sampled);
+            DebugKey = keyFactory(ZipkinHttpHeaders.Flags);
         }
 
-        public IInjector<C> Injector<C>(ISetter<C, K> setter)
+        public IInjector<C> Injector<C>(Setter<C, K> setter)
         {
             if (setter == null) throw new NullReferenceException("setter == null");
             return new B3Injector<C, K>(this, setter);
         }
 
-        public IExtractor<C> Extractor<C>(IGetter<C, K> getter)
+        public IExtractor<C> Extractor<C>(Getter<C, K> getter)
         {
             if (getter == null) throw new NullReferenceException("getter == null");
             return new B3Extractor<C, K>(this, getter);

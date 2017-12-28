@@ -11,32 +11,12 @@ namespace zipkin4net.Transport
     [Obsolete("Please use Propagation.IPropagation instead")]
     public class ZipkinHttpTraceExtractor : ITraceExtractor<NameValueCollection>, ITraceExtractor<IDictionary<string, string>>, ITraceExtractor
     {
-        private const int traceId64BitsSerializationLength = 16;
-
-        private class ZipkinHttpTraceExtractorGetter<C> : IGetter<C, string>
-        {
-            private readonly Func<C, string, string> _extractor;
-
-            internal ZipkinHttpTraceExtractorGetter(Func<C, string, string> extractor)
-            {
-                _extractor = extractor;
-            }
-
-            public string Get(C carrier, string key)
-            {
-                return _extractor(carrier, key);
-            }
-        }
-
-        private static IGetter<NameValueCollection, string> NameValueCollectionGetter = new ZipkinHttpTraceExtractorGetter<NameValueCollection>((c, key) => c[key]);
-        private static IGetter<IDictionary<string, string>, string> DictionaryGetter = new ZipkinHttpTraceExtractorGetter<IDictionary<string, string>>((c, key) =>
+        private static readonly IExtractor<NameValueCollection> NameValueCollectionExtractor = Propagations.B3String.Extractor<NameValueCollection>((c, key) => c[key]);
+        private static readonly IExtractor<IDictionary<string, string>> DictionaryExtractor = Propagations.B3String.Extractor<IDictionary<string, string>>((c, key) =>
         {
             string value;
             return c.TryGetValue(key, out value) ? value : null;
         });
-
-        private static readonly IExtractor<NameValueCollection> NameValueCollectionExtractor = Propagations.B3String.Extractor(NameValueCollectionGetter);
-        private static readonly IExtractor<IDictionary<string, string>> DictionaryExtractor = Propagations.B3String.Extractor(DictionaryGetter);
 
         public bool TryExtract<TE>(TE carrier, Func<TE, string, string> extractor, out Trace trace)
         {

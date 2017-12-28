@@ -9,7 +9,7 @@ namespace zipkin4net.Middleware
     {
         public static void UseTracing(this IApplicationBuilder app, string serviceName)
         {
-            var extractor = Propagations.B3String.Extractor(new HeaderDictionaryGetter());
+            var extractor = Propagations.B3String.Extractor<IHeaderDictionary>((carrier, key) => carrier[key]);
             app.Use(async (context, next) =>
             {
                 var request = context.Request;
@@ -25,14 +25,6 @@ namespace zipkin4net.Middleware
                     await serverTrace.TracedActionAsync(next());
                 }
             });
-        }
-
-        private class HeaderDictionaryGetter : IGetter<IHeaderDictionary, string>
-        {
-            public string Get(IHeaderDictionary carrier, string key)
-            {
-                return carrier[key];
-            }
         }
     }
 }
