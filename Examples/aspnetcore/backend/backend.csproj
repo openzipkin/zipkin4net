@@ -6,12 +6,12 @@
     <VersionPrefix>0.1</VersionPrefix>
     <Authors>Criteo</Authors>
     <TargetFramework>netcoreapp2.0</TargetFramework>
-    <AssemblyName>frontend</AssemblyName>
-    <PackageId>frontend</PackageId>
+    <AssemblyName>backend</AssemblyName>
+    <PackageId>backend</PackageId>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="../common/common.dotnetcore.csproj" />
+    <ProjectReference Include="../common/common.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -21,21 +21,28 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="../../../Src/zipkin4net/Src/zipkin4net.dotnetcore.csproj" />
-    <ProjectReference Include="../../../Src/zipkin4net.middleware.aspnetcore/Src/zipkin4net.middleware.aspnetcore.dotnetcore.csproj" />
+    <ProjectReference Include="../../../Src/zipkin4net/Src/zipkin4net.csproj" />
+    <ProjectReference Include="../../../Src/zipkin4net.middleware.aspnetcore/Src/zipkin4net.middleware.aspnetcore.csproj" />
   </ItemGroup>
 
-  <PropertyGroup Condition=" '$(TargetFramework)' == 'netcoreapp1.0' ">
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'netcoreapp2.0' ">
     <DefineConstants>$(DefineConstants);NET_CORE</DefineConstants>
   </PropertyGroup>
 
-  <PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <OutputType>Exe</OutputType>
   </PropertyGroup>
 
-  <ItemGroup>
+  <ItemGroup Condition=" '$(Configuration)' == 'Debug' ">
     <None Update="appSettings.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
+
+  <ItemGroup Condition=" '$(Configuration)' == 'Release' ">
+    <None Update="appSettings.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>
