@@ -1,11 +1,11 @@
 
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "common.dotnetcore", "common\common.dotnetcore.csproj", "{ED53B531-434D-4BB3-B916-64E33864B1BD}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "common", "common\common.csproj", "{ED53B531-434D-4BB3-B916-64E33864B1BD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "frontend.dotnetcore", "frontend\frontend.dotnetcore.csproj", "{4290149E-DC42-4FE6-934C-3F07A2488BFE}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "frontend", "frontend\frontend.csproj", "{4290149E-DC42-4FE6-934C-3F07A2488BFE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "backend.dotnetcore", "backend\backend.dotnetcore.csproj", "{D43B106A-93F2-4B0E-BDCF-014427A65014}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "backend", "backend\backend.csproj", "{D43B106A-93F2-4B0E-BDCF-014427A65014}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

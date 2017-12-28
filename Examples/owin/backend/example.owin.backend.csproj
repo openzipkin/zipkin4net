@@ -19,7 +19,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="../common/example.owin.common.dotnetcore.csproj" />
+    <ProjectReference Include="../common/example.owin.common.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -30,8 +30,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="../../../Src/zipkin4net/Src/zipkin4net.dotnetcore.csproj" />
-    <ProjectReference Include="../../../Src/zipkin4net.middleware.owin/Src/zipkin4net.middleware.owin.dotnetcore.csproj" />
+    <ProjectReference Include="../../../Src/zipkin4net/Src/zipkin4net.csproj" />
+    <ProjectReference Include="../../../Src/zipkin4net.middleware.owin/Src/zipkin4net.middleware.owin.csproj" />
   </ItemGroup>
 
   <PropertyGroup Condition=" '$(TargetFramework)' == 'netcoreapp2.0' ">
