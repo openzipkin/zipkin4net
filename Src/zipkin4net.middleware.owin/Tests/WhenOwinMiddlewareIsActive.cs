@@ -3,14 +3,11 @@ using zipkin4net.Tracers;
 using NSubstitute;
 using NUnit.Framework;
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using zipkin4net.Middleware.Tests.Helpers;
-using zipkin4net.Transport;
-using Microsoft.Owin;
 
 namespace zipkin4net.Middleware.Tests
 {
@@ -26,15 +23,12 @@ namespace zipkin4net.Middleware.Tests
         private static readonly bool IsRunningOnMono = Type.GetType("Mono.Runtime") != null;
         private ILogger _logger;
         private InMemoryTracer _tracer;
-        private ITraceExtractor _traceExtractor;
 
         [SetUp]
         public void Setup()
         {
             _logger = Substitute.For<ILogger>();
             _tracer = new InMemoryTracer();
-            _traceExtractor = Substitute.For<ITraceExtractor>();
-
 
             TraceManager.SamplingRate = 1.0f;
             TraceManager.RegisterTracer(_tracer);
@@ -61,11 +55,8 @@ namespace zipkin4net.Middleware.Tests
             };
 
             //Act
-            await Call(DefaultStartup(serviceName, _traceExtractor), clientCall);
+            await Call(DefaultStartup(serviceName), clientCall);
 
-            //Assert
-            Trace trace = null;
-            _traceExtractor.ReceivedWithAnyArgs(1).TryExtract(Arg.Any<IHeaderDictionary>(), Arg.Any<Func<IHeaderDictionary, string, string>>(), out trace);
             var records = _tracer.Records;
 
             if (!IsRunningOnMono)
@@ -94,12 +85,8 @@ namespace zipkin4net.Middleware.Tests
             };
 
             //Act
-            var responseContent = await Call(DefaultStartup(serviceName, _traceExtractor), clientCall);
+            var responseContent = await Call(DefaultStartup(serviceName), clientCall);
             Assert.IsNotEmpty(responseContent);
-
-            //Assert
-            Trace trace = null;
-            _traceExtractor.ReceivedWithAnyArgs(1).TryExtract(Arg.Any<IHeaderDictionary>(), Arg.Any<Func<IHeaderDictionary, string, string>>(), out trace);
 
             var records = _tracer.Records;
             if (!IsRunningOnMono)
@@ -122,7 +109,7 @@ namespace zipkin4net.Middleware.Tests
         private static void AssertAnnotationReceived<T>(IEnumerable<Record> records, Func<T, bool> assertionOnAnnotation)
         {
             Assert.That(records.Any(r => r.Annotation is T && assertionOnAnnotation((T) r.Annotation)), Is.True.After(DelayInMilliseconds, PollingInterval),
-                $"Didn't get {typeof(T)} annotation within 5s. Annotations: {records}");
+                $"Didn't get {typeof(T)} annotation within 5s. Annotations: [{string.Join(", ", records)}]");
         }
     }
 }

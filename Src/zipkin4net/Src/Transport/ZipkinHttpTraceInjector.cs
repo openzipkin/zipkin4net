@@ -26,8 +26,8 @@ namespace zipkin4net.Transport
             }
         }
 
-        private static ISetter<NameValueCollection, string> NameValueCollectionSetter = new ZipkinHttpTraceInjectorSetter<NameValueCollection>((c, key, value) => c[key] = value);
-        private static ISetter<IDictionary<string, string>, string> DictionarySetter = new ZipkinHttpTraceInjectorSetter<IDictionary<string, string>>((c, key, value) => c[key] = value);
+        private static readonly ISetter<NameValueCollection, string> NameValueCollectionSetter = new ZipkinHttpTraceInjectorSetter<NameValueCollection>((c, key, value) => c[key] = value);
+        private static readonly ISetter<IDictionary<string, string>, string> DictionarySetter = new ZipkinHttpTraceInjectorSetter<IDictionary<string, string>>((c, key, value) => c[key] = value);
 
         private static readonly IInjector<NameValueCollection> NameValueCollectionInjector = Propagations.B3String.Injector(NameValueCollectionSetter);
         private static readonly IInjector<IDictionary<string, string>> DictionaryInjector = Propagations.B3String.Injector(DictionarySetter);
