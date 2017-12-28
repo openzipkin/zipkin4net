@@ -10,14 +10,6 @@ namespace Owin
             => appBuilder.Use<ZipkinMiddleware>(serviceName, traceExtractor);
 
         public static IAppBuilder UseZipkinTracer(this IAppBuilder appBuilder, string serviceName)
-            => appBuilder.UseZipkinTracer(serviceName, Propagations.B3String.Extractor(new HeaderDictionaryGetter()));
-
-        private class HeaderDictionaryGetter : IGetter<IHeaderDictionary, string>
-        {
-            public string Get(IHeaderDictionary carrier, string key)
-            {
-                return string.Join(",", carrier[key]);
-            }
-        }
+            => appBuilder.UseZipkinTracer(serviceName, Propagations.B3String.Extractor((IHeaderDictionary carrier, string key) => string.Join(",", carrier[key])));
     }
 }

@@ -7,11 +7,11 @@ namespace zipkin4net.Propagation
     internal class B3Extractor<C, K> : IExtractor<C>
     {
         private readonly B3Propagation<K> _b3Propagation;
-        private readonly IGetter<C, K> _getter;
+        private readonly Getter<C, K> _getter;
 
         private const int TraceId64BitsSerializationLength = 16;
 
-        internal B3Extractor(B3Propagation<K> b3Propagation, IGetter<C, K> getter)
+        internal B3Extractor(B3Propagation<K> b3Propagation, Getter<C, K> getter)
         {
             _b3Propagation = b3Propagation;
             _getter = getter;
@@ -20,11 +20,11 @@ namespace zipkin4net.Propagation
         public ITraceContext Extract(C carrier)
         {
             return TryParseTrace(
-                _getter.Get(carrier, _b3Propagation.TraceIdKey),
-                _getter.Get(carrier, _b3Propagation.SpanIdKey),
-                _getter.Get(carrier, _b3Propagation.ParentSpanIdKey),
-                _getter.Get(carrier, _b3Propagation.SampledKey),
-                _getter.Get(carrier, _b3Propagation.DebugKey)
+                _getter(carrier, _b3Propagation.TraceIdKey),
+                _getter(carrier, _b3Propagation.SpanIdKey),
+                _getter(carrier, _b3Propagation.ParentSpanIdKey),
+                _getter(carrier, _b3Propagation.SampledKey),
+                _getter(carrier, _b3Propagation.DebugKey)
             );
         }
 
