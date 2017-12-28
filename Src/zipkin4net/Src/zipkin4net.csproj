@@ -1,5 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
-
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFrameworks>netstandard1.5;net45</TargetFrameworks>
     <AssemblyName>zipkin4net</AssemblyName>
@@ -23,11 +22,9 @@
     <PackageProjectUrl>https://github.com/openzipkin/zipkin4net</PackageProjectUrl>
     <PackageLicenseUrl>https://github.com/openzipkin/zipkin4net/blob/master/LICENSE</PackageLicenseUrl>
   </PropertyGroup>
-
   <PropertyGroup Condition="'$(TargetFramework)' == 'netstandard1.5'">
     <DefineConstants>$(DefineConstants);NET_CORE</DefineConstants>
   </PropertyGroup>
-
   <ItemGroup Condition="'$(TargetFramework)' == 'netstandard1.5'">
     <PackageReference Include="System.Threading" Version="4.3.0" />
     <PackageReference Include="System.Threading.Thread" Version="4.3.0" />
@@ -41,9 +38,7 @@
     <PackageReference Include="System.Net.Http" Version="4.3.0" />
     <PackageReference Include="apache-thrift-netcore" Version="0.9.3" />
   </ItemGroup>
-
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
-
 </Project>
