@@ -1,4 +1,6 @@
-﻿namespace zipkin4net
+﻿using System.Collections.Generic;
+
+namespace zipkin4net
 {
     public interface ITraceContext : ISamplingFlags
     {
@@ -20,5 +22,13 @@
         /// <p>A span is uniquely identified in storage by (<see cref="TraceId"/>, <see cref="SpanId"/>)</p>
         /// </summary>
         long SpanId { get; }
+        /// <summary>
+        /// Returns a list of additional data propagated through this trace.
+        ///
+        /// <p>The contents are intentionally opaque, deferring to <see cref="Propagation.IPropagation{K}"/> to define. An
+        /// example implementation could be storing a class containing a correlation value, which is
+        /// extracted from incoming requests and injected as-is onto outgoing requests.
+        /// </summary>
+        List<object> Extra { get; }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 
 namespace zipkin4net
@@ -56,6 +57,11 @@ namespace zipkin4net
         }
 
         public SpanState(long traceIdHigh, long traceId, long? parentSpanId, long spanId, bool? isSampled, bool isDebug)
+            : this(traceIdHigh, traceId, parentSpanId, spanId, isSampled, isDebug, new List<object>())
+        {
+        }
+
+        public SpanState(long traceIdHigh, long traceId, long? parentSpanId, long spanId, bool? isSampled, bool isDebug, List<object> extra)
         {
             TraceIdHigh = traceIdHigh;
             TraceId = traceId;
@@ -66,6 +72,7 @@ namespace zipkin4net
 #pragma warning disable 618
             Flags = GetFlagsForBackwardCompatibility(isSampled, isDebug);
 #pragma warning restore 618
+            Extra = extra;
         }
 
         private static SpanFlags GetFlagsForBackwardCompatibility(bool? isSampled, bool isDebug)
@@ -120,6 +127,8 @@ namespace zipkin4net
         public bool? Sampled { get; private set; }
 
         public bool Debug { get; private set; }
+
+        public List<object> Extra { get; private set; }
     }
 
     [Flags]
