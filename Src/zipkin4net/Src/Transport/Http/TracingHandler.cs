@@ -11,7 +11,7 @@ namespace zipkin4net.Transport.Http
         private readonly string _serviceName;
 
         public TracingHandler(string serviceName, HttpMessageHandler httpMessageHandler = null)
-        : this(Propagations.B3String.Injector(new HeadersSetter()), serviceName, httpMessageHandler)
+        : this(Propagations.B3String.Injector<HttpHeaders>((carrier, key, value) => carrier.Add(key, value)), serviceName, httpMessageHandler)
         { }
 
         private TracingHandler(IInjector<HttpHeaders> injector, string serviceName, HttpMessageHandler httpMessageHandler = null)
@@ -29,14 +29,6 @@ namespace zipkin4net.Transport.Http
                     _injector.Inject(clientTrace.Trace.CurrentSpan, request.Headers);
                 }
                 return await clientTrace.TracedActionAsync(base.SendAsync(request, cancellationToken));
-            }
-        }
-
-        private class HeadersSetter : ISetter<HttpHeaders, string>
-        {
-            public void Put(HttpHeaders carrier, string key, string value)
-            {
-                carrier.Add(key, value);
             }
         }
     }

@@ -6,9 +6,9 @@ namespace zipkin4net.Propagation
     internal class B3Injector<C, K> : IInjector<C>
     {
         private readonly B3Propagation<K> _b3Propagation;
-        private readonly ISetter<C, K> _setter;
+        private readonly Setter<C, K> _setter;
 
-        public B3Injector(B3Propagation<K> b3Propagation, ISetter<C, K> setter)
+        public B3Injector(B3Propagation<K> b3Propagation, Setter<C, K> setter)
         {
             _b3Propagation = b3Propagation;
             _setter = setter;
@@ -16,19 +16,19 @@ namespace zipkin4net.Propagation
 
         public void Inject(ITraceContext traceContext, C carrier)
         {
-            _setter.Put(carrier, _b3Propagation.TraceIdKey, SerializeTraceId(traceContext));
-            _setter.Put(carrier, _b3Propagation.SpanIdKey, NumberUtils.EncodeLongToLowerHexString(traceContext.SpanId));
+            _setter(carrier, _b3Propagation.TraceIdKey, SerializeTraceId(traceContext));
+            _setter(carrier, _b3Propagation.SpanIdKey, NumberUtils.EncodeLongToLowerHexString(traceContext.SpanId));
             if (traceContext.ParentSpanId != null)
             {
                 // Cannot be null in theory, the root span must have been created on request receive hence further RPC calls are necessary children
-                _setter.Put(carrier, _b3Propagation.ParentSpanIdKey, NumberUtils.EncodeLongToLowerHexString(traceContext.ParentSpanId.Value));
+                _setter(carrier, _b3Propagation.ParentSpanIdKey, NumberUtils.EncodeLongToLowerHexString(traceContext.ParentSpanId.Value));
             }
-            _setter.Put(carrier, _b3Propagation.DebugKey, ((long)GetFlags(traceContext.Sampled, traceContext.Debug)).ToString(CultureInfo.InvariantCulture));
+            _setter(carrier, _b3Propagation.DebugKey, ((long)GetFlags(traceContext.Sampled, traceContext.Debug)).ToString(CultureInfo.InvariantCulture));
 
             // Add "Sampled" header for compatibility with Finagle
             if (traceContext.Sampled.HasValue)
             {
-                _setter.Put(carrier, _b3Propagation.SampledKey, traceContext.Sampled.Value ? "1" : "0");
+                _setter(carrier, _b3Propagation.SampledKey, traceContext.Sampled.Value ? "1" : "0");
             }
         }
 
