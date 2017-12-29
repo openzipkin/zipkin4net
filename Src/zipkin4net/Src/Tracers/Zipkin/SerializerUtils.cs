@@ -28,6 +28,11 @@ namespace zipkin4net.Tracers.Zipkin
             return IPAddress.NetworkToHostOrder(BitConverter.ToInt32(ipAddr.GetAddressBytes(), 0));
         }
 
+        public static string IpToString(IPAddress ipAddr)
+        {
+            return ipAddr.ToString();
+        }
+
 
         public static string GetServiceNameOrDefault(Span span)
         {
