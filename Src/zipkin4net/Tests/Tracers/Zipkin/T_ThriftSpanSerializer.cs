@@ -177,13 +177,8 @@ namespace zipkin4net.UTest.Tracers.Zipkin
             var spanState = new SpanState(1, 0, 2, isSampled: null, isDebug: false);
             var span = new Span(spanState, TimeUtils.UtcNow);
 
-            var recordStart = new Record(spanState, startTime, Annotations.LocalOperationStart("Operation"));
-            var visitorStart = new ZipkinAnnotationVisitor(recordStart, span);
-            recordStart.Annotation.Accept(visitorStart);
-            var recordStop = new Record(spanState, startTime.AddHours(1), Annotations.LocalOperationStop());
-            var visitorStop = new ZipkinAnnotationVisitor(recordStop, span);
-            recordStop.Annotation.Accept(visitorStop);
-
+            span.AddBinaryAnnotation(new BinaryAnnotation(zipkinCoreConstants.LOCAL_COMPONENT, Encoding.UTF8.GetBytes("lc"), AnnotationType.STRING, startTime, null, SerializerUtils.DefaultEndPoint));
+            span.SetAsComplete(startTime.AddHours(1));
             var thriftSpan = ThriftSpanSerializer.ConvertToThrift(span);
             Assert.AreEqual(startTime.ToUnixTimestamp(), thriftSpan.Timestamp);
             Assert.AreEqual(1, thriftSpan.Binary_annotations.Count);

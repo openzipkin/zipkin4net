@@ -11,12 +11,15 @@ namespace zipkin4net.Internal.Recorder
     {
         private readonly IReporter _reporter;
         private readonly IStatistics _statistics;
-        private readonly ConcurrentDictionary<ITraceContext, Span> _spanMap = new ConcurrentDictionary<ITraceContext, Span>();
+
+        private readonly ConcurrentDictionary<ITraceContext, Span> _spanMap =
+            new ConcurrentDictionary<ITraceContext, Span>();
+
         /// <summary>
         /// Flush old records when fired.
         /// </summary>
         private readonly Timer _flushTimer;
-        
+
         /// <summary>
         /// Spans which are not completed by this time are automatically flushed.
         /// </summary>
@@ -26,7 +29,7 @@ namespace zipkin4net.Internal.Recorder
             : this(reporter, new Statistics())
         {
         }
-        
+
         internal MutableSpanMap(IReporter reporter, IStatistics statistics)
         {
             _reporter = reporter;
@@ -50,16 +53,8 @@ namespace zipkin4net.Internal.Recorder
                     oldSpanEntry.Value.AddAnnotation(new ZipkinAnnotation(TimeUtils.UtcNow, "flush.timeout"));
                     _statistics.UpdateSpanFlushed();
                 }
-                RemoveThenLogSpan(oldSpanEntry.Key);
-            }
-        }
-        
-        private void RemoveThenLogSpan(ITraceContext spanState)
-        {
-            Span spanToLog;
-            if (_spanMap.TryRemove(spanState, out spanToLog))
-            {
-                _reporter.Report(spanToLog);
+
+                RemoveThenReportSpan(oldSpanEntry.Key);
             }
         }
 
@@ -68,11 +63,31 @@ namespace zipkin4net.Internal.Recorder
             return _spanMap.GetOrAdd(traceContext, spanCreator);
         }
 
+        public Span Get(ITraceContext context)
+        {
+            Span span;
+            if (!_spanMap.TryGetValue(context, out span))
+            {
+                throw new InvalidOperationException($"Span associated with {context} couldn't be found");
+            }
+
+            return span;
+        }
+
         public Span Remove(ITraceContext traceContext)
         {
             Span span = null;
             _spanMap.TryRemove(traceContext, out span);
             return span; //Will return null if span doesn't exist
+        }
+        
+        public void RemoveThenReportSpan(ITraceContext spanState)
+        {
+            var spanToLog = Remove(spanState);
+            if (spanToLog != null)
+            {
+                _reporter.Report(spanToLog);
+            }
         }
     }
 }

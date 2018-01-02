@@ -14,6 +14,8 @@ namespace zipkin4net.Tracers.Zipkin
     public class Span
     {
         public ITraceContext SpanState { get; private set; }
+        
+        public SpanKind? SpanKind { get; set; }
 
         public ICollection<ZipkinAnnotation> Annotations { get; private set; }
 

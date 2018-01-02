@@ -25,14 +25,20 @@ namespace zipkin4net.UTest.Tracers.Zipkin
         public void ShouldThrowWithNullSender()
         {
             IZipkinSender sender = null;
-            Assert.Throws<ArgumentNullException>(() => { var tracer = new ZipkinTracer(sender, Mock.Of<ISpanSerializer>());});
+            Assert.Throws<ArgumentNullException>(() =>
+            {
+                var tracer = new ZipkinTracer(sender, Mock.Of<ISpanSerializer>());
+            });
         }
 
         [Test]
         public void ShouldThrowWithNullSerializer()
         {
             ISpanSerializer spanSerializer = null;
-            Assert.Throws<ArgumentNullException>(() => { var tracer = new ZipkinTracer(Mock.Of<IZipkinSender>(), spanSerializer);});
+            Assert.Throws<ArgumentNullException>(() =>
+            {
+                var tracer = new ZipkinTracer(Mock.Of<IZipkinSender>(), spanSerializer);
+            });
         }
 
         [Test]
@@ -52,16 +58,6 @@ namespace zipkin4net.UTest.Tracers.Zipkin
             var trace = Trace.Create();
 
             Record(trace, Annotations.ServerRecv());
-            Record(trace, Annotations.ServerSend());
-
-            _reporter.Verify(r => r.Report(It.IsAny<Span>()), Times.Once());
-        }
-
-        [Test]
-        public void StatisticsAreUpdatedForSent()
-        {
-            var trace = Trace.Create();
-
             Record(trace, Annotations.ServerSend());
 
             _reporter.Verify(r => r.Report(It.IsAny<Span>()), Times.Once());
@@ -90,5 +86,10 @@ namespace zipkin4net.UTest.Tracers.Zipkin
             tracer.Record(record);
         }
 
+        private static SpanState CreateSpan()
+        {
+            return new SpanState(traceId: new Random().Next(), parentSpanId: 0, spanId: 1, isSampled: null,
+                isDebug: false);
+        }
     }
 }
