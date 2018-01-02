@@ -1,8 +1,10 @@
 ﻿using System;
-using zipkin4net.Annotation;
+using System.Text;
 using zipkin4net.Tracers.Zipkin;
 using zipkin4net.Utils;
 using NUnit.Framework;
+using zipkin4net.Tracers.Zipkin.Thrift;
+using BinaryAnnotation = zipkin4net.Tracers.Zipkin.BinaryAnnotation;
 using Span = zipkin4net.Tracers.Zipkin.Span;
 
 namespace zipkin4net.UTest.Tracers.Zipkin
@@ -11,87 +13,17 @@ namespace zipkin4net.UTest.Tracers.Zipkin
     internal class T_Span
     {
         [Test]
-        public void DurationAndSpanStartedSetWhenSetAsComplete()
-        {
-            VerifySpanDurationComputedWhenSetAsComplete(Annotations.ClientSend(), Annotations.ClientRecv(), isRootSpan: false, isSpanStartedAndDurationSet:true);
-            VerifySpanDurationComputedWhenSetAsComplete(Annotations.ServerRecv(), Annotations.ServerSend(), isRootSpan: true, isSpanStartedAndDurationSet: true);
-            VerifySpanDurationComputedWhenSetAsComplete(Annotations.ServerRecv(), Annotations.ServerSend(), isRootSpan: false, isSpanStartedAndDurationSet: false);
-            VerifySpanDurationComputedWhenSetAsComplete(Annotations.LocalOperationStart("Operation"), Annotations.LocalOperationStop(), isRootSpan: false, isSpanStartedAndDurationSet: true);
-            VerifySpanDurationComputedWhenSetAsComplete(Annotations.ProducerStart(), Annotations.ProducerStop(), isRootSpan: false, isSpanStartedAndDurationSet: false);
-            VerifySpanDurationComputedWhenSetAsComplete(Annotations.ConsumerStart(), Annotations.ConsumerStop(), isRootSpan: false, isSpanStartedAndDurationSet: false);
-        }
-
-        private static void VerifySpanDurationComputedWhenSetAsComplete(IAnnotation start, IAnnotation stop, bool isRootSpan, bool isSpanStartedAndDurationSet)
-        {
-            var startTime = DateTime.Now;
-            var endTime = startTime.AddHours(1);
-            var expectedDuration = endTime.Subtract(startTime);
-
-            long? parentId = 0;
-            if (isRootSpan)
-                parentId = null;
-            var spanState = new SpanState(1, parentId, 2, isSampled: null, isDebug: false);
-            var spanCreatedTimestamp = TimeUtils.UtcNow;
-            var span = new Span(spanState, spanCreatedTimestamp);
-
-            var recordStart = new Record(spanState, startTime, start);
-            var visitorStart = new ZipkinAnnotationVisitor(recordStart, span);
-            var recordStop  = new Record(spanState, endTime, stop);
-            var visitorStop  = new ZipkinAnnotationVisitor(recordStop, span);
-
-            Assert.AreEqual(spanCreatedTimestamp, span.SpanCreated);
-            Assert.False(span.Duration.HasValue);
-            Assert.False(span.Complete);
-            recordStart.Annotation.Accept(visitorStart);
-            Assert.False(span.Duration.HasValue);
-            Assert.False(span.Complete);
-            recordStop.Annotation.Accept(visitorStop);
-            Assert.True(span.Complete);
-            if (isSpanStartedAndDurationSet)
-            {
-                Assert.AreEqual(expectedDuration, span.Duration);
-                Assert.AreEqual(startTime, span.SpanStarted);
-            }
-            else
-            {
-                Assert.False(span.Duration.HasValue);
-                Assert.False(span.SpanStarted.HasValue);
-            }
-        }
-
-        [Test]
-        public void ClientDurationIsPreferredOverServer()
-        {
-            var spanState = new SpanState(1, null, 2, isSampled: null, isDebug: false);
-            var span = new Span(spanState, TimeUtils.UtcNow);
-            const int offset = 10;
-
-            var annotationTime = TimeUtils.UtcNow;
-            var recordServerRecv = new Record(spanState, annotationTime, Annotations.ServerRecv());
-            recordServerRecv.Annotation.Accept(new ZipkinAnnotationVisitor(recordServerRecv, span));
-            var recordServerSend = new Record(spanState, annotationTime.AddMilliseconds(offset), Annotations.ServerSend());
-            recordServerSend.Annotation.Accept(new ZipkinAnnotationVisitor(recordServerSend, span));
-            var recordClientSend = new Record(spanState, annotationTime.AddMilliseconds(-offset), Annotations.ClientSend());
-            recordClientSend.Annotation.Accept(new ZipkinAnnotationVisitor(recordClientSend, span));
-            var recordClientRecv = new Record(spanState, annotationTime.AddMilliseconds(2 * offset), Annotations.ClientRecv());
-            recordClientRecv.Annotation.Accept(new ZipkinAnnotationVisitor(recordClientRecv, span));
-
-            Assert.True(span.Duration.HasValue);
-            Assert.AreEqual(3 * offset, span.Duration.Value.TotalMilliseconds);
-        }
-
-        [Test]
         public void MinimumDurationShouldBeAMicrosecond()
         {
             var spanState = new SpanState(1, null, 2, isSampled: null, isDebug: false);
             var span = new Span(spanState, TimeUtils.UtcNow);
-
             var annotationTime = span.SpanCreated;
-            var recordServerRecv = new Record(spanState, annotationTime, Annotations.ServerRecv());
-            recordServerRecv.Annotation.Accept(new ZipkinAnnotationVisitor(recordServerRecv, span));
-            var recordServerSend = new Record(spanState, annotationTime.AddTicks(1), Annotations.ServerSend());
-            recordServerSend.Annotation.Accept(new ZipkinAnnotationVisitor(recordServerSend, span));
-            Assert.True(span.Duration.HasValue);
+            span.AddBinaryAnnotation(new BinaryAnnotation(zipkinCoreConstants.LOCAL_COMPONENT,
+                Encoding.UTF8.GetBytes("lc1"), AnnotationType.STRING, annotationTime,
+                SerializerUtils.DefaultServiceName, SerializerUtils.DefaultEndPoint));
+            span.SetAsComplete(annotationTime.AddTicks(1));
+
+            Assert.NotNull(span.Duration);
             Assert.AreEqual(0.001, span.Duration.Value.TotalMilliseconds);
         }
 
@@ -102,9 +34,11 @@ namespace zipkin4net.UTest.Tracers.Zipkin
         [TestCase(200, true)]
         public void SpanHasDurationOnlyIfValueIsPositive(int offset, bool shouldHaveDuration)
         {
-            var duration = GetSpanDuration(offset, Annotations.ClientSend(), Annotations.ClientRecv());
+            var duration = GetSpanDuration(TimeSpan.FromMilliseconds(offset), zipkinCoreConstants.CLIENT_SEND,
+                zipkinCoreConstants.CLIENT_RECV);
             if (shouldHaveDuration)
             {
+                Assert.NotNull(duration);
                 Assert.AreEqual(offset, (int) duration.Value.TotalMilliseconds);
             }
             else
@@ -116,34 +50,23 @@ namespace zipkin4net.UTest.Tracers.Zipkin
         [Test]
         public void SpanDoesntHaveDurationIfIncomplete()
         {
-            const int offset = 10;
+            var offset = TimeSpan.FromMilliseconds(10);
 
-            Assert.False(GetSpanDuration(offset, Annotations.ServerRecv()).HasValue);
-            Assert.False(GetSpanDuration(offset, Annotations.ServerSend()).HasValue);
-            Assert.False(GetSpanDuration(offset, Annotations.ClientRecv()).HasValue);
-            Assert.False(GetSpanDuration(offset, Annotations.ClientSend()).HasValue);
-            Assert.False(GetSpanDuration(offset, Annotations.LocalOperationStart("Operation")).HasValue);
-            Assert.False(GetSpanDuration(offset, Annotations.LocalOperationStop()).HasValue);
-            Assert.False(GetSpanDuration(offset, Annotations.ConsumerStart()).HasValue);
-            Assert.False(GetSpanDuration(offset, Annotations.ConsumerStop()).HasValue);
-            Assert.False(GetSpanDuration(offset, Annotations.ProducerStart()).HasValue);
-            Assert.False(GetSpanDuration(offset, Annotations.ProducerStop()).HasValue);
+            Assert.False(GetSpanDuration(offset, zipkinCoreConstants.SERVER_SEND).HasValue);
+            Assert.False(GetSpanDuration(offset, zipkinCoreConstants.CLIENT_RECV).HasValue);
         }
 
 
-        private static TimeSpan? GetSpanDuration(int offset, IAnnotation firstAnnotation, IAnnotation secondAnnotation = null)
+        private static TimeSpan? GetSpanDuration(TimeSpan offset, params string[] annotations)
         {
-            var spanState = new SpanState(1, 0, 2, isSampled: null, isDebug: false);
+            var spanState = new SpanState(1, null, 2, isSampled: null, isDebug: false);
             var span = new Span(spanState, TimeUtils.UtcNow);
+            var annotationTime = span.SpanCreated;
 
-            var annotationTime = TimeUtils.UtcNow;
-            var firstRecord = new Record(spanState, annotationTime, firstAnnotation);
-            firstRecord.Annotation.Accept(new ZipkinAnnotationVisitor(firstRecord, span));
-            if (secondAnnotation != null)
-            {
-                var secondRecord = new Record(spanState, annotationTime.AddMilliseconds(offset), secondAnnotation);
-                secondRecord.Annotation.Accept(new ZipkinAnnotationVisitor(secondRecord, span));
-            }
+            Array.ForEach(annotations, a =>
+                span.AddAnnotation(new ZipkinAnnotation(annotationTime, a)));
+
+            span.SetAsComplete(annotationTime.Add(offset));
 
             return span.Duration;
         }
