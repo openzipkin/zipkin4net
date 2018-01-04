@@ -15,7 +15,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="../Src/zipkin4net.dotnetcore.csproj" />
+    <ProjectReference Include="../Src/zipkin4net.csproj" />
   </ItemGroup>
 
   <ItemGroup>

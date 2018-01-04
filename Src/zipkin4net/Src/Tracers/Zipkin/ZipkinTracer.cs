@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Concurrent;
-using System.IO;
-using System.Linq;
-using System.Threading;
-using zipkin4net.Utils;
+using zipkin4net.Internal.Recorder;
 
 namespace zipkin4net.Tracers.Zipkin
 {
@@ -15,98 +11,53 @@ namespace zipkin4net.Tracers.Zipkin
     /// </summary>
     public class ZipkinTracer : ITracer
     {
+        [Obsolete]
         public IStatistics Statistics { get; private set; }
 
-        private readonly ConcurrentDictionary<SpanState, Span> _spanMap = new ConcurrentDictionary<SpanState, Span>();
-        private readonly IZipkinSender _spanSender;
-        private readonly ISpanSerializer _spanSerializer;
+        private readonly MutableSpanMap _spanMap;
 
-        /// <summary>
-        /// Flush old records when fired.
-        /// </summary>
-        private readonly Timer _flushTimer;
+        private readonly IReporter _reporter;
 
-        /// <summary>
-        /// Spans which are not completed by this time are automatically flushed.
-        /// </summary>
-        internal static readonly TimeSpan TimeToLive = TimeSpan.FromMinutes(1);
 
         public ZipkinTracer(IZipkinSender sender, ISpanSerializer spanSerializer, IStatistics statistics = null)
+            : this(new ZipkinTracerReporter(sender, spanSerializer, statistics), statistics)
         {
-            if (sender == null) throw new ArgumentNullException("sender", "You have to specify a non-null sender for Zipkin tracer.");
+        }
+
+        internal ZipkinTracer(IReporter reporter, IStatistics statistics)
+        {
             Statistics = statistics ?? new Statistics();
-            _spanSender = sender;
-
-            if (spanSerializer == null) throw new ArgumentNullException("spanSerializer", "You have to specify a non-null span serializer for Zipkin tracer.");
-            _spanSerializer = spanSerializer;
-
-            _flushTimer = new Timer(_ => FlushOldSpans(TimeUtils.UtcNow), null, TimeToLive, TimeToLive);
+            _reporter = reporter;
+            _spanMap = new MutableSpanMap(_reporter, Statistics);
         }
 
         public void Record(Record record)
         {
             Statistics.UpdateRecordProcessed();
 
-            var updatedSpan = _spanMap.AddOrUpdate(record.SpanState,
-                id => VisitAnnotation(record, new Span(record.SpanState, record.Timestamp)),
-                (id, span) => VisitAnnotation(record, span));
+            var traceContext = record.SpanState;
+            var span = _spanMap.GetOrCreate(traceContext, (t) => new Span(t, record.Timestamp));
+            VisitAnnotation(record, span);
 
-            if (updatedSpan.Complete)
+            if (span.Complete)
             {
                 RemoveThenLogSpan(record.SpanState);
             }
         }
 
-        private static Span VisitAnnotation(Record record, Span span)
+        private static void VisitAnnotation(Record record, Span span)
         {
             var visitor = new ZipkinAnnotationVisitor(record, span);
 
             record.Annotation.Accept(visitor);
-
-            return span;
         }
 
-        private void RemoveThenLogSpan(SpanState spanState)
+        private void RemoveThenLogSpan(ITraceContext spanState)
         {
-            Span spanToLog;
-            if (_spanMap.TryRemove(spanState, out spanToLog))
+            var spanToLog = _spanMap.Remove(spanState);
+            if (spanToLog != null)
             {
-                LogSpan(spanToLog);
-            }
-        }
-
-        private void LogSpan(Span span)
-        {
-            byte[] serializedSpan = null;
-            
-            using(var memoryStream = new MemoryStream())
-            {
-                _spanSerializer.SerializeTo(memoryStream, span);
-                serializedSpan = memoryStream.ToArray();
-            }
-
-            _spanSender.Send(serializedSpan);
-            Statistics.UpdateSpanSent();
-            Statistics.UpdateSpanSentBytes(serializedSpan.Length);
-        }
-
-        /// <summary>
-        /// Flush old spans which didn't complete before the end of their TTL.
-        /// Visibility is set to internal to allow unit testing.
-        /// </summary>
-        /// <param name="utcNow"></param>
-        internal void FlushOldSpans(DateTime utcNow)
-        {
-            var outlivedSpans = _spanMap.Where(pair => (utcNow - pair.Value.SpanCreated) > TimeToLive).ToList();
-
-            foreach (var oldSpanEntry in outlivedSpans)
-            {
-                if (!oldSpanEntry.Value.Complete)
-                {
-                    oldSpanEntry.Value.AddAnnotation(new ZipkinAnnotation(TimeUtils.UtcNow, "flush.timeout"));
-                    Statistics.UpdateSpanFlushed();
-                }
-                RemoveThenLogSpan(oldSpanEntry.Key);
+                _reporter.Report(spanToLog);
             }
         }
     }

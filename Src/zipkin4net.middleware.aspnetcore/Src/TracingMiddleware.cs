@@ -1,9 +1,7 @@
-﻿using System;
-using Microsoft.AspNetCore.Builder;
-using zipkin4net;
-using zipkin4net.Transport;
-using zipkin4net.Utils;
+﻿using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
+using zipkin4net.Propagation;
 
 namespace zipkin4net.Middleware
 {
@@ -11,15 +9,13 @@ namespace zipkin4net.Middleware
     {
         public static void UseTracing(this IApplicationBuilder app, string serviceName)
         {
-            var extractor = new ZipkinHttpTraceExtractor();
+            var extractor = Propagations.B3String.Extractor<IHeaderDictionary>((carrier, key) => carrier[key]);
             app.Use(async (context, next) =>
             {
-                Trace trace;
                 var request = context.Request;
-                if (!extractor.TryExtract(request.Headers, (c, key) => c[key], out trace))
-                {
-                    trace = Trace.Create();
-                }
+                var traceContext = extractor.Extract(request.Headers);
+                
+                var trace = traceContext == null ? Trace.Create() : Trace.CreateFromId(traceContext);
                 Trace.Current = trace;
                 using (var serverTrace = new ServerTrace(serviceName, request.Method))
                 {

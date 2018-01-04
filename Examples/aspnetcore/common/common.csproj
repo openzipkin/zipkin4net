@@ -16,8 +16,8 @@
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="2.0.0" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="../../../Src/zipkin4net/Src/zipkin4net.dotnetcore.csproj" />
-    <ProjectReference Include="../../../Src/zipkin4net.middleware.aspnetcore/Src/zipkin4net.middleware.aspnetcore.dotnetcore.csproj" />
+    <ProjectReference Include="../../../Src/zipkin4net/Src/zipkin4net.csproj" />
+    <ProjectReference Include="../../../Src/zipkin4net.middleware.aspnetcore/Src/zipkin4net.middleware.aspnetcore.csproj" />
   </ItemGroup>
   <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard1.6' ">
     <DefineConstants>$(DefineConstants);NET_CORE</DefineConstants>

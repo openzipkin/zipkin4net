@@ -1,5 +1,4 @@
-﻿using zipkin4net.Transport;
-using Microsoft.Owin.Testing;
+﻿using Microsoft.Owin.Testing;
 using Owin;
 using System;
 using System.Net.Http;
@@ -9,22 +8,22 @@ namespace zipkin4net.Middleware.Tests.Helpers
 {
     static class OwinHelper
     {
-        internal static async Task Call(Action<IAppBuilder> startup, Func<HttpClient, Task> clientCall)
+        internal static async Task<string> Call(Action<IAppBuilder> startup, Func<HttpClient, Task<string>> clientCall)
         {
             using (var server = TestServer.Create(startup))
             {
                 using (var client = new HttpClient(server.Handler))
                 {
-                    await clientCall(client);
+                    return await clientCall(client);
                 }
             }
         }
-        internal static Action<IAppBuilder> DefaultStartup(string serviceName, ITraceExtractor traceExtractor)
+        internal static Action<IAppBuilder> DefaultStartup(string serviceName)
         {
             return
                 app =>
                 {
-                    app.UseZipkinTracer(serviceName, traceExtractor);
+                    app.UseZipkinTracer(serviceName);
 
                     app.Run(async context =>
                     {

@@ -1,18 +1,18 @@
-﻿using zipkin4net.Transport;
-using Microsoft.Owin;
+﻿using Microsoft.Owin;
 using System.Threading.Tasks;
+using zipkin4net.Propagation;
 
 namespace zipkin4net.Middleware
 {
     class ZipkinMiddleware : OwinMiddleware
     {
         private readonly string serviceName;
-        private readonly ITraceExtractor traceExtractor;
+        private readonly IExtractor<IHeaderDictionary> traceExtractor;
 
         public ZipkinMiddleware(
             OwinMiddleware next,
             string serviceName,
-            ITraceExtractor traceExtractor) : base(next)
+            IExtractor<IHeaderDictionary> traceExtractor) : base(next)
         {
             this.serviceName = serviceName;
             this.traceExtractor = traceExtractor;
@@ -20,12 +20,8 @@ namespace zipkin4net.Middleware
 
         public override async Task Invoke(IOwinContext context)
         {
-            Trace trace;
-
-            if (!this.traceExtractor.TryExtract(context.Request.Headers, (dic, k) => string.Join(",", dic[k]), out trace))
-            {
-                trace = Trace.Create();
-            }
+            var traceContext = traceExtractor.Extract(context.Request.Headers);
+            var trace = traceContext == null ? Trace.Create() : Trace.CreateFromId(traceContext);
 
             Trace.Current = trace;
 

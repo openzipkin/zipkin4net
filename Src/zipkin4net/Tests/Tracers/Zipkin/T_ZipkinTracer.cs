@@ -1,28 +1,24 @@
 ﻿using System;
-using System.IO;
 using zipkin4net.Annotation;
 using zipkin4net.Tracers.Zipkin;
 using zipkin4net.Utils;
 using Moq;
 using NUnit.Framework;
+using zipkin4net.Internal.Recorder;
 
 namespace zipkin4net.UTest.Tracers.Zipkin
 {
     [TestFixture]
     internal class T_ZipkinTracer
     {
-        private Mock<ISpanSerializer> _spanSerializer;
-        private Mock<IZipkinSender> _spanSender;
-        private Mock<IStatistics> _statistics;
+        private Mock<IReporter> _reporter;
         private ZipkinTracer _tracer;
 
         [SetUp]
         public void Setup()
         {
-            _spanSerializer = new Mock<ISpanSerializer>();
-            _spanSender = new Mock<IZipkinSender>();
-            _statistics = new Mock<IStatistics>();
-            _tracer = new ZipkinTracer(_spanSender.Object, _spanSerializer.Object, _statistics.Object);
+            _reporter = new Mock<IReporter>();
+            _tracer = new ZipkinTracer(_reporter.Object, null);
         }
 
         [Test]
@@ -47,8 +43,7 @@ namespace zipkin4net.UTest.Tracers.Zipkin
             Record(trace, Annotations.ClientSend());
             Record(trace, Annotations.ClientRecv());
 
-            _spanSerializer.Verify(s => s.SerializeTo(It.IsAny<Stream>(), It.IsAny<Span>()), Times.Once());
-            _spanSender.Verify(sender => sender.Send(It.IsAny<byte[]>()), Times.Once());
+            _reporter.Verify(r => r.Report(It.IsAny<Span>()), Times.Once());
         }
 
         [Test]
@@ -59,58 +54,8 @@ namespace zipkin4net.UTest.Tracers.Zipkin
             Record(trace, Annotations.ServerRecv());
             Record(trace, Annotations.ServerSend());
 
-            _spanSerializer.Verify(s => s.SerializeTo(It.IsAny<Stream>(), It.IsAny<Span>()), Times.Once());
-            _spanSender.Verify(sender => sender.Send(It.IsAny<byte[]>()), Times.Once());
-
+            _reporter.Verify(r => r.Report(It.IsAny<Span>()), Times.Once());
         }
-
-        [Test]
-        public void SpansShouldBeFlushedAfterTtl()
-        {
-            var now = TimeUtils.UtcNow;
-
-            var firstSpanState = new SpanState(traceId: 1, parentSpanId: 0, spanId: 4874542152, flags: SpanFlags.None);
-            var record = new Record(firstSpanState, now, Annotations.ServerRecv());
-
-            _tracer.Record(record);
-
-            // futureTime = now + (ttl - 4)
-            var futureTime = now.AddSeconds(ZipkinTracer.TimeToLive.TotalSeconds - 4); // of course test will fail if TTL is set lower than 4 seconds
-
-            _tracer.FlushOldSpans(futureTime); // shouldn't do anything since we haven't reached span ttl yet
-
-            _spanSender.Verify(sender => sender.Send(It.IsAny<byte[]>()), Times.Never());
-
-            var newerSpanState = new SpanState(traceId: 2, parentSpanId: 0, spanId: 9988415021, flags: SpanFlags.None);
-            var newerRecord = new Record(newerSpanState, futureTime, Annotations.ServerRecv());
-            _tracer.Record(newerRecord); // creates a second span
-
-            futureTime = futureTime.AddSeconds(5); // = now + (ttl - 4) + 5 = now + ttl + 1
-
-            _tracer.FlushOldSpans(futureTime); // should flush only the first span since we are 1 second past its TTL but 5 seconds before the second span TTL
-
-            _spanSender.Verify(sender => sender.Send(It.IsAny<byte[]>()), Times.Once());
-
-            // "ServerSend" should make the second span "complete" hence the second span should be sent immediately
-            var newerComplementaryRecord = new Record(newerSpanState, futureTime, Annotations.ServerSend());
-            _tracer.Record(newerComplementaryRecord);
-
-            _spanSender.Verify(sender => sender.Send(It.IsAny<byte[]>()), Times.Exactly(2));
-        }
-
-        [Test]
-        public void StatisticsAreUpdatedForFlush()
-        {
-            var trace = Trace.Create();
-
-            var now = TimeUtils.UtcNow;
-            var record = new Record(trace.CurrentSpan, now.AddSeconds(-2 * ZipkinTracer.TimeToLive.TotalSeconds), Annotations.ServerRecv());
-            _tracer.Record(record);
-            _tracer.FlushOldSpans(now);
-
-            _statistics.Verify(s => s.UpdateSpanFlushed(), Times.Once());
-        }
-
 
         [Test]
         public void StatisticsAreUpdatedForSent()
@@ -119,24 +64,30 @@ namespace zipkin4net.UTest.Tracers.Zipkin
 
             Record(trace, Annotations.ServerSend());
 
-            _statistics.Verify(s => s.UpdateSpanSent(), Times.Once());
-            _statistics.Verify(s => s.UpdateSpanSentBytes(It.IsAny<int>()), Times.Once());
+            _reporter.Verify(r => r.Report(It.IsAny<Span>()), Times.Once());
         }
 
         [Test]
         public void StatisticsAreUpdatedForRecord()
         {
+            var statistics = new Mock<IStatistics>();
+            var tracer = new ZipkinTracer(Mock.Of<IZipkinSender>(), Mock.Of<ISpanSerializer>(), statistics.Object);
             var trace = Trace.Create();
 
-            Record(trace, Annotations.ServerRecv());
+            Record(tracer, trace, Annotations.ServerRecv());
 
-            _statistics.Verify(s => s.UpdateRecordProcessed(), Times.Once());
+            statistics.Verify(s => s.UpdateRecordProcessed(), Times.Once());
         }
 
         private void Record(Trace trace, IAnnotation annotation)
         {
+            Record(_tracer, trace, annotation);
+        }
+        
+        private static void Record(ITracer tracer, Trace trace, IAnnotation annotation)
+        {
             var record = new Record(trace.CurrentSpan, TimeUtils.UtcNow, annotation);
-            _tracer.Record(record);
+            tracer.Record(record);
         }
 
     }

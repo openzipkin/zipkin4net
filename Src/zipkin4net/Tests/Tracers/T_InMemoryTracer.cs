@@ -15,7 +15,7 @@ namespace zipkin4net.UTest.Tracers
         {
             var memoryTracer = new InMemoryTracer();
 
-            var spanState = new SpanState(1, 0, 1, SpanFlags.None);
+            var spanState = new SpanState(1, 0, 1, isSampled: null, isDebug: false);
 
             var rpcAnn = Annotations.Rpc("GET RPC");
             var recordRpc = new Record(spanState, TimeUtils.UtcNow, rpcAnn);

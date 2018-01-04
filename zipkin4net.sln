@@ -1,31 +1,45 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26730.15
+VisualStudioVersion = 15.0.27130.2010
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "zipkin4net.dotnetcore", "Src\zipkin4net\Src\zipkin4net.dotnetcore.csproj", "{537FF480-331E-4567-AA77-1BAF43F205CB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "zipkin4net", "Src\zipkin4net\Src\zipkin4net.csproj", "{537FF480-331E-4567-AA77-1BAF43F205CB}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "zipkin4net.Tests.dotnetcore", "Src\zipkin4net\Tests\zipkin4net.Tests.dotnetcore.csproj", "{5BCC39BF-CCB1-450C-8831-389A4B935A4A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "zipkin4net.Tests", "Src\zipkin4net\Tests\zipkin4net.Tests.csproj", "{5BCC39BF-CCB1-450C-8831-389A4B935A4A}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "zipkin4net.Benchmark.dotnetcore", "Src\zipkin4net\Benchmark\zipkin4net.Benchmark.dotnetcore.csproj", "{B2591E13-5E59-4D09-BAFD-C285BB6315B9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "zipkin4net.Benchmark", "Src\zipkin4net\Benchmark\zipkin4net.Benchmark.csproj", "{B2591E13-5E59-4D09-BAFD-C285BB6315B9}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "zipkin4net.middleware.aspnetcore.dotnetcore", "Src\zipkin4net.middleware.aspnetcore\Src\zipkin4net.middleware.aspnetcore.dotnetcore.csproj", "{F02EDF71-04C6-44A2-8C11-8F23A7F7A6AC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "zipkin4net.middleware.aspnetcore", "Src\zipkin4net.middleware.aspnetcore\Src\zipkin4net.middleware.aspnetcore.csproj", "{F02EDF71-04C6-44A2-8C11-8F23A7F7A6AC}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "zipkin4net.middleware.owin.dotnetcore", "Src\zipkin4net.middleware.owin\Src\zipkin4net.middleware.owin.dotnetcore.csproj", "{654A440D-6490-42F0-BFC3-14086F3817BF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "zipkin4net.middleware.owin", "Src\zipkin4net.middleware.owin\Src\zipkin4net.middleware.owin.csproj", "{654A440D-6490-42F0-BFC3-14086F3817BF}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "zipkin4net.middleware.owin.Tests.dotnetcore", "Src\zipkin4net.middleware.owin\Tests\zipkin4net.middleware.owin.Tests.dotnetcore.csproj", "{6FFC4FC6-725F-4463-922C-79DCC48DF3D7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "zipkin4net.middleware.owin.Tests", "Src\zipkin4net.middleware.owin\Tests\zipkin4net.middleware.owin.Tests.csproj", "{6FFC4FC6-725F-4463-922C-79DCC48DF3D7}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "common.dotnetcore", "Examples\aspnetcore\common\common.dotnetcore.csproj", "{7DEAB9B8-FC6E-409D-8CA1-39E1FE0990C4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "common", "Examples\aspnetcore\common\common.csproj", "{7DEAB9B8-FC6E-409D-8CA1-39E1FE0990C4}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "backend.dotnetcore", "Examples\aspnetcore\backend\backend.dotnetcore.csproj", "{5D3A113D-1E11-40AC-AEA5-D5F8FE8292F8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "backend", "Examples\aspnetcore\backend\backend.csproj", "{5D3A113D-1E11-40AC-AEA5-D5F8FE8292F8}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "frontend.dotnetcore", "Examples\aspnetcore\frontend\frontend.dotnetcore.csproj", "{9D64A8B7-B8C6-4B52-ACA5-AE2C3A73BE97}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "frontend", "Examples\aspnetcore\frontend\frontend.csproj", "{9D64A8B7-B8C6-4B52-ACA5-AE2C3A73BE97}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "example.owin.backend.dotnetcore", "Examples\owin\backend\example.owin.backend.dotnetcore.csproj", "{CB09552F-2BE0-453F-8F1E-A3B51CC9667D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "example.owin.backend", "Examples\owin\backend\example.owin.backend.csproj", "{CB09552F-2BE0-453F-8F1E-A3B51CC9667D}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "example.owin.frontend.dotnetcore", "Examples\owin\frontend\example.owin.frontend.dotnetcore.csproj", "{F92CE013-4974-45D6-973B-0E03D49CE405}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "example.owin.frontend", "Examples\owin\frontend\example.owin.frontend.csproj", "{F92CE013-4974-45D6-973B-0E03D49CE405}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "example.owin.common.dotnetcore", "Examples\owin\common\example.owin.common.dotnetcore.csproj", "{6C3CEF75-174F-436B-B252-F2F339521307}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "example.owin.common", "Examples\owin\common\example.owin.common.csproj", "{6C3CEF75-174F-436B-B252-F2F339521307}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "examples", "examples", "{DD8D68DE-B823-422F-B22B-E28B8FA1397E}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{8DC9F862-EC74-4F2B-BAB1-C445C76E6EC6}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "middleware", "middleware", "{2E8B6A44-12FD-4432-BDA8-9CFC2B148D48}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "owin", "owin", "{0F072F12-188A-4BB5-857B-B7B3D59C0ED6}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "aspnetcore", "aspnetcore", "{9D41A684-7B6C-4F00-972C-BDE4E5ECCAA3}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "middleware", "middleware", "{576FE96A-9156-4DFF-BA99-6E3AAC66E3BE}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{37F98480-6352-42B5-BDD0-421DC4387B87}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -84,6 +98,24 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{5BCC39BF-CCB1-450C-8831-389A4B935A4A} = {8DC9F862-EC74-4F2B-BAB1-C445C76E6EC6}
+		{2E8B6A44-12FD-4432-BDA8-9CFC2B148D48} = {8DC9F862-EC74-4F2B-BAB1-C445C76E6EC6}
+		{6FFC4FC6-725F-4463-922C-79DCC48DF3D7} = {2E8B6A44-12FD-4432-BDA8-9CFC2B148D48}
+		{0F072F12-188A-4BB5-857B-B7B3D59C0ED6} = {DD8D68DE-B823-422F-B22B-E28B8FA1397E}
+		{CB09552F-2BE0-453F-8F1E-A3B51CC9667D} = {0F072F12-188A-4BB5-857B-B7B3D59C0ED6}
+		{6C3CEF75-174F-436B-B252-F2F339521307} = {0F072F12-188A-4BB5-857B-B7B3D59C0ED6}
+		{F92CE013-4974-45D6-973B-0E03D49CE405} = {0F072F12-188A-4BB5-857B-B7B3D59C0ED6}
+		{9D41A684-7B6C-4F00-972C-BDE4E5ECCAA3} = {DD8D68DE-B823-422F-B22B-E28B8FA1397E}
+		{9D64A8B7-B8C6-4B52-ACA5-AE2C3A73BE97} = {9D41A684-7B6C-4F00-972C-BDE4E5ECCAA3}
+		{5D3A113D-1E11-40AC-AEA5-D5F8FE8292F8} = {9D41A684-7B6C-4F00-972C-BDE4E5ECCAA3}
+		{7DEAB9B8-FC6E-409D-8CA1-39E1FE0990C4} = {9D41A684-7B6C-4F00-972C-BDE4E5ECCAA3}
+		{F02EDF71-04C6-44A2-8C11-8F23A7F7A6AC} = {576FE96A-9156-4DFF-BA99-6E3AAC66E3BE}
+		{654A440D-6490-42F0-BFC3-14086F3817BF} = {576FE96A-9156-4DFF-BA99-6E3AAC66E3BE}
+		{537FF480-331E-4567-AA77-1BAF43F205CB} = {37F98480-6352-42B5-BDD0-421DC4387B87}
+		{B2591E13-5E59-4D09-BAFD-C285BB6315B9} = {37F98480-6352-42B5-BDD0-421DC4387B87}
+		{576FE96A-9156-4DFF-BA99-6E3AAC66E3BE} = {37F98480-6352-42B5-BDD0-421DC4387B87}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {624F3E6A-F976-434B-9D83-591B0F35D42B}

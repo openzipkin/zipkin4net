@@ -10,12 +10,12 @@ namespace zipkin4net.UTest.Transport
     {
         private readonly ZipkinHttpTraceInjector _injector = new ZipkinHttpTraceInjector();
 
-        [TestCase(SpanFlags.None, null)]
-        [TestCase(SpanFlags.SamplingKnown, "0")]
-        [TestCase(SpanFlags.SamplingKnown | SpanFlags.Sampled, "1")]
-        public void SampledHeaderFollowFlagsValueForCompatibility(SpanFlags flags, string expectedHeader)
+        [TestCase(null, null)]
+        [TestCase(false, "0")]
+        [TestCase(true, "1")]
+        public void SampledHeaderFollowFlagsValueForCompatibility(bool? isSampled, string expectedHeader)
         {
-            var spanFlagNotSampled = Trace.CreateFromId(new SpanState(1, 2, 250, flags));
+            var spanFlagNotSampled = Trace.CreateFromId(new SpanState(1, 2, 250, isSampled, false));
 
             var headers = new Dictionary<string, string>();
             _injector.Inject(spanFlagNotSampled, headers);
@@ -31,11 +31,11 @@ namespace zipkin4net.UTest.Transport
         }
 
         [TestCase("0000000000000001", 0L, "0000000000000000", "00000000000000fa", true, "6", "1", 5)]
-        [TestCase("0000000000000001", 0L, "0000000000000000", "00000000000000fa", false, "0", null, 4)]
+        [TestCase("0000000000000001", 0L, "0000000000000000", "00000000000000fa", null, "0", null, 4)]
         [TestCase("0000000000000001", null, null, "00000000000000fa", true, "6", "1", 4)]
-        public void HeadersAreCorrectlySet(string expectedTraceId, long? parentSpanId, string expectedParentSpanId, string expectedSpanId, bool setSampled, string expectedFlags, string expectedSampled, int expectedCount)
+        public void HeadersAreCorrectlySet(string expectedTraceId, long? parentSpanId, string expectedParentSpanId, string expectedSpanId, bool? setSampled, string expectedFlags, string expectedSampled, int expectedCount)
         {
-            var spanState = new SpanState(1, parentSpanId, 250, setSampled ? (SpanFlags.SamplingKnown | SpanFlags.Sampled) : SpanFlags.None);
+            var spanState = new SpanState(1, parentSpanId, 250, setSampled, false);
             var trace = Trace.CreateFromId(spanState);
 
             var headersNvc = new NameValueCollection();
