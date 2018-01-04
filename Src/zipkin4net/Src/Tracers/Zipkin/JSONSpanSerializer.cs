@@ -122,7 +122,7 @@ namespace zipkin4net.Tracers.Zipkin
         private static void SerializeEndPoint(StreamWriter writer, IPEndPoint endPoint, string serviceName)
         {
             writer.Write(openingBrace);
-            writer.WriteField(ipv4, SerializerUtils.IpToInt(endPoint.Address));
+            writer.WriteField(ipv4, SerializerUtils.PureIP(endPoint.Address));
             writer.Write(comma);
             writer.WriteField(port, (short)endPoint.Port);
             writer.Write(comma);
