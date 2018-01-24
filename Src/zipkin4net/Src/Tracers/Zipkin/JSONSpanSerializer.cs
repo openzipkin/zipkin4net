@@ -175,7 +175,7 @@ namespace zipkin4net.Tracers.Zipkin
         )
         {
             WriteAnchor(writer, fieldName);
-            writer.Write(fieldValue);
+            writer.Write(fieldValue ? "true" : "false");
         }
 
         internal static void WriteField
