@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net45</TargetFrameworks>
+    <TargetFrameworks>net451</TargetFrameworks>
     <AssemblyName>zipkin4net.middleware.owin</AssemblyName>
     <PackageId>zipkin4net.middleware.owin</PackageId>
     <Title>zipkin4net.middleware.owin</Title>
@@ -24,13 +24,6 @@
     <PackageLicenseUrl>https://github.com/openzipkin/zipkin4net/blob/master/LICENSE</PackageLicenseUrl>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(TargetFramework)' == 'netstandard1.5'">
-    <DefineConstants>$(DefineConstants);NET_CORE</DefineConstants>
-  </PropertyGroup>
-
-  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard1.5'">
-
-  </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.Owin" Version="3.1.0" />
     <PackageReference Include="System.Threading.Tasks.Dataflow" Version="4.7.0" />
