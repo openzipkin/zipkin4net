@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net45</TargetFramework>
+    <TargetFramework>net451</TargetFramework>
     <AssemblyName>zipkin4netmiddleware.owin.UTest</AssemblyName>
     <PackageId>zipkin4net.middleware.owin.UTest</PackageId>
     <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
