@@ -72,6 +72,36 @@ namespace zipkin4net.Middleware.Tests
         }
 
         [Test]
+        public async Task Check_That_dispatcher_is_called_with_expected_records_on_GET_call_when_using_custom_rpc()
+        {
+            //Arrange
+            var urlToCall = new Uri("http://testserver/api/values?foo=bar");
+            var serviceName = "OwinTest";
+
+            Func<HttpClient, Task<string>> clientCall = async (client) =>
+            {
+                var response = await client.GetAsync(urlToCall);
+                return await response.Content.ReadAsStringAsync();
+            };
+
+            //Act
+            await Call(DefaultStartup(serviceName, context => $"{context.Request.Method}:{context.Request.Path}"), clientCall);
+
+            var records = _tracer.Records;
+
+            if (!IsRunningOnMono)
+            {
+                AssertAnnotationReceived<ServerRecv>(records);
+                AssertAnnotationReceived<ServerSend>(records);
+                AssertAnnotationReceived<Rpc>(records, rpc => rpc.Name == "GET:/api/values");
+                AssertAnnotationReceived<ServiceName>(records, serviceNameAnnotation => serviceNameAnnotation.Service == serviceName);
+            }
+            AssertAnnotationReceived<TagAnnotation>(records, tag => has("http.host", urlToCall.Host, tag));
+            AssertAnnotationReceived<TagAnnotation>(records, tag => has("http.url", urlToCall.AbsoluteUri, tag));
+            AssertAnnotationReceived<TagAnnotation>(records, tag => has("http.path", urlToCall.AbsolutePath, tag));
+        }
+
+        [Test]
         public async Task Check_That_dispatcher_is_called_with_expected_records_on_POST_call()
         {
             //Arrange
