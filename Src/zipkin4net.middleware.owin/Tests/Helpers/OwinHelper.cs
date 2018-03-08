@@ -1,4 +1,5 @@
-﻿using Microsoft.Owin.Testing;
+﻿using Microsoft.Owin;
+using Microsoft.Owin.Testing;
 using Owin;
 using System;
 using System.Net.Http;
@@ -18,12 +19,12 @@ namespace zipkin4net.Middleware.Tests.Helpers
                 }
             }
         }
-        internal static Action<IAppBuilder> DefaultStartup(string serviceName)
+        internal static Action<IAppBuilder> DefaultStartup(string serviceName, Func<IOwinContext, string> getRpc = null)
         {
             return
                 app =>
                 {
-                    app.UseZipkinTracer(serviceName);
+                    app.UseZipkinTracer(serviceName, getRpc);
 
                     app.Run(async context =>
                     {
