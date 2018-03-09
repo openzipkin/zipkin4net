@@ -1,12 +1,11 @@
 ﻿using zipkin4net.Annotation;
-using zipkin4net.Tracers;
 using NSubstitute;
 using NUnit.Framework;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Moq;
+using zipkin4net.Dispatcher;
 using zipkin4net.Middleware.Tests.Helpers;
 
 namespace zipkin4net.Middleware.Tests
@@ -22,23 +21,26 @@ namespace zipkin4net.Middleware.Tests
         //See https://github.com/criteo/zipkin4net/commit/14574b36582d184ecba28f746e779c6ff36442b2
         private static readonly bool IsRunningOnMono = Type.GetType("Mono.Runtime") != null;
         private ILogger _logger;
-        private InMemoryTracer _tracer;
+        private ITracer _tracer;
+        private Mock<IRecordDispatcher> _dispatcher;
 
         [SetUp]
         public void Setup()
         {
             _logger = Substitute.For<ILogger>();
-            _tracer = new InMemoryTracer();
+            _tracer = Mock.Of<ITracer>();
+            _dispatcher = new Mock<IRecordDispatcher>();
 
             TraceManager.SamplingRate = 1.0f;
             TraceManager.RegisterTracer(_tracer);
-            TraceManager.Start(_logger);
+            TraceManager.Start(_logger, _dispatcher.Object);
         }
 
         [TearDown]
         public void TearDown()
         {
             TraceManager.ClearTracers();
+            TraceManager.Stop();
         }
 
         [Test]
@@ -55,20 +57,19 @@ namespace zipkin4net.Middleware.Tests
             };
 
             //Act
-            await Call(DefaultStartup(serviceName), clientCall);
-
-            var records = _tracer.Records;
+            var responseContent = await Call(DefaultStartup(serviceName), clientCall);
+            Assert.IsNotEmpty(responseContent);
 
             if (!IsRunningOnMono)
             {
-                AssertAnnotationReceived<ServerRecv>(records);
-                AssertAnnotationReceived<ServerSend>(records);
-                AssertAnnotationReceived<Rpc>(records, rpc => rpc.Name == "GET");
-                AssertAnnotationReceived<ServiceName>(records, serviceNameAnnotation => serviceNameAnnotation.Service == serviceName);
+                AssertAnnotationReceived<ServerRecv>(_dispatcher);
+                AssertAnnotationReceived<ServerSend>(_dispatcher);
+                AssertAnnotationReceived<Rpc>(_dispatcher, rpc => rpc.Name == "GET");
+                AssertAnnotationReceived<ServiceName>(_dispatcher, serviceNameAnnotation => serviceNameAnnotation.Service == serviceName);
             }
-            AssertAnnotationReceived<TagAnnotation>(records, tag => has("http.host", urlToCall.Host, tag));
-            AssertAnnotationReceived<TagAnnotation>(records, tag => has("http.url", urlToCall.AbsoluteUri, tag));
-            AssertAnnotationReceived<TagAnnotation>(records, tag => has("http.path", urlToCall.AbsolutePath, tag));
+            AssertAnnotationReceived<TagAnnotation>(_dispatcher, tag => has("http.host", urlToCall.Host, tag));
+            AssertAnnotationReceived<TagAnnotation>(_dispatcher, tag => has("http.url", urlToCall.AbsoluteUri, tag));
+            AssertAnnotationReceived<TagAnnotation>(_dispatcher, tag => has("http.path", urlToCall.AbsolutePath, tag));
         }
 
         [Test]
@@ -85,20 +86,19 @@ namespace zipkin4net.Middleware.Tests
             };
 
             //Act
-            await Call(DefaultStartup(serviceName, context => $"{context.Request.Method}:{context.Request.Path}"), clientCall);
-
-            var records = _tracer.Records;
+            var responseContent = await Call(DefaultStartup(serviceName, context => $"{context.Request.Method}:{context.Request.Path}"), clientCall);
+            Assert.IsNotEmpty(responseContent);
 
             if (!IsRunningOnMono)
             {
-                AssertAnnotationReceived<ServerRecv>(records);
-                AssertAnnotationReceived<ServerSend>(records);
-                AssertAnnotationReceived<Rpc>(records, rpc => rpc.Name == "GET:/api/values");
-                AssertAnnotationReceived<ServiceName>(records, serviceNameAnnotation => serviceNameAnnotation.Service == serviceName);
+                AssertAnnotationReceived<ServerRecv>(_dispatcher);
+                AssertAnnotationReceived<ServerSend>(_dispatcher);
+                AssertAnnotationReceived<Rpc>(_dispatcher, rpc => rpc.Name == "GET:/api/values");
+                AssertAnnotationReceived<ServiceName>(_dispatcher, serviceNameAnnotation => serviceNameAnnotation.Service == serviceName);
             }
-            AssertAnnotationReceived<TagAnnotation>(records, tag => has("http.host", urlToCall.Host, tag));
-            AssertAnnotationReceived<TagAnnotation>(records, tag => has("http.url", urlToCall.AbsoluteUri, tag));
-            AssertAnnotationReceived<TagAnnotation>(records, tag => has("http.path", urlToCall.AbsolutePath, tag));
+            AssertAnnotationReceived<TagAnnotation>(_dispatcher, tag => has("http.host", urlToCall.Host, tag));
+            AssertAnnotationReceived<TagAnnotation>(_dispatcher, tag => has("http.url", urlToCall.AbsoluteUri, tag));
+            AssertAnnotationReceived<TagAnnotation>(_dispatcher, tag => has("http.path", urlToCall.AbsolutePath, tag));
         }
 
         [Test]
@@ -118,28 +118,26 @@ namespace zipkin4net.Middleware.Tests
             var responseContent = await Call(DefaultStartup(serviceName), clientCall);
             Assert.IsNotEmpty(responseContent);
 
-            var records = _tracer.Records;
             if (!IsRunningOnMono)
             {
-                AssertAnnotationReceived<ServerRecv>(records);
-                AssertAnnotationReceived<ServerSend>(records);
-                AssertAnnotationReceived<Rpc>(records, rpc => rpc.Name == "POST");
-                AssertAnnotationReceived<ServiceName>(records, serviceNameAnnotation => serviceNameAnnotation.Service == serviceName);
+                AssertAnnotationReceived<ServerRecv>(_dispatcher);
+                AssertAnnotationReceived<ServerSend>(_dispatcher);
+                AssertAnnotationReceived<Rpc>(_dispatcher, rpc => rpc.Name == "POST");
+                AssertAnnotationReceived<ServiceName>(_dispatcher, serviceNameAnnotation => serviceNameAnnotation.Service == serviceName);
             }
-            AssertAnnotationReceived<TagAnnotation>(records, tag => has("http.host", urlToCall.Host, tag));
-            AssertAnnotationReceived<TagAnnotation>(records, tag => has("http.url", urlToCall.AbsoluteUri, tag));
-            AssertAnnotationReceived<TagAnnotation>(records, tag => has("http.path", urlToCall.AbsolutePath, tag));
+            AssertAnnotationReceived<TagAnnotation>(_dispatcher, tag => has("http.host", urlToCall.Host, tag));
+            AssertAnnotationReceived<TagAnnotation>(_dispatcher, tag => has("http.url", urlToCall.AbsoluteUri, tag));
+            AssertAnnotationReceived<TagAnnotation>(_dispatcher, tag => has("http.path", urlToCall.AbsolutePath, tag));
         }
 
-        private static void AssertAnnotationReceived<T>(IEnumerable<Record> records)
+        private static void AssertAnnotationReceived<T>(Mock<IRecordDispatcher> dispatcher)
         {
-            AssertAnnotationReceived<T>(records, annotation => true);
+            AssertAnnotationReceived<T>(dispatcher, annotation => true);
         }
 
-        private static void AssertAnnotationReceived<T>(IEnumerable<Record> records, Func<T, bool> assertionOnAnnotation)
+        private static void AssertAnnotationReceived<T>(Mock<IRecordDispatcher> dispatcher, Func<T, bool> assertionOnAnnotation)
         {
-            Assert.That(records.Any(r => r.Annotation is T && assertionOnAnnotation((T) r.Annotation)), Is.True.After(DelayInMilliseconds, PollingInterval),
-                $"Didn't get {typeof(T)} annotation within 5s. Annotations: [{string.Join(", ", records)}]");
+            dispatcher.Verify(d => d.Dispatch(It.Is<Record>(r => r.Annotation is T && assertionOnAnnotation((T)r.Annotation))));
         }
     }
 }

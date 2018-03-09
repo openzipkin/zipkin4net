@@ -48,5 +48,6 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyVersion("1.1.0.0")]
 [assembly: AssemblyFileVersion("1.1.0.0")]
 [assembly: InternalsVisibleTo("zipkin4net.UTest")]
+[assembly: InternalsVisibleTo("zipkin4netmiddleware.owin.UTest")]
 [assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]
 
