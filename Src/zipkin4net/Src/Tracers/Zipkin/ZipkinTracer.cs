@@ -19,14 +19,24 @@ namespace zipkin4net.Tracers.Zipkin
         private readonly IReporter _reporter;
 
 
-        public ZipkinTracer(IZipkinSender sender, ISpanSerializer spanSerializer, IStatistics statistics = null)
+        public ZipkinTracer(IZipkinSender sender, ISpanSerializer spanSerializer)
+            : this(sender, spanSerializer, new Statistics())
+        {
+        }
+
+        public ZipkinTracer(IZipkinSender sender, ISpanSerializer spanSerializer, IStatistics statistics)
             : this(new ZipkinTracerReporter(sender, spanSerializer, statistics), statistics)
         {
         }
 
         internal ZipkinTracer(IReporter reporter, IStatistics statistics)
         {
-            Statistics = statistics ?? new Statistics();
+            if (statistics == null)
+            {
+                throw new ArgumentNullException(nameof(statistics),
+                    "You have to specify a non-null statistics.");
+            }
+            Statistics = statistics;
             _reporter = reporter;
             _spanMap = new MutableSpanMap(_reporter, Statistics);
         }

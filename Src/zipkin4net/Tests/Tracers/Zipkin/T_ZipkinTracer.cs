@@ -18,7 +18,7 @@ namespace zipkin4net.UTest.Tracers.Zipkin
         public void Setup()
         {
             _reporter = new Mock<IReporter>();
-            _tracer = new ZipkinTracer(_reporter.Object, null);
+            _tracer = new ZipkinTracer(_reporter.Object, new Statistics());
         }
 
         [Test]
