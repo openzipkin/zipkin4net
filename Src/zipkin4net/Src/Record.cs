@@ -3,7 +3,7 @@ using zipkin4net.Annotation;
 
 namespace zipkin4net
 {
-    public sealed class Record
+    internal sealed class Record
     {
         private const string DatetimeFormat = "MMdd HH:mm:ss.fff";
 
