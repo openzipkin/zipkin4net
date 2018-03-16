@@ -15,9 +15,9 @@ before_build:
 build_script:
 - dotnet build "zipkin4net.sln" -c %CONFIGURATION%
 after_build:
-- dotnet pack /p:PackageVersion="%APPVEYOR_REPO_TAG_NAME%" "Src\zipkin4net\Src\zipkin4net.csproj" -c %CONFIGURATION% --no-build --no-restore -o %APPVEYOR_BUILD_FOLDER%\artifacts
-- dotnet pack /p:PackageVersion="%APPVEYOR_REPO_TAG_NAME%" "Src\zipkin4net.middleware.aspnetcore\Src\zipkin4net.middleware.aspnetcore.csproj" -c %CONFIGURATION% --no-build --no-restore -o %APPVEYOR_BUILD_FOLDER%\artifacts
-- dotnet pack /p:PackageVersion="%APPVEYOR_REPO_TAG_NAME%" "Src\zipkin4net.middleware.owin\Src\zipkin4net.middleware.owin.csproj" -c %CONFIGURATION% --no-build --no-restore -o %APPVEYOR_BUILD_FOLDER%\artifacts
+- cmd: IF "%APPVEYOR_REPO_TAG%" == "true" (dotnet pack /p:PackageVersion="%APPVEYOR_REPO_TAG_NAME%" "Src\zipkin4net\Src\zipkin4net.csproj" -c %CONFIGURATION% --no-build --no-restore -o %APPVEYOR_BUILD_FOLDER%\artifacts)
+- cmd: IF "%APPVEYOR_REPO_TAG%" == "true" (dotnet pack /p:PackageVersion="%APPVEYOR_REPO_TAG_NAME%" "Src\zipkin4net.middleware.aspnetcore\Src\zipkin4net.middleware.aspnetcore.csproj" -c %CONFIGURATION% --no-build --no-restore -o %APPVEYOR_BUILD_FOLDER%\artifacts)
+- cmd: IF "%APPVEYOR_REPO_TAG%" == "true" (dotnet pack /p:PackageVersion="%APPVEYOR_REPO_TAG_NAME%" "Src\zipkin4net.middleware.owin\Src\zipkin4net.middleware.owin.csproj" -c %CONFIGURATION% --no-build --no-restore -o %APPVEYOR_BUILD_FOLDER%\artifacts)
 test_script:
 - dotnet test "Src/zipkin4net/Tests/zipkin4net.Tests.csproj" -c %CONFIGURATION%
 - dotnet test "Src/zipkin4net.middleware.owin/Tests/zipkin4net.middleware.owin.Tests.csproj" -c %CONFIGURATION%
