@@ -2,10 +2,12 @@
 
 namespace zipkin4net.Tracers.Zipkin
 {
-    public interface ISpanSerializer
+    public interface ISpanSerializer<S>
     {
-
-        void SerializeTo(Stream stream, Span span);
-
+        void SerializeTo(Stream stream, S span);
+    }
+    
+    public interface ISpanSerializer : ISpanSerializer<Span>
+    {
     }
 }

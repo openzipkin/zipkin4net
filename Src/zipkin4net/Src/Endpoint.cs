@@ -1,8 +1,8 @@
 ﻿using System.Net;
 
-namespace zipkin4net.Internal.V2
+namespace zipkin4net
 {
-    internal struct Endpoint
+    public struct Endpoint
     {
         public readonly string ServiceName;
         public readonly IPEndPoint IpEndPoint;

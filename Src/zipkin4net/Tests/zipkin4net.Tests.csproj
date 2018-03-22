@@ -1,5 +1,4 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <TargetFramework>netcoreapp2.0</TargetFramework>
     <AssemblyName>zipkin4net.UTest</AssemblyName>
@@ -14,24 +13,19 @@
     <GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>
     <GenerateAssemblyFileVersionAttribute>false</GenerateAssemblyFileVersionAttribute>
   </PropertyGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\Src\zipkin4net.csproj" />
   </ItemGroup>
-
   <ItemGroup>
     <PackageReference Include="Moq" Version="4.7.99" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.0.0" />
     <PackageReference Include="NUnit" Version="3.8.0" />
     <PackageReference Include="NUnit3TestAdapter" Version="3.8.0" />
   </ItemGroup>
-
   <PropertyGroup Condition=" '$(TargetFramework)' == 'netcoreapp2.0' ">
     <DefineConstants>$(DefineConstants);NET_CORE</DefineConstants>
   </PropertyGroup>
-
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
-
 </Project>

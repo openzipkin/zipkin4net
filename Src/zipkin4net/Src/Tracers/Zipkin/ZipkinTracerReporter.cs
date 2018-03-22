@@ -4,13 +4,13 @@ using zipkin4net.Internal.Recorder;
 
 namespace zipkin4net.Tracers.Zipkin
 {
-    internal class ZipkinTracerReporter : IReporter
+    internal class ZipkinTracerReporter<S> : IReporter<S>
     {
         private readonly IZipkinSender _sender;
-        private readonly ISpanSerializer _spanSerializer;
+        private readonly ISpanSerializer<S> _spanSerializer;
         private readonly IStatistics _statistics;
 
-        internal ZipkinTracerReporter(IZipkinSender sender, ISpanSerializer spanSerializer, IStatistics statistics)
+        internal ZipkinTracerReporter(IZipkinSender sender, ISpanSerializer<S> spanSerializer, IStatistics statistics)
         {
             if (sender == null)
             {
@@ -34,7 +34,7 @@ namespace zipkin4net.Tracers.Zipkin
             _statistics = statistics;
         }
 
-        public void Report(Span span)
+        public void Report(S span)
         {
             byte[] serializedSpan = null;
 
