@@ -14,6 +14,8 @@ namespace zipkin4net.Tracers.Zipkin
     public class Span
     {
         public ITraceContext SpanState { get; private set; }
+        
+        public SpanKind? SpanKind { get; set; }
 
         public ICollection<ZipkinAnnotation> Annotations { get; private set; }
 
@@ -108,7 +110,7 @@ namespace zipkin4net.Tracers.Zipkin
                 startTime = annotation.Timestamp;
             }
             // Else look for server annotations
-            else if(IsRoot && TryGetServerRecv(out annotation))
+            else if (IsRoot && TryGetServerRecv(out annotation))
             {
                 startTime = annotation.Timestamp;
             }
@@ -126,13 +128,16 @@ namespace zipkin4net.Tracers.Zipkin
             }
             else
             {
-                Duration = durationValue < MinimumDuration ? TimeSpan.FromTicks(TimeSpan.TicksPerMillisecond / 1000) : duration;
+                Duration = durationValue < MinimumDuration
+                    ? TimeSpan.FromTicks(TimeSpan.TicksPerMillisecond / 1000)
+                    : duration;
             }
         }
 
         private bool TryGetLocalComponent(out BinaryAnnotation localComponentBinAnnotation)
         {
-            localComponentBinAnnotation = BinaryAnnotations.FirstOrDefault(a => a.Key.Equals(zipkinCoreConstants.LOCAL_COMPONENT));
+            localComponentBinAnnotation =
+                BinaryAnnotations.FirstOrDefault(a => a.Key.Equals(zipkinCoreConstants.LOCAL_COMPONENT));
             return localComponentBinAnnotation != default(BinaryAnnotation);
         }
 
@@ -152,15 +157,59 @@ namespace zipkin4net.Tracers.Zipkin
             return annotation != default(ZipkinAnnotation);
         }
 
-        public override string ToString()
+        /**public override string ToString()
         {
             return string.Format("Span: {0} name={1} Annotations={2} BinAnnotations={3}", SpanState, Name, ToString(Annotations, ","), ToString(BinaryAnnotations, ","));
         }
-
+*/
         private static string ToString<T>(IEnumerable<T> l, string separator)
         {
             return "[" + string.Join(separator, l.Select(i => i.ToString()).ToArray()) + "]";
         }
+        public override string ToString()
+        {
+            return
+                $"{nameof(SpanState)}: {SpanState}, {nameof(Annotations)}: {ToString(Annotations,",")}, {nameof(BinaryAnnotations)}: {ToString(BinaryAnnotations, ",")}, {nameof(Endpoint)}: {Endpoint}, {nameof(ServiceName)}: {ServiceName}, {nameof(Name)}: {Name}, {nameof(Complete)}: {Complete}, {nameof(IsRoot)}: {IsRoot}, {nameof(SpanCreated)}: {SpanCreated}, {nameof(SpanStarted)}: {SpanStarted}, {nameof(Duration)}: {Duration}";
+        }
 
+        protected bool Equals(Span other)
+        {
+            return Equals(SpanState, other.SpanState)
+                   && Annotations.All(other.Annotations.Contains) && Annotations.Count == other.Annotations.Count
+                   && BinaryAnnotations.All(other.BinaryAnnotations.Contains) && BinaryAnnotations.Count == other.BinaryAnnotations.Count
+                   && Equals(Endpoint, other.Endpoint)
+                   && string.Equals(ServiceName, other.ServiceName)
+                   && string.Equals(Name, other.Name)
+                   && Complete == other.Complete
+                   && SpanCreated.Equals(other.SpanCreated)
+                   && SpanStarted.Equals(other.SpanStarted)
+                   && Duration.Equals(other.Duration);
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            if (obj.GetType() != this.GetType()) return false;
+            return Equals((Span) obj);
+        }
+
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                var hashCode = (SpanState != null ? SpanState.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ (Annotations != null ? Annotations.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ (BinaryAnnotations != null ? BinaryAnnotations.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ (Endpoint != null ? Endpoint.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ (ServiceName != null ? ServiceName.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ (Name != null ? Name.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ Complete.GetHashCode();
+                hashCode = (hashCode * 397) ^ SpanCreated.GetHashCode();
+                hashCode = (hashCode * 397) ^ SpanStarted.GetHashCode();
+                hashCode = (hashCode * 397) ^ Duration.GetHashCode();
+                return hashCode;
+            }
+        }
     }
 }

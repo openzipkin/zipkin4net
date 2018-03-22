@@ -1,154 +1,184 @@
 ﻿using System;
 using System.Linq;
 using System.Net;
+using Moq;
 using zipkin4net.Annotation;
 using zipkin4net.Tracers.Zipkin;
-using zipkin4net.Tracers.Zipkin.Thrift;
 using zipkin4net.Utils;
 using NUnit.Framework;
-using Span = zipkin4net.Tracers.Zipkin.Span;
+using zipkin4net.Internal.Recorder;
+using Span = zipkin4net.Internal.V2.Span;
 
 namespace zipkin4net.UTest.Tracers.Zipkin
 {
     [TestFixture]
     internal class T_ZipkinAnnotationVisitor
     {
-
+/*
+        private static readonly Endpoint DefaultLocalEndPoint =
+            new Endpoint(SerializerUtils.DefaultServiceName, SerializerUtils.DefaultEndPoint);
         private static readonly SpanState SpanState = new SpanState(1, 0, 2, isSampled: null, isDebug: false);
+        private Recorder _recorder;
+        private Mock<IReporter<Span>> _reporter = new Mock<IReporter<Span>>();
+
+        [SetUp]
+        public void SetUp()
+        {
+            _recorder = new Recorder(new Endpoint(SerializerUtils.DefaultServiceName, SerializerUtils.DefaultEndPoint),
+                _reporter.Object);
+        }
 
         [Test]
         public void RpcNameAnnotationChangesSpanName()
         {
-            var span = new Span(SpanState, spanCreated: TimeUtils.UtcNow);
+            _recorder.Start(SpanState);
+            CreateAndVisitRecord(SpanState, Annotations.Rpc("myRPCmethod"));
+            _recorder.Finish(SpanState);
 
-            CreateAndVisitRecord(span, Annotations.Rpc("myRPCmethod"));
 
-            Assert.AreEqual("myRPCmethod", span.Name);
+            _reporter.Verify(r => r.Report(It.Is<Span>(s => "myRPCmethod".Equals(s.Name))));
         }
 
         [Test]
         public void ServNameAnnotationChangesSpanServName()
         {
-            var span = new Span(SpanState, spanCreated: TimeUtils.UtcNow);
+            _recorder.Start(SpanState);
+            CreateAndVisitRecord(SpanState, Annotations.ServiceName("myService"));
+            _recorder.Finish(SpanState);
 
-            CreateAndVisitRecord(span, Annotations.ServiceName("myService"));
-
-            Assert.AreEqual("myService", span.ServiceName);
+            _reporter.Verify(r => r.Report(It.Is<Span>(s => "myService".Equals(s.LocalServiceName))));
         }
 
         [Test]
         public void LocalAddrAnnotationChangesSpanLocalAddr()
         {
-            var span = new Span(SpanState, spanCreated: TimeUtils.UtcNow);
-
+            _recorder.Start(SpanState);
             var ipEndpoint = new IPEndPoint(IPAddress.Loopback, 9987);
-            CreateAndVisitRecord(span, Annotations.LocalAddr(ipEndpoint));
+            CreateAndVisitRecord(SpanState, Annotations.LocalAddr(ipEndpoint));
+            _recorder.Finish(SpanState);
 
-            Assert.AreEqual(ipEndpoint, span.Endpoint);
+            _reporter.Verify(r => r.Report(It.Is<Span>(s => ipEndpoint.Equals(s.LocalEndpoint.IpEndPoint))));
         }
 
         [Test]
         [Description("RPC, ServiceName and LocalAddr annotations override any previous recorded value.")]
         public void LastAnnotationValueIsKeptIfMultipleRecord()
         {
-            var span = new Span(SpanState, spanCreated: TimeUtils.UtcNow);
+            _recorder.Start(SpanState);
+            CreateAndVisitRecord(SpanState, Annotations.ServiceName("myService"));
+            CreateAndVisitRecord(SpanState, Annotations.ServiceName("someOtherName"));
+            _recorder.Finish(SpanState);
 
-            CreateAndVisitRecord(span, Annotations.ServiceName("myService"));
-            CreateAndVisitRecord(span, Annotations.ServiceName("someOtherName"));
-
-            Assert.AreEqual("someOtherName", span.ServiceName);
+            _reporter.Verify(r => r.Report(It.Is<Span>(s => "someOtherName".Equals(s.LocalServiceName))));
         }
 
-        private static void CreateAndVisitRecord(Span span, IAnnotation annotation)
+        private void CreateAndVisitRecord(ITraceContext spanState, IAnnotation annotation)
         {
-            var record = new Record(span.SpanState, TimeUtils.UtcNow, annotation);
-            var visitor = new ZipkinAnnotationVisitor(record, span);
+            var record = new Record(spanState, TimeUtils.UtcNow, annotation);
+            var visitor = new ZipkinAnnotationVisitor(_recorder, record, spanState);
 
             record.Annotation.Accept(visitor);
         }
+        
 
-        [TestCase("string", new byte[] { 0x73, 0x74, 0x72, 0x69, 0x6E, 0x67 }, AnnotationType.STRING)]
-        [TestCase(true, new byte[] { 0x1 }, AnnotationType.BOOL)]
-        [TestCase(short.MaxValue, new byte[] { 0x7F, 0xFF }, AnnotationType.I16)]
-        [TestCase(int.MaxValue, new byte[] { 0x7F, 0xFF, 0xFF, 0xFF }, AnnotationType.I32)]
-        [TestCase(long.MaxValue, new byte[] { 0x7F, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF }, AnnotationType.I64)]
-        [TestCase(new byte[] { 0x93 }, new byte[] { 0x93 }, AnnotationType.BYTES)]
-        [TestCase(9.3d, new byte[] { 0x40, 0x22, 0x99, 0x99, 0x99, 0x99, 0x99, 0x9A, }, AnnotationType.DOUBLE)]
-        public void TagAnnotationCorrectlyAdded(object value, byte[] expectedBytes, AnnotationType expectedType)
+        [TestCase("string")]
+        [TestCase(true)]
+        [TestCase(short.MaxValue)]
+        [TestCase(int.MaxValue)]
+        [TestCase(long.MaxValue)]
+        [TestCase(new byte[] {0x93})]
+        [TestCase(9.3d)]
+        public void TagAnnotationCorrectlyAdded(object value)
         {
-            var span = new Span(SpanState, spanCreated: TimeUtils.UtcNow);
+            var span = new MutableSpan(SpanState, DefaultLocalEndPoint);
 
+            _recorder.Start(SpanState);
             var record = new Record(SpanState, TimeUtils.UtcNow, new TagAnnotation("magicKey", value));
             var visitor = new ZipkinAnnotationVisitor(record, span);
-
-            Assert.AreEqual(0, span.Annotations.Count);
-            Assert.AreEqual(0, span.BinaryAnnotations.Count);
-
             record.Annotation.Accept(visitor);
+            _recorder.Finish(SpanState);
 
-            Assert.AreEqual(0, span.Annotations.Count);
-            Assert.AreEqual(1, span.BinaryAnnotations.Count);
-
-            var binAnn = span.BinaryAnnotations.First(_ => true);
-
-            Assert.AreEqual("magicKey", binAnn.Key);
-            Assert.AreEqual(expectedBytes, binAnn.Value);
-            Assert.AreEqual(expectedType, binAnn.AnnotationType);
+            _reporter.Verify(r => r.Report(It.Is<Span>(s =>
+                s.Annotations.Count == 0 && s.Tags.Count == 1 && s.Tags.Any(b =>
+                    "magicKey".Equals(b.Key) && value.ToString().Equals(b.Value)))));
         }
+
 
         [Test]
         public void UnsupportedTagAnnotationShouldThrow()
         {
-            var span = new Span(SpanState, spanCreated: TimeUtils.UtcNow);
+            var span = new MutableSpan(SpanState, DefaultLocalEndPoint);
 
             var record = new Record(SpanState, TimeUtils.UtcNow, new TagAnnotation("magicKey", 1f));
             var visitor = new ZipkinAnnotationVisitor(record, span);
-
+            _recorder.Start(SpanState);
             Assert.Throws<ArgumentException>(() => record.Annotation.Accept(visitor));
         }
 
         [Test]
-        [Description("Span should only be marked as complete when either ClientRecv, ServerSend or LocalOperationStop are present.")]
-        public void SimpleAnnotationsCorrectlyAdded()
+        public void DurationAndSpanStartedSetWhenSetAsComplete()
         {
-            AnnotationCorrectlyAdded(Annotations.ClientSend(), zipkinCoreConstants.CLIENT_SEND, false, false);
-            AnnotationCorrectlyAdded(Annotations.ClientRecv(), zipkinCoreConstants.CLIENT_RECV, false, true);
-            AnnotationCorrectlyAdded(Annotations.ServerRecv(), zipkinCoreConstants.SERVER_RECV, false, false);
-            AnnotationCorrectlyAdded(Annotations.ServerSend(), zipkinCoreConstants.SERVER_SEND, false, true);
-            AnnotationCorrectlyAdded(Annotations.WireRecv(), zipkinCoreConstants.WIRE_RECV, false, false);
-            AnnotationCorrectlyAdded(Annotations.WireSend(), zipkinCoreConstants.WIRE_SEND, false, false);
-            AnnotationCorrectlyAdded(Annotations.LocalOperationStart("Operation"), zipkinCoreConstants.LOCAL_COMPONENT, true, false);
-            AnnotationCorrectlyAdded(Annotations.ConsumerStart(), zipkinCoreConstants.MESSAGE_RECV, false, false);
-            AnnotationCorrectlyAdded(Annotations.ProducerStart(), zipkinCoreConstants.MESSAGE_SEND, false, false);
-            AnnotationCorrectlyAdded(Annotations.MessageAddr("service", new IPEndPoint(0, 1)), zipkinCoreConstants.MESSAGE_ADDR, true, false);
+            VerifySpanDurationComputedWhenSetAsComplete(Annotations.ClientSend(), Annotations.ClientRecv(),
+                isRootSpan: false, isSpanStartedAndDurationSet: true);
+            VerifySpanDurationComputedWhenSetAsComplete(Annotations.ServerRecv(), Annotations.ServerSend(),
+                isRootSpan: true, isSpanStartedAndDurationSet: true);
+            VerifySpanDurationComputedWhenSetAsComplete(Annotations.ServerRecv(), Annotations.ServerSend(),
+                isRootSpan: false, isSpanStartedAndDurationSet: false);
+            VerifySpanDurationComputedWhenSetAsComplete(Annotations.LocalOperationStart("Operation"),
+                Annotations.LocalOperationStop(), isRootSpan: false, isSpanStartedAndDurationSet: true);
+            VerifySpanDurationComputedWhenSetAsComplete(Annotations.ProducerStart(), Annotations.ProducerStop(),
+                isRootSpan: false, isSpanStartedAndDurationSet: false);
+            VerifySpanDurationComputedWhenSetAsComplete(Annotations.ConsumerStart(), Annotations.ConsumerStop(),
+                isRootSpan: false, isSpanStartedAndDurationSet: false);
         }
 
-        private static void AnnotationCorrectlyAdded(IAnnotation ann, string expectedValue, bool isBinaryAnnotation, bool spanCompleted)
+        private static void VerifySpanDurationComputedWhenSetAsComplete(IAnnotation start, IAnnotation stop,
+            bool isRootSpan, bool isSpanStartedAndDurationSet)
         {
-            var span = new Span(SpanState, spanCreated: TimeUtils.UtcNow);
+            var startTime = DateTime.Now;
+            var endTime = startTime.AddHours(1);
+            var expectedDuration = endTime.Subtract(startTime).TotalMilliseconds * 1000.0;
 
-            var record = new Record(SpanState, TimeUtils.UtcNow, ann);
-            var visitor = new ZipkinAnnotationVisitor(record, span);
+            long? parentId = 0;
+            if (isRootSpan)
+                parentId = null;
+            var spanState = new SpanState(1, parentId, 2, isSampled: null, isDebug: false);
+            var spanCreatedTimestamp = TimeUtils.UtcNow;
+            var span = new MutableSpan(SpanState, DefaultLocalEndPoint);
 
-            Assert.AreEqual(0, span.Annotations.Count);
-            Assert.AreEqual(0, span.BinaryAnnotations.Count);
+            var recordStart = new Record(spanState, startTime, start);
+            var reporter = new Mock<IReporter>();
+            var visitorStart = new ZipkinAnnotationVisitor(recordStart, span);
+            var recordStop = new Record(spanState, endTime, stop);
+            var visitorStop = new ZipkinAnnotationVisitor(recordStop, span);
 
-            record.Annotation.Accept(visitor);
+            recordStart.Annotation.Accept(visitorStart);
+            reporter.Verify(r => r.Report(It.IsAny<Span>()), Times.Never());
+            recordStop.Annotation.Accept(visitorStop);
+            reporter.Verify(
+                r => r.Report(It.Is<Span>(s =>
+                    DurationComputedWhenSetAsComplete(s, isSpanStartedAndDurationSet, expectedDuration, startTime))),
+                Times.Once());
+        }
 
-            if (isBinaryAnnotation)
+        private static bool DurationComputedWhenSetAsComplete(Span span, bool isSpanStartedAndDurationSet,
+            long expectedDuration, DateTime startTime)
+        {
+            if (span.Duration == 0L)
             {
-                Assert.AreEqual(0, span.Annotations.Count);
-                Assert.AreEqual(1, span.BinaryAnnotations.Count);
-                Assert.AreEqual(expectedValue, span.BinaryAnnotations.First(_ => true).Key);
+                return false;
+            }
+
+            if (isSpanStartedAndDurationSet)
+            {
+                return expectedDuration.Equals(span.Duration) &&
+                       startTime.Equals(span.Timestamp);
             }
             else
             {
-                Assert.AreEqual(1, span.Annotations.Count);
-                Assert.AreEqual(0, span.BinaryAnnotations.Count);
-                Assert.AreEqual(expectedValue, span.Annotations.First(_ => true).Value);
+                return span.Duration == 0L &&
+                       span.Timestamp == default(DateTime);
             }
-
-            Assert.AreEqual(spanCompleted, span.Complete);
-        }
+        }*/
     }
 }

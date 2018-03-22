@@ -9,25 +9,27 @@ namespace zipkin4net.Internal.Recorder
 {
     internal class MutableSpanMap
     {
-        private readonly IReporter _reporter;
+        private readonly IReporter<V2.Span> _reporter;
         private readonly IStatistics _statistics;
-        private readonly ConcurrentDictionary<ITraceContext, Span> _spanMap = new ConcurrentDictionary<ITraceContext, Span>();
+
+        private readonly ConcurrentDictionary<ITraceContext, MutableSpan> _spanMap = new ConcurrentDictionary<ITraceContext, MutableSpan>();
+
         /// <summary>
         /// Flush old records when fired.
         /// </summary>
         private readonly Timer _flushTimer;
-        
+
         /// <summary>
         /// Spans which are not completed by this time are automatically flushed.
         /// </summary>
         internal static readonly TimeSpan TimeToLive = TimeSpan.FromMinutes(1);
 
-        internal MutableSpanMap(IReporter reporter)
+        internal MutableSpanMap(IReporter<V2.Span> reporter)
             : this(reporter, new Statistics())
         {
         }
         
-        internal MutableSpanMap(IReporter reporter, IStatistics statistics)
+        internal MutableSpanMap(IReporter<V2.Span> reporter, IStatistics statistics)
         {
             _reporter = reporter;
             _statistics = statistics;
@@ -41,38 +43,49 @@ namespace zipkin4net.Internal.Recorder
         /// <param name="utcNow"></param>
         internal void FlushOldSpans(DateTime utcNow)
         {
-            var outlivedSpans = _spanMap.Where(pair => (utcNow - pair.Value.SpanCreated) > TimeToLive).ToList();
+            var outlivedSpans = _spanMap.Where(pair => (utcNow - pair.Value.Timestamp) > TimeToLive).ToList();
 
             foreach (var oldSpanEntry in outlivedSpans)
             {
-                if (!oldSpanEntry.Value.Complete)
+                if (!oldSpanEntry.Value.Finished)
                 {
-                    oldSpanEntry.Value.AddAnnotation(new ZipkinAnnotation(TimeUtils.UtcNow, "flush.timeout"));
+                    oldSpanEntry.Value.Annotate(TimeUtils.UtcNow, "flush.timeout");
                     _statistics.UpdateSpanFlushed();
                 }
-                RemoveThenLogSpan(oldSpanEntry.Key);
-            }
-        }
-        
-        private void RemoveThenLogSpan(ITraceContext spanState)
-        {
-            Span spanToLog;
-            if (_spanMap.TryRemove(spanState, out spanToLog))
-            {
-                _reporter.Report(spanToLog);
+                RemoveThenReportSpan(oldSpanEntry.Key);
             }
         }
 
-        public Span GetOrCreate(ITraceContext traceContext, Func<ITraceContext, Span> spanCreator)
+        public MutableSpan GetOrCreate(ITraceContext traceContext, Func<ITraceContext, MutableSpan> spanCreator)
         {
             return _spanMap.GetOrAdd(traceContext, spanCreator);
         }
 
-        public Span Remove(ITraceContext traceContext)
+        public MutableSpan Get(ITraceContext context)
         {
-            Span span = null;
+            MutableSpan span;
+            if (!_spanMap.TryGetValue(context, out span))
+            {
+                throw new InvalidOperationException($"Span associated with {context} couldn't be found");
+            }
+
+            return span;
+        }
+
+        public MutableSpan Remove(ITraceContext traceContext)
+        {
+            MutableSpan span = null;
             _spanMap.TryRemove(traceContext, out span);
             return span; //Will return null if span doesn't exist
+        }
+        
+        public void RemoveThenReportSpan(ITraceContext spanState)
+        {
+            var spanToLog = Remove(spanState);
+            if (spanToLog != null)
+            {
+                _reporter.Report(spanToLog.ToSpan());
+            }
         }
     }
 }

@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
+﻿using System.IO;
 using System.Linq;
 using System.Net;
-using zipkin4net.Tracers.Zipkin.Thrift;
 using zipkin4net.Utils;
 using Thrift.Protocol;
 using Thrift.Transport;

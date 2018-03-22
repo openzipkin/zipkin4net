@@ -1,6 +1,6 @@
 ﻿using System.Net;
 
-namespace zipkin4net.Internal.V2
+namespace zipkin4net
 {
     internal struct Endpoint
     {

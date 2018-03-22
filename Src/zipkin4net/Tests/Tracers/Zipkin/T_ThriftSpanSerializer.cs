@@ -6,6 +6,8 @@ using zipkin4net.Tracers.Zipkin;
 using zipkin4net.Tracers.Zipkin.Thrift;
 using zipkin4net.Utils;
 using NUnit.Framework;
+using zipkin4net.Internal;
+using zipkin4net.Internal.Recorder;
 using BinaryAnnotation = zipkin4net.Tracers.Zipkin.BinaryAnnotation;
 using Span = zipkin4net.Tracers.Zipkin.Span;
 
@@ -17,7 +19,7 @@ namespace zipkin4net.UTest.Tracers.Zipkin
     {
         private const string SomeRandomAnnotation = "SomethingHappenedHere";
 
-        private readonly Endpoint _someHost = new Endpoint { Service_name = "myService", Port = 80, Ipv4 = 123456 };
+        private readonly zipkin4net.Tracers.Zipkin.Thrift.Endpoint _someHost = new zipkin4net.Tracers.Zipkin.Thrift.Endpoint { Service_name = "myService", Port = 80, Ipv4 = 123456 };
 
         [Test]
         public void ThriftConversionBinaryAnnotationIsCorrect()
@@ -32,7 +34,7 @@ namespace zipkin4net.UTest.Tracers.Zipkin
         {
             var serviceName = "database";
             var ipEndPoint = new IPEndPoint(1, 2);
-            var expectedEndpoint = new Endpoint { Service_name = serviceName, Ipv4 = SerializerUtils.IpToInt(ipEndPoint.Address), Port = (short)ipEndPoint.Port };
+            var expectedEndpoint = new zipkin4net.Tracers.Zipkin.Thrift.Endpoint { Service_name = serviceName, Ipv4 = SerializerUtils.IpToInt(ipEndPoint.Address), Port = (short)ipEndPoint.Port };
             AssertBinaryAnnotationConversion(serviceName, ipEndPoint, expectedEndpoint);
         }
 
@@ -41,11 +43,11 @@ namespace zipkin4net.UTest.Tracers.Zipkin
         {
             string serviceName = null;
             var ipEndPoint = new IPEndPoint(1, 2);
-            var expectedEndpoint = new Endpoint { Service_name = _someHost.Service_name, Ipv4 = SerializerUtils.IpToInt(ipEndPoint.Address), Port = (short)ipEndPoint.Port };
+            var expectedEndpoint = new zipkin4net.Tracers.Zipkin.Thrift.Endpoint { Service_name = _someHost.Service_name, Ipv4 = SerializerUtils.IpToInt(ipEndPoint.Address), Port = (short)ipEndPoint.Port };
             AssertBinaryAnnotationConversion(serviceName, ipEndPoint, expectedEndpoint);
         }
 
-        private void AssertBinaryAnnotationConversion(string serviceName, IPEndPoint endpoint, Endpoint expectedEndpoint)
+        private void AssertBinaryAnnotationConversion(string serviceName, IPEndPoint endpoint, zipkin4net.Tracers.Zipkin.Thrift.Endpoint expectedEndpoint)
         {
             const string key = "myKey";
             var data = Encoding.ASCII.GetBytes("hello");
@@ -84,14 +86,14 @@ namespace zipkin4net.UTest.Tracers.Zipkin
             AssertEndpointIsCorrect(thriftAnn.Host);
         }
 
-        private void AssertEndpointIsEqual(Endpoint expectedEndPoint, Endpoint endpoint)
+        private void AssertEndpointIsEqual(zipkin4net.Tracers.Zipkin.Thrift.Endpoint expectedEndPoint, zipkin4net.Tracers.Zipkin.Thrift.Endpoint endpoint)
         {
             Assert.AreEqual(expectedEndPoint.Service_name, endpoint.Service_name);
             Assert.AreEqual(expectedEndPoint.Port, endpoint.Port);
             Assert.AreEqual(expectedEndPoint.Ipv4, endpoint.Ipv4);
         }
 
-        private void AssertEndpointIsCorrect(Endpoint endpoint)
+        private void AssertEndpointIsCorrect(zipkin4net.Tracers.Zipkin.Thrift.Endpoint endpoint)
         {
             AssertEndpointIsEqual(_someHost, endpoint);
         }
@@ -122,7 +124,7 @@ namespace zipkin4net.UTest.Tracers.Zipkin
 
             var thriftSpan = ThriftSpanSerializer.ConvertToThrift(span);
 
-            var expectedHost = new Endpoint()
+            var expectedHost = new zipkin4net.Tracers.Zipkin.Thrift.Endpoint()
             {
                 Ipv4 = SerializerUtils.IpToInt(hostIp),
                 Port = hostPort,
@@ -177,19 +179,14 @@ namespace zipkin4net.UTest.Tracers.Zipkin
             var spanState = new SpanState(1, 0, 2, isSampled: null, isDebug: false);
             var span = new Span(spanState, TimeUtils.UtcNow);
 
-            var recordStart = new Record(spanState, startTime, Annotations.LocalOperationStart("Operation"));
-            var visitorStart = new ZipkinAnnotationVisitor(recordStart, span);
-            recordStart.Annotation.Accept(visitorStart);
-            var recordStop = new Record(spanState, startTime.AddHours(1), Annotations.LocalOperationStop());
-            var visitorStop = new ZipkinAnnotationVisitor(recordStop, span);
-            recordStop.Annotation.Accept(visitorStop);
-
+            span.AddBinaryAnnotation(new BinaryAnnotation(zipkinCoreConstants.LOCAL_COMPONENT, Encoding.ASCII.GetBytes(""), AnnotationType.STRING, startTime, "service", SerializerUtils.DefaultEndPoint));
+            span.SetAsComplete(startTime.AddHours(1));
             var thriftSpan = ThriftSpanSerializer.ConvertToThrift(span);
             Assert.AreEqual(startTime.ToUnixTimestamp(), thriftSpan.Timestamp);
             Assert.AreEqual(1, thriftSpan.Binary_annotations.Count);
             var endpoint = thriftSpan.Binary_annotations[0].Host;
             Assert.NotNull(endpoint);
-            Assert.IsEmpty(endpoint.Service_name);
+            Assert.AreEqual("service", endpoint.Service_name);
             Assert.IsNotNull(endpoint.Ipv4);
         }
 

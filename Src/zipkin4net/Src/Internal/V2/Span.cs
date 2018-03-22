@@ -35,7 +35,7 @@ namespace zipkin4net.Internal.V2
         {
             return new Builder(this);
         }
-        
+
         /// <summary>
         /// Trace identifier, set on all spans within it.
         ///
@@ -68,28 +68,29 @@ namespace zipkin4net.Internal.V2
         /// </summary>
         public enum SpanKind
         {
-            CLIENT,
-            SERVER,
+            NoKind,
+            Client,
+            Server,
 
             /// <summary>
             /// When present, <see cref="Span.Timestamp"/> is the moment a producer sent a message to a destination.
             /// <see cref="Span.Duration"/> represents delay sending the message, such as batching, while <see
             /// cref="Span.RemoteEndpoint"/> indicates the destination, such as a broker.
             ///
-            /// <p>Unlike <see cref="CLIENT"/>, messaging spans never share a span ID. For example, the <see cref="CONSUMER"/>
+            /// <p>Unlike <see cref="Client"/>, messaging spans never share a span ID. For example, the <see cref="Consumer"/>
             /// of the same message has <see cref="Span.ParentId"/> set to this span's <see cref="Span.Id"/>.
             /// </summary>
-            PRODUCER,
+            Producer,
 
             /// <summary>
             /// When present, <see cref="Span.Timestamp"/> is the moment a consumer received a message from an
             /// origin. <see cref="Span.Duration"/> represents delay consuming the message, such as from backlog,
             /// while <see cref="Span.RemoteEndpoint"/> indicates the origin, such as a broker.
             ///
-            /// <p>Unlike <see cref="SERVER"/>, messaging spans never share a span ID. For example, the <see cref="PRODUCER"/>
+            /// <p>Unlike <see cref="Server"/>, messaging spans never share a span ID. For example, the <see cref="Producer"/>
             /// of this message is the <see cref="Span.ParentId"/> of this span.
             /// </summary>
-            CONSUMER
+            Consumer
         }
 
         /// <summary>
@@ -121,7 +122,7 @@ namespace zipkin4net.Internal.V2
         ///
         /// <seealso cref="Duration"/>
         /// </summary>
-        public readonly long Timestamp;
+        public readonly DateTime Timestamp;
 
         /// <summary>
         /// Measurement in microseconds of the critical path, if known. Durations of less than one
@@ -178,7 +179,7 @@ namespace zipkin4net.Internal.V2
 
         /// <summary>
         /// True if we are contributing to a span started by another tracer (ex on a different host).
-        /// Defaults to null. When set, it is expected for <see cref="Kind"/> to be <see cref="SpanKind.SERVER"/>.
+        /// Defaults to null. When set, it is expected for <see cref="Kind"/> to be <see cref="SpanKind.Server"/>.
         /// 
         /// <p>When an RPC trace is client-originated, it will be sampled and the same span ID is used for
         /// the server side. However, the server shouldn't set span.timestamp or duration since it didn't
@@ -189,7 +190,7 @@ namespace zipkin4net.Internal.V2
         public readonly string LocalServiceName;
 
         public readonly string RemoteServiceName;
-        
+
         private static bool HasFlag(int flags, int flag)
         {
             return (flags & flag) == flag;
@@ -214,16 +215,51 @@ namespace zipkin4net.Internal.V2
             LocalServiceName = builder.localEndpoint.ServiceName;
             RemoteServiceName = builder.remoteEndpoint.ServiceName;
         }
-        
+
+        public bool Equals(Span other)
+        {
+            return string.Equals(TraceId, other.TraceId)
+                   && string.Equals(ParentId, other.ParentId)
+                   && string.Equals(Id, other.Id);
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj)) return false;
+            return obj is Span && Equals((Span) obj);
+        }
+
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                var hashCode = TraceId.GetHashCode();
+                hashCode = (hashCode * 397) ^ (ParentId != null ? ParentId.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ (Id != null ? Id.GetHashCode() : 0);
+                return hashCode;
+            }
+        }
+
+        public static bool operator ==(Span left, Span right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(Span left, Span right)
+        {
+            return !left.Equals(right);
+        }
+
         internal sealed class Builder
         {
             internal string traceId, parentId, id;
             internal SpanKind kind;
             internal string name;
-            internal long timestamp, duration; // zero means null
+            internal DateTime timestamp;
+            internal long duration; // zero means null
             internal Endpoint localEndpoint, remoteEndpoint;
-            internal IList<Annotation> annotations;
-            internal IDictionary<string, string> tags;
+            internal IList<Annotation> annotations = new List<Annotation>();
+            internal IDictionary<string, string> tags = new Dictionary<string, string>();
             internal int flags = 0; // bit field for timestamp and duration
 
             public Builder Reset()
@@ -233,7 +269,7 @@ namespace zipkin4net.Internal.V2
                 id = null;
                 kind = default(SpanKind);
                 name = null;
-                timestamp = 0L;
+                timestamp = default(DateTime);
                 duration = 0L;
                 localEndpoint = default(Endpoint);
                 remoteEndpoint = default(Endpoint);
@@ -241,6 +277,10 @@ namespace zipkin4net.Internal.V2
                 tags?.Clear();
                 flags = 0;
                 return this;
+            }
+
+            internal Builder()
+            {
             }
 
             internal Builder(Span source)
@@ -320,16 +360,10 @@ namespace zipkin4net.Internal.V2
                 return this;
             }
 
-            public Builder Timestamp(long timestamp)
+            public Builder Timestamp(DateTime timestamp)
             {
-                if (timestamp < 0L) timestamp = 0L;
                 this.timestamp = timestamp;
                 return this;
-            }
-
-            public Builder Timestamp(long? timestamp)
-            {
-                return Timestamp(timestamp ?? 0L);
             }
 
             public Builder Duration(long duration)
@@ -356,7 +390,7 @@ namespace zipkin4net.Internal.V2
                 return this;
             }
 
-            public Builder AddAnnotation(long timestamp, string value)
+            public Builder AddAnnotation(DateTime timestamp, string value)
             {
                 if (annotations == null) annotations = new List<Annotation>();
                 annotations.Add(new Annotation(timestamp, value));
@@ -432,22 +466,24 @@ namespace zipkin4net.Internal.V2
                 if (!"".Equals(missing)) throw new InvalidOperationException("Missing :" + missing);
                 return new Span(this);
             }
-
-            internal Builder()
-            {
-            }
         }
 
-        private static string NormalizeTraceId(string traceId) {
+        private static string NormalizeTraceId(string traceId)
+        {
             if (traceId == null) throw new ArgumentNullException($"{nameof(traceId)} == null");
             var length = traceId.Length;
             if (length > 32) throw new ArgumentException($"{nameof(traceId)}.length > 32");
             ValidateHex(traceId);
-            if (length == 32 || length == 16) {
+            if (length == 32 || length == 16)
+            {
                 return traceId;
-            } else if (length < 16) {
+            }
+            else if (length < 16)
+            {
                 return PadLeft(traceId, 16);
-            } else {
+            }
+            else
+            {
                 return PadLeft(traceId, 32);
             }
         }

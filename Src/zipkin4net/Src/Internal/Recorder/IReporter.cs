@@ -2,8 +2,8 @@
 
 namespace zipkin4net.Internal.Recorder
 {
-    internal interface IReporter
+    internal interface IReporter<S>
     {
-        void Report(Span span);
+        void Report(S span);
     }
 }

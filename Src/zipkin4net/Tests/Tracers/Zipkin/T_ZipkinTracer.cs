@@ -11,28 +11,35 @@ namespace zipkin4net.UTest.Tracers.Zipkin
     [TestFixture]
     internal class T_ZipkinTracer
     {
-        private Mock<IReporter> _reporter;
+        private Mock<IReporter<zipkin4net.Internal.V2.Span>> _reporter;
         private ZipkinTracer _tracer;
 
         [SetUp]
         public void Setup()
         {
-            _reporter = new Mock<IReporter>();
-            _tracer = new ZipkinTracer(_reporter.Object, new Statistics());
+            TraceManager.SamplingRate = 1.0f;
+            _reporter = new Mock<IReporter<zipkin4net.Internal.V2.Span>>();
+            _tracer = new ZipkinTracer(_reporter.Object, new Endpoint(), new Statistics());
         }
 
         [Test]
         public void ShouldThrowWithNullSender()
         {
             IZipkinSender sender = null;
-            Assert.Throws<ArgumentNullException>(() => { var tracer = new ZipkinTracer(sender, Mock.Of<ISpanSerializer>());});
+            Assert.Throws<ArgumentNullException>(() =>
+            {
+                var tracer = new ZipkinTracer(sender, Mock.Of<ISpanSerializer>());
+            });
         }
 
         [Test]
         public void ShouldThrowWithNullSerializer()
         {
             ISpanSerializer spanSerializer = null;
-            Assert.Throws<ArgumentNullException>(() => { var tracer = new ZipkinTracer(Mock.Of<IZipkinSender>(), spanSerializer);});
+            Assert.Throws<ArgumentNullException>(() =>
+            {
+                var tracer = new ZipkinTracer(Mock.Of<IZipkinSender>(), spanSerializer);
+            });
         }
 
         [Test]
@@ -43,7 +50,7 @@ namespace zipkin4net.UTest.Tracers.Zipkin
             Record(trace, Annotations.ClientSend());
             Record(trace, Annotations.ClientRecv());
 
-            _reporter.Verify(r => r.Report(It.IsAny<Span>()), Times.Once());
+            _reporter.Verify(r => r.Report(It.IsAny<zipkin4net.Internal.V2.Span>()), Times.Once());
         }
 
         [Test]
@@ -54,7 +61,7 @@ namespace zipkin4net.UTest.Tracers.Zipkin
             Record(trace, Annotations.ServerRecv());
             Record(trace, Annotations.ServerSend());
 
-            _reporter.Verify(r => r.Report(It.IsAny<Span>()), Times.Once());
+            _reporter.Verify(r => r.Report(It.IsAny<zipkin4net.Internal.V2.Span>()), Times.Once());
         }
 
         [Test]
@@ -64,7 +71,7 @@ namespace zipkin4net.UTest.Tracers.Zipkin
 
             Record(trace, Annotations.ServerSend());
 
-            _reporter.Verify(r => r.Report(It.IsAny<Span>()), Times.Once());
+            _reporter.Verify(r => r.Report(It.IsAny<zipkin4net.Internal.V2.Span>()), Times.Once());
         }
 
         [Test]
@@ -90,5 +97,10 @@ namespace zipkin4net.UTest.Tracers.Zipkin
             tracer.Record(record);
         }
 
+        private static SpanState CreateSpan()
+        {
+            return new SpanState(traceId: new Random().Next(), parentSpanId: 0, spanId: 1, isSampled: null,
+                isDebug: false);
+        }
     }
 }
