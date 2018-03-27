@@ -198,9 +198,7 @@ namespace zipkin4net.Tracers.Zipkin
         )
         {
             WriteAnchor(writer, fieldName);
-            writer.Write(quotes);
             writer.Write(fieldValue);
-            writer.Write(quotes);
         }
 
         internal static void WriteAnchor(this StreamWriter writer, string anchor)
