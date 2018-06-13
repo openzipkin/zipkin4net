@@ -7,7 +7,7 @@ namespace zipkin4net.Dispatcher
     /// <summary>
     /// Dispatch messages asynchronously in order using an ActionBlock
     /// </summary>
-    internal class InOrderAsyncActionBlockDispatcher : IRecordDispatcher
+    public class InOrderAsyncActionBlockDispatcher : IRecordDispatcher
     {
         private readonly ActionBlock<Record> _actionBlock;
         private readonly TimeSpan _timeoutOnStop;

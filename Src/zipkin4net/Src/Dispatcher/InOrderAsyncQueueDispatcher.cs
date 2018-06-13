@@ -8,7 +8,7 @@ namespace zipkin4net.Dispatcher
     /// <summary>
     /// Dispatch messages asynchronously in order using a concurrent queue and a consumer task
     /// </summary>
-    internal class InOrderAsyncQueueDispatcher : IRecordDispatcher
+    public class InOrderAsyncQueueDispatcher : IRecordDispatcher
     {
         private readonly Action<Record> _pushToTracers;
         private readonly int _maxCapacity;

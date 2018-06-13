@@ -61,7 +61,11 @@ namespace zipkin4net
             return Start(logger, new InOrderAsyncQueueDispatcher(Push));
         }
 
-        internal static bool Start(ILogger logger, IRecordDispatcher dispatcher)
+        /// <summary>
+        /// Start tracing, records will be forwarded to the registered tracers, using the provided dispatcher.
+        /// </summary>
+        /// <returns>True if successfully started, false if error or the service was already running.</returns>
+        public static bool Start(ILogger logger, IRecordDispatcher dispatcher)
         {
             if (Interlocked.CompareExchange(ref _status, (int)Status.Started, (int)Status.Stopped) ==
                       (int)Status.Stopped)
