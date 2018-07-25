@@ -12,16 +12,26 @@ namespace zipkin4net.Transport.Http
         private readonly string _serviceName;
         private readonly Func<HttpRequestMessage, string> _getClientTraceRpc;
 
-        public TracingHandler(string serviceName, HttpMessageHandler httpMessageHandler = null, Func<HttpRequestMessage, string> getClientTraceRpc = null)
+        public TracingHandler(string serviceName, HttpMessageHandler httpMessageHandler, Func<HttpRequestMessage, string> getClientTraceRpc = null)
         : this(Propagations.B3String.Injector<HttpHeaders>((carrier, key, value) => carrier.Add(key, value)), serviceName, httpMessageHandler, getClientTraceRpc)
         { }
 
-        private TracingHandler(IInjector<HttpHeaders> injector, string serviceName, HttpMessageHandler httpMessageHandler = null, Func<HttpRequestMessage, string> getClientTraceRpc = null)
+        public TracingHandler(string serviceName, Func<HttpRequestMessage, string> getClientTraceRpc = null)
+            : this(Propagations.B3String.Injector<HttpHeaders>((carrier, key, value) => carrier.Add(key, value)), serviceName, getClientTraceRpc)
+        { }
+
+        private TracingHandler(IInjector<HttpHeaders> injector, string serviceName, HttpMessageHandler httpMessageHandler, Func<HttpRequestMessage, string> getClientTraceRpc = null)
+            : base(httpMessageHandler)
         {
             _injector = injector;
             _serviceName = serviceName;
             _getClientTraceRpc = getClientTraceRpc ?? (request => request.Method.ToString());
-            InnerHandler = httpMessageHandler ?? new HttpClientHandler();
+        }
+        private TracingHandler(IInjector<HttpHeaders> injector, string serviceName, Func<HttpRequestMessage, string> getClientTraceRpc = null)
+        {
+            _injector = injector;
+            _serviceName = serviceName;
+            _getClientTraceRpc = getClientTraceRpc ?? (request => request.Method.ToString());
         }
         protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, System.Threading.CancellationToken cancellationToken)
         {
