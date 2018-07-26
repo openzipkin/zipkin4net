@@ -2,16 +2,17 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using System;
-using System.Net.Http;
-using System.Threading;
-using System.Threading.Tasks;
-using zipkin4net.Middleware;
 using common;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace backend
 {
     public class Startup : CommonStartup
     {
+        public override void ConfigureServices(IServiceCollection services)
+        {
+        }
+
         protected override void Run(IApplicationBuilder app, IConfiguration config)
         {
             app.Run(async (context) =>
