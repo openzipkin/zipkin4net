@@ -12,13 +12,13 @@ namespace zipkin4net.Transport.Http
         private readonly string _serviceName;
         private readonly Func<HttpRequestMessage, string> _getClientTraceRpc;
 
-        public TracingHandler(string serviceName, HttpMessageHandler httpMessageHandler, Func<HttpRequestMessage, string> getClientTraceRpc = null)
-        : this(Propagations.B3String.Injector<HttpHeaders>((carrier, key, value) => carrier.Add(key, value)), serviceName, httpMessageHandler, getClientTraceRpc)
+        public TracingHandler(string serviceName, HttpMessageHandler httpMessageHandler = null, Func<HttpRequestMessage, string> getClientTraceRpc = null)
+        : this(Propagations.B3String.Injector<HttpHeaders>((carrier, key, value) => carrier.Add(key, value)), serviceName, httpMessageHandler ?? new HttpClientHandler(), getClientTraceRpc)
         { }
 
-        public TracingHandler(string serviceName, Func<HttpRequestMessage, string> getClientTraceRpc = null)
-            : this(Propagations.B3String.Injector<HttpHeaders>((carrier, key, value) => carrier.Add(key, value)), serviceName, getClientTraceRpc)
-        { }
+        
+        public static TracingHandler WithoutInnerHandler(string serviceName, Func<HttpRequestMessage, string> getClientTraceRpc = null)
+         =>  new TracingHandler(Propagations.B3String.Injector<HttpHeaders>((carrier, key, value) => carrier.Add(key, value)), serviceName, getClientTraceRpc);
 
         private TracingHandler(IInjector<HttpHeaders> injector, string serviceName, HttpMessageHandler httpMessageHandler, Func<HttpRequestMessage, string> getClientTraceRpc = null)
             : base(httpMessageHandler)
