@@ -18,13 +18,11 @@ using System.Threading;
 
 namespace common
 {
-    abstract public class CommonStartup
+    public abstract class CommonStartup
     {
         // This method gets called by the runtime. Use this method to add services to the container.
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
-        public void ConfigureServices(IServiceCollection services)
-        {
-        }
+        public abstract void ConfigureServices(IServiceCollection services);
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
@@ -54,6 +52,6 @@ namespace common
             Run(app, config);
         }
 
-        abstract protected void Run(IApplicationBuilder app, IConfiguration configuration);
+        protected abstract void Run(IApplicationBuilder app, IConfiguration configuration);
     }
 }
