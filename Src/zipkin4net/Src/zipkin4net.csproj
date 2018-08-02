@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>netstandard1.4;netstandard1.6;net451</TargetFrameworks>
+    <TargetFrameworks>netstandard1.4;netstandard1.6;net451;net452;net46;net461;net462</TargetFrameworks>
     <AssemblyName>zipkin4net</AssemblyName>
     <PackageId>zipkin4net</PackageId>
     <Title>zipkin4net</Title>
@@ -33,6 +33,12 @@
     <PackageReference Include="System.Net.NetworkInformation" Version="4.3.0" />
     <PackageReference Include="System.Runtime.Serialization.Formatters" Version="4.3.0" />
   </ItemGroup>
+  <ItemGroup Condition="'$(TargetFramework)' == 'net462' OR '$(TargetFramework)' == 'net461' OR '$(TargetFramework)' == 'net46' OR '$(TargetFramework)' == 'net452' OR '$(TargetFramework)' == 'net451'">
+	<Reference Include="System.Web" />
+  </ItemGroup>
+  <PropertyGroup Condition="'$(TargetFramework)' == 'net462' OR '$(TargetFramework)' == 'net461' OR '$(TargetFramework)' == 'net46' OR '$(TargetFramework)' == 'net452' OR '$(TargetFramework)' == 'net451'">
+	<DefineConstants>$(DefineConstants);NETFULL</DefineConstants>
+  </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Apache.Thrift" Version="1.0.2" />
     <PackageReference Include="System.Threading.Tasks.Dataflow" Version="4.7.0" />

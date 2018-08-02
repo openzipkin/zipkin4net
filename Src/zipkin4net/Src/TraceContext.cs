@@ -4,6 +4,9 @@ using System.Threading;
 #else
 using System.Runtime.Remoting.Messaging;
 #endif
+#if NETFULL
+using System.Web;
+#endif
 
 namespace zipkin4net
 {
@@ -24,7 +27,19 @@ namespace zipkin4net
 #else
             if (IsRunningOnMono) return null;
 
-            return CallContext.LogicalGetData(TraceCallContextKey) as Trace;
+            var trace = CallContext.LogicalGetData(TraceCallContextKey) as Trace;
+
+            // For applications hosted in IIS, the controller call context is not shared with the call context in which the middleware is executed.
+            // https://stackoverflow.com/questions/29194836/passing-logical-call-context-from-owin-pipeline-to-webapi-controller
+            // This means that the Trace set in the OWIN middleware cannot be retrieved by the TracingHandler.
+            if (trace == null)
+            {
+#if NETFULL 
+                return HttpContext.Current?.Items[TraceCallContextKey] as Trace;
+#endif
+            }
+
+            return trace;
 #endif
         }
 
@@ -36,6 +51,13 @@ namespace zipkin4net
             if (IsRunningOnMono) return;
 
             CallContext.LogicalSetData(TraceCallContextKey, trace);
+
+#if NETFULL
+            if (HttpContext.Current != null)
+            {
+                HttpContext.Current.Items[TraceCallContextKey] = trace;
+            }
+#endif
 #endif
         }
 
@@ -47,6 +69,13 @@ namespace zipkin4net
             if (IsRunningOnMono) return;
 
             CallContext.FreeNamedDataSlot(TraceCallContextKey);
+
+#if NETFULL
+            if (HttpContext.Current != null)
+            {
+                HttpContext.Current.Items[TraceCallContextKey] = null;
+            }
+#endif
 #endif
         }
     }
