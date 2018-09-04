@@ -15,13 +15,13 @@ namespace zipkin4net.Propagation
         public IInjector<C> Injector<C>(Setter<C, K> setter)
         {
             if (setter == null) throw new NullReferenceException("setter == null");
-            return new B3SingleInjector<C, K>(this, setter);
+            return new B3SingleInjector<C, K>(B3Key, setter);
         }
 
         public IExtractor<C> Extractor<C>(Getter<C, K> getter)
         {
             if (getter == null) throw new NullReferenceException("getter == null");
-            return new B3SingleExtractor<C, K>(this, getter);
+            return new B3SingleExtractor<C, K>(B3Key, getter);
         }
     }
 }

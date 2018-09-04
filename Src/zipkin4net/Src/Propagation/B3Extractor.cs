@@ -8,6 +8,7 @@ namespace zipkin4net.Propagation
     {
         private readonly B3Propagation<K> _b3Propagation;
         private readonly Getter<C, K> _getter;
+        private readonly B3SingleExtractor<C, K> _singleExtractor;
 
         private const int TraceId64BitsSerializationLength = 16;
 
@@ -15,10 +16,17 @@ namespace zipkin4net.Propagation
         {
             _b3Propagation = b3Propagation;
             _getter = getter;
+            _singleExtractor = new B3SingleExtractor<C, K>(b3Propagation.B3Key, getter);
         }
 
         public ITraceContext Extract(C carrier)
         {
+            var extracted =_singleExtractor.Extract(carrier);
+            if (extracted != null)
+            {
+                return extracted;
+            }
+            
             return TryParseTrace(
                 _getter(carrier, _b3Propagation.TraceIdKey),
                 _getter(carrier, _b3Propagation.SpanIdKey),
