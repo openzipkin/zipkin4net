@@ -13,6 +13,7 @@ namespace zipkin4net.Transport
         public const string ParentSpanId = "X-B3-ParentSpanId";
         public const string Sampled = "X-B3-Sampled"; // Will be replaced by Flags in the future releases of Finagle
         public const string Flags = "X-B3-Flags";
+        public const string B3 = "b3";
 
         public static SpanFlags ParseFlagsHeader(string header)
         {
