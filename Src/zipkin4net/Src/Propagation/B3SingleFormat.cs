@@ -104,6 +104,10 @@ namespace zipkin4net.Propagation
 
         public static ITraceContext ParseB3SingleFormat(string b3)
         {
+            if (b3 == null)
+            {
+                return null;
+            }
             return ParseB3SingleFormat(b3, 0, b3.Length);
         }
 
