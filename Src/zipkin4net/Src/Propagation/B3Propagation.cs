@@ -13,6 +13,8 @@ namespace zipkin4net.Propagation
         internal readonly K SampledKey;
         internal readonly K DebugKey;
 
+        internal readonly K B3Key;
+
         internal B3Propagation(KeyFactory<K> keyFactory)
         {
             TraceIdKey = keyFactory(ZipkinHttpHeaders.TraceId);
@@ -20,6 +22,7 @@ namespace zipkin4net.Propagation
             ParentSpanIdKey = keyFactory(ZipkinHttpHeaders.ParentSpanId);
             SampledKey = keyFactory(ZipkinHttpHeaders.Sampled);
             DebugKey = keyFactory(ZipkinHttpHeaders.Flags);
+            B3Key = keyFactory(ZipkinHttpHeaders.B3);
         }
 
         public IInjector<C> Injector<C>(Setter<C, K> setter)
