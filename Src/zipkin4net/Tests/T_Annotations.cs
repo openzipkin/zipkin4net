@@ -34,7 +34,7 @@ namespace zipkin4net.UTest
         [Test]
         public void ToStringWriteExtraDataInAdditionToType()
         {
-            Assert.AreEqual("TagAnnotation: sampleTagKey [sampleTagValue System.String]", Annotations.Tag("sampleTagKey", "sampleTagValue").ToString());
+            Assert.AreEqual("TagAnnotation: sampleTagKey:sampleTagValue", Annotations.Tag("sampleTagKey", "sampleTagValue").ToString());
             Assert.AreEqual("Rpc: GET", Annotations.Rpc("GET").ToString());
             Assert.AreEqual("ServiceName: sampleName", Annotations.ServiceName("sampleName").ToString());
             Assert.AreEqual("Event: sampleName", Annotations.Event("sampleName").ToString());
