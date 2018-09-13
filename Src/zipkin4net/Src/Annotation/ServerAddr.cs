@@ -11,6 +11,11 @@ namespace zipkin4net.Annotation
             ServiceName = serviceName;
         }
 
+        public override string ToString()
+        {
+            return string.Format("{0}: {1}/{2}", GetType().Name, ServiceName, Endpoint);
+        }
+
         public override void Accept(IAnnotationVisitor visitor)
         {
             visitor.Visit(this);
