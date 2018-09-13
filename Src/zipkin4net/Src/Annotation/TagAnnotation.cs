@@ -13,7 +13,7 @@
 
         public override string ToString()
         {
-            return string.Format("{0}: {1} [{2} {3}]", GetType().Name, Key, Value, Value.GetType());
+            return string.Format("{0}: {1}:{2}", GetType().Name, Key, Value);
         }
 
         public void Accept(IAnnotationVisitor visitor)
