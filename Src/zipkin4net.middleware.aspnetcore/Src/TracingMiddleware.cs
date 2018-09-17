@@ -25,8 +25,8 @@ namespace zipkin4net.Middleware
                     if (request.Host.HasValue)
                     {
                         trace.Record(Annotations.Tag("http.host", request.Host.ToString()));
+                        trace.Record(Annotations.Tag("http.uri", UriHelper.GetDisplayUrl(request)));
                     }
-                    trace.Record(Annotations.Tag("http.uri", UriHelper.GetDisplayUrl(request)));
                     trace.Record(Annotations.Tag("http.path", request.Path));
                     await serverTrace.TracedActionAsync(next());
                 }
