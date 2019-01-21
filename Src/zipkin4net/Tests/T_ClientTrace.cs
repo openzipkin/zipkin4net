@@ -15,14 +15,14 @@ namespace zipkin4net.UTest
         private const string serviceName = "service1";
         private const string rpc = "rpc";
 
-		[SetUp]
-		public void SetUp()
-		{
-			TraceManager.ClearTracers();
-			TraceManager.Stop();
-			dispatcher = new Mock<IRecordDispatcher>();
-			TraceManager.Start(new VoidLogger(), dispatcher.Object);
-		}
+        [SetUp]
+        public void SetUp()
+        {
+            TraceManager.ClearTracers();
+            TraceManager.Stop();
+            dispatcher = new Mock<IRecordDispatcher>();
+            TraceManager.Start(new VoidLogger(), dispatcher.Object);
+        }
 
         [Test]
         public void ShouldNotSetCurrentTrace()
@@ -46,34 +46,48 @@ namespace zipkin4net.UTest
             }
         }
 
-		[Test]
-		public void ExceptionThrownInTracedActionAsyncShouldAddErrorTagAndRethrow()
-		{
-
-			var trace = Trace.Create();
+        [Test]
+        public void ExceptionThrownInTracedActionAsyncShouldAddErrorTagAndRethrow()
+        {
+            var trace = Trace.Create();
             trace.ForceSampled();
-			Trace.Current = trace;
+            Trace.Current = trace;
             var clientTrace = new ClientTrace(serviceName, rpc);
-			var ex = new Exception("something bad happened");
-			Task<int> task = Task.Run(() =>
-			{
-				try
-				{
-					return 0;
-				}
-				finally
-				{
-					throw ex;
-				}
-			});
+            var ex = new Exception("something bad happened");
+            Task<int> task = Task.Run(() =>
+            {
+                try
+                {
+                    return 0;
+                }
+                finally
+                {
+                    throw ex;
+                }
+            });
             Assert.ThrowsAsync<Exception>(() => clientTrace.TracedActionAsync(task));
 
-			VerifyDispatcherRecordedAnnotation(new TagAnnotation("error", ex.Message));
-		}
+            VerifyDispatcherRecordedAnnotation(new TagAnnotation("error", ex.Message));
+        }
 
-		private void VerifyDispatcherRecordedAnnotation(IAnnotation annotation)
-		{
-			dispatcher.Verify(d => d.Dispatch(It.Is<Record>(r => r.Annotation.Equals(annotation))));
-		}
+        [Test]
+        public void ExceptionThrownInTracedActionAsyncShouldBeRethrownWhenCurrentTraceIsNull()
+        {
+            Trace.Current = null;
+            var clientTrace = new ClientTrace(serviceName, rpc);
+
+            Task<object> task = Task.Run<object>(() => throw new SomeException());
+
+            Assert.ThrowsAsync<SomeException>(() => clientTrace.TracedActionAsync(task));
+        }
+
+        private void VerifyDispatcherRecordedAnnotation(IAnnotation annotation)
+        {
+            dispatcher.Verify(d => d.Dispatch(It.Is<Record>(r => r.Annotation.Equals(annotation))));
+        }
+
+        private class SomeException : Exception
+        {
+        }
     }
 }
