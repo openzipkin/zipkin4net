@@ -27,7 +27,7 @@ namespace zipkin4net
 
         public virtual void Error(Exception ex)
         {
-            Trace.RecordAnnotation(Annotations.Tag("error", ex.Message));
+            Trace?.RecordAnnotation(Annotations.Tag("error", ex.Message));
         }
 
         public void Dispose()
