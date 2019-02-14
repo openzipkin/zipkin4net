@@ -43,6 +43,10 @@ namespace zipkin4net.Middleware
                     await serverTrace.TracedActionAsync(Next.Invoke(context));
                 }
             }
+            else
+            {
+                await Next.Invoke(context);
+            }
         }
     }
 }

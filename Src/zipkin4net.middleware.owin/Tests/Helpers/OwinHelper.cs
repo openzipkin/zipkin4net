@@ -19,12 +19,12 @@ namespace zipkin4net.Middleware.Tests.Helpers
                 }
             }
         }
-        internal static Action<IAppBuilder> DefaultStartup(string serviceName, Func<IOwinContext, string> getRpc = null)
+        internal static Action<IAppBuilder> DefaultStartup(string serviceName, Func<IOwinContext, string> getRpc = null, Func<PathString, bool> routeFilter = null)
         {
             return
                 app =>
                 {
-                    app.UseZipkinTracer(serviceName, getRpc);
+                    app.UseZipkinTracer(serviceName, getRpc, routeFilter);
 
                     app.Run(async context =>
                     {
