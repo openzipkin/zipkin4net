@@ -4,6 +4,7 @@ using NUnit.Framework;
 using System;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Microsoft.Owin;
 using Moq;
 using zipkin4net.Dispatcher;
 using zipkin4net.Middleware.Tests.Helpers;
@@ -130,6 +131,37 @@ namespace zipkin4net.Middleware.Tests
             AssertAnnotationReceived<TagAnnotation>(_dispatcher, tag => has("http.path", urlToCall.AbsolutePath, tag));
         }
 
+        [Test]
+        public async Task Check_That_filter_is_dropping_annotations_for_filtered_routes()
+        {
+            //Arrange
+            var urlToCall = new Uri("http://testserver/api/values");
+            var serviceName = "OwinTest";
+
+            bool AlwaysFalseFilter(PathString x) => false;
+            
+            Func<HttpClient, Task<string>> clientCall = async (client) =>
+            {
+                var response = await client.PostAsync(urlToCall, new StringContent(""));
+                return await response.Content.ReadAsStringAsync();
+            };
+
+            //Act
+            var responseContent = await Call(DefaultStartup(serviceName, null, AlwaysFalseFilter), clientCall);
+            Assert.IsNotEmpty(responseContent);
+
+            if (!IsRunningOnMono)
+            {
+                AssertAnnotationNotReceived<ServerRecv>(_dispatcher);
+                AssertAnnotationNotReceived<ServerSend>(_dispatcher);
+                AssertAnnotationNotReceived<Rpc>(_dispatcher, rpc => rpc.Name == "POST");
+                AssertAnnotationNotReceived<ServiceName>(_dispatcher, serviceNameAnnotation => serviceNameAnnotation.Service == serviceName);
+            }
+            AssertAnnotationNotReceived<TagAnnotation>(_dispatcher, tag => has("http.host", urlToCall.Host, tag));
+            AssertAnnotationNotReceived<TagAnnotation>(_dispatcher, tag => has("http.url", urlToCall.AbsoluteUri, tag));
+            AssertAnnotationNotReceived<TagAnnotation>(_dispatcher, tag => has("http.path", urlToCall.AbsolutePath, tag));
+        }
+
         private static void AssertAnnotationReceived<T>(Mock<IRecordDispatcher> dispatcher)
         {
             AssertAnnotationReceived<T>(dispatcher, annotation => true);
@@ -138,6 +170,16 @@ namespace zipkin4net.Middleware.Tests
         private static void AssertAnnotationReceived<T>(Mock<IRecordDispatcher> dispatcher, Func<T, bool> assertionOnAnnotation)
         {
             dispatcher.Verify(d => d.Dispatch(It.Is<Record>(r => r.Annotation is T && assertionOnAnnotation((T)r.Annotation))));
+        }
+
+        private static void AssertAnnotationNotReceived<T>(Mock<IRecordDispatcher> dispatcher)
+        {
+            AssertAnnotationNotReceived<T>(dispatcher, annotation => true);
+        }
+
+        private static void AssertAnnotationNotReceived<T>(Mock<IRecordDispatcher> dispatcher, Func<T, bool> assertionOnAnnotation)
+        {
+            dispatcher.Verify(d => d.Dispatch(It.Is<Record>(r => r.Annotation is T && assertionOnAnnotation((T)r.Annotation))), Times.Never);
         }
     }
 }
