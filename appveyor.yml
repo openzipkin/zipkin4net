@@ -5,7 +5,7 @@ nuget:
   disable_publish_on_pr: true
 configuration:
 - Release
-artifacts:  
+artifacts:
 - path: .\artifacts\*.nupkg
   name: NuGet
 environment:
@@ -27,7 +27,7 @@ deploy:
 - provider: NuGet
   name: production
   api_key:
-    secure: Mewglv4qtQ2Z1VySya6Xzx2EHmf+8F01lNnUwmgQHjiQdmQPpijYf8MyZrhFvNWf
+    secure: /U9jebmr13NyJPUqTEItqBKxMEVUZWqD5scotuC33CVbfCevG+oepVUv/kvqPMJN
   on:
     branch: master
     appveyor_repo_tag: true
