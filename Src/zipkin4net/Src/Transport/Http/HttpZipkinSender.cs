@@ -10,15 +10,11 @@ namespace zipkin4net.Transport.Http
         private HttpClient _httpClient;
         private readonly string _contentType;
 
-        public HttpZipkinSender(string zipkinCollectorUrl, string contentType)
-        : this(new HttpClient(), zipkinCollectorUrl, contentType)
-        {}
-
-        public HttpZipkinSender(HttpClient httpClient, string zipkinCollectorUrl, string contentType)
+        public HttpZipkinSender(string zipkinCollectorUrl, string contentType, HttpClient httpClient = null)
         {
             _zipkinCollectorUrl = ForgeSpansEndpoint(zipkinCollectorUrl);
-            _httpClient = httpClient;
             _contentType = contentType;
+            _httpClient = httpClient ?? new HttpClient();
         }
 
         public void Send(byte[] data)
