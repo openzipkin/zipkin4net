@@ -29,7 +29,7 @@ namespace zipkin4net.UTest.Transport.Http
         public void sendDataShouldSendOnSpansEndPoint()
         {
             var contentType = "application/x-thrift";
-            var sender = new HttpZipkinSender(httpClient, url, contentType);
+            var sender = new HttpZipkinSender(url, contentType, httpClient);
             sender.Send(content);
             mockMessageHandler.Verify(h => h.Send(It.Is<HttpRequestMessage>(
                 m => m.RequestUri.Equals(url + "/api/v1/spans")
@@ -42,7 +42,7 @@ namespace zipkin4net.UTest.Transport.Http
         [Test]
         public void invalidUrlShouldThrowWhenSending()
         {
-            var sender = new HttpZipkinSender(httpClient, "url", contentType);
+            var sender = new HttpZipkinSender("url", contentType, httpClient);
             Assert.Throws<InvalidOperationException>(() => sender.Send(content));
         }
 
@@ -50,7 +50,7 @@ namespace zipkin4net.UTest.Transport.Http
         public void sendDataShouldNotAddASlashIfAlreadyPresent()
         {
             var url = "http://localhost/";
-            var sender = new HttpZipkinSender(httpClient, url, contentType);
+            var sender = new HttpZipkinSender(url, contentType, httpClient);
             sender.Send(content);
             mockMessageHandler.Verify(h => h.Send(It.Is<HttpRequestMessage>(
                 m => m.RequestUri.Equals(url + "api/v1/spans")
