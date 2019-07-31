@@ -1,5 +1,5 @@
 # Basic example showing distributed tracing across ASP.Net core apps
-This is an example app where two ASP.Net core (C#) services collaborate on an http request. Notably, timing of these requests are recorded into [Zipkin](http://zipkin.io/), a distributed tracing system. This allows you to see the how long the whole operation took, as well how much time was spent in each service.
+This is an example app where two ASP.Net core (C#) services collaborate on an http request. Notably, timing of these requests are recorded into [Zipkin](https://zipkin.io/), a distributed tracing system. This allows you to see the how long the whole operation took, as well how much time was spent in each service.
 
 Here's an example of what it looks like
 ![zipkin4net-example](https://files.gitter.im/criteo/zipkin4net/o1To/zipkin4net-example.png)
@@ -47,10 +47,10 @@ $ dotnet run http://*:9000
 ```
 
 
-Next, run [Zipkin](http://zipkin.io/), which stores and queries traces reported by the above services.
+Next, run [Zipkin](https://zipkin.io/), which stores and queries traces reported by the above services.
 
 ```bash
-wget -O zipkin.jar 'https://search.maven.org/remote_content?g=io.zipkin.java&a=zipkin-server&v=LATEST&c=exec'
+curl -sSL https://zipkin.io/quickstart.sh | bash -s
 java -jar zipkin.jar
 ```
 
