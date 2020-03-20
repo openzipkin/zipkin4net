@@ -30,7 +30,7 @@ First, we need to compile the example
 ```bash
 $ pwd
 ~/zipkin4net/
-$ ./buildAndTest.sh
+$ ./build.sh
 ```
 
 In separate tabs or windows, start each of frontend and backend:
@@ -52,6 +52,12 @@ Next, run [Zipkin](https://zipkin.io/), which stores and queries traces reported
 ```bash
 curl -sSL https://zipkin.io/quickstart.sh | bash -s
 java -jar zipkin.jar
+```
+
+Alternatively, if you use Docker, follow the [Zipkin quickstart](https://zipkin.io/pages/quickstart.html) to run the same service:
+
+```bash
+docker run -d -p 9411:9411 openzipkin/zipkin
 ```
 
 ## Advanced setup
