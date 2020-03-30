@@ -102,6 +102,16 @@ namespace zipkin4net.Tracers.Zipkin
             {
                 startTime = binaryAnnotation.Timestamp;
             }
+            // Else for producer duration
+            else if (TryGetProducerStart(out annotation))
+            {
+                startTime = annotation.Timestamp;
+            }
+            // Else for consumer duration
+            else if (TryGetConsumerStart(out annotation))
+            {
+                startTime = annotation.Timestamp;
+            }
             // Else for the client duration
             else if (TryGetClientSend(out annotation))
             {
@@ -134,6 +144,16 @@ namespace zipkin4net.Tracers.Zipkin
         {
             localComponentBinAnnotation = BinaryAnnotations.FirstOrDefault(a => a.Key.Equals(zipkinCoreConstants.LOCAL_COMPONENT));
             return localComponentBinAnnotation != default(BinaryAnnotation);
+        }
+
+        private bool TryGetProducerStart(out ZipkinAnnotation producerStartAnnotation)
+        {
+            return TryGetAnnotation(zipkinCoreConstants.MESSAGE_SEND, out producerStartAnnotation);
+        }
+
+        private bool TryGetConsumerStart(out ZipkinAnnotation consumerStartAnnotation)
+        {
+            return TryGetAnnotation(zipkinCoreConstants.MESSAGE_RECV, out consumerStartAnnotation);
         }
 
         private bool TryGetClientSend(out ZipkinAnnotation clientSendAnnotation)
