@@ -122,7 +122,7 @@ namespace zipkin4net.Tracers.Zipkin
                 startTime = annotation.Timestamp;
             }
 
-            if (startTime == default)
+            if (startTime == default(DateTime))
                 return;
 
             SpanStarted = startTime;
