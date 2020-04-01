@@ -3,6 +3,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using zipkin4net.Propagation;
+using zipkin4net.Tracers.Zipkin.Thrift;
 
 namespace zipkin4net.Transport.Http
 {
@@ -51,6 +52,7 @@ namespace zipkin4net.Transport.Http
             _serviceName = serviceName;
             _getClientTraceRpc = getClientTraceRpc ?? (request => request.Method.ToString());
         }
+
         protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, System.Threading.CancellationToken cancellationToken)
         {
             using (var clientTrace = new ClientTrace(_serviceName, _getClientTraceRpc(request)))
@@ -59,7 +61,18 @@ namespace zipkin4net.Transport.Http
                 {
                     _injector.Inject(clientTrace.Trace.CurrentSpan, request.Headers);
                 }
-                return await clientTrace.TracedActionAsync(base.SendAsync(request, cancellationToken));
+
+                var result = await clientTrace.TracedActionAsync(base.SendAsync(request, cancellationToken));
+
+                if (clientTrace.Trace != null)
+                {
+                    clientTrace.AddAnnotation(Annotations.Tag(zipkinCoreConstants.HTTP_HOST, result.RequestMessage.RequestUri.Host));
+                    clientTrace.AddAnnotation(Annotations.Tag(zipkinCoreConstants.HTTP_PATH, result.RequestMessage.RequestUri.LocalPath));
+                    clientTrace.AddAnnotation(Annotations.Tag(zipkinCoreConstants.HTTP_METHOD, result.RequestMessage.Method.Method));
+                    clientTrace.AddAnnotation(Annotations.Tag(zipkinCoreConstants.HTTP_STATUS_CODE, ((int)result.StatusCode).ToString()));
+                }
+
+                return result;
             }
         }
     }
