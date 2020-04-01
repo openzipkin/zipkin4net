@@ -18,6 +18,8 @@ namespace zipkin4net.UTest.Transport
         public void Setup()
         {
             _mockLogger = new Mock<ILogger>();
+            TraceManager.ClearTracers();
+            TraceManager.Stop();
             TraceManager.Start(_mockLogger.Object);
         }
 
