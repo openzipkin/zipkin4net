@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using System.Resources;
 using zipkin4net.Tracers.Zipkin.Thrift;
 
 namespace zipkin4net.Tracers.Zipkin
@@ -102,13 +101,23 @@ namespace zipkin4net.Tracers.Zipkin
             {
                 startTime = binaryAnnotation.Timestamp;
             }
+            // Else for producer duration
+            else if (TryGetAnnotation(zipkinCoreConstants.MESSAGE_SEND, out annotation))
+            {
+                startTime = annotation.Timestamp;
+            }
+            // Else for consumer duration
+            else if (TryGetAnnotation(zipkinCoreConstants.MESSAGE_RECV, out annotation))
+            {
+                startTime = annotation.Timestamp;
+            }
             // Else for the client duration
-            else if (TryGetClientSend(out annotation))
+            else if (TryGetAnnotation(zipkinCoreConstants.CLIENT_SEND, out annotation))
             {
                 startTime = annotation.Timestamp;
             }
             // Else look for server annotations
-            else if(IsRoot && TryGetServerRecv(out annotation))
+            else if (IsRoot && TryGetAnnotation(zipkinCoreConstants.SERVER_RECV, out annotation))
             {
                 startTime = annotation.Timestamp;
             }
@@ -134,16 +143,6 @@ namespace zipkin4net.Tracers.Zipkin
         {
             localComponentBinAnnotation = BinaryAnnotations.FirstOrDefault(a => a.Key.Equals(zipkinCoreConstants.LOCAL_COMPONENT));
             return localComponentBinAnnotation != default(BinaryAnnotation);
-        }
-
-        private bool TryGetClientSend(out ZipkinAnnotation clientSendAnnotation)
-        {
-            return TryGetAnnotation(zipkinCoreConstants.CLIENT_SEND, out clientSendAnnotation);
-        }
-
-        private bool TryGetServerRecv(out ZipkinAnnotation serverRecvAnnotation)
-        {
-            return TryGetAnnotation(zipkinCoreConstants.SERVER_RECV, out serverRecvAnnotation);
         }
 
         private bool TryGetAnnotation(string annotationType, out ZipkinAnnotation annotation)

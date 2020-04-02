@@ -47,13 +47,17 @@ namespace zipkin4net.UTest.Tracers.Zipkin
             }
         }
 
-        [Test]
-        public void SpanDoesntHaveDurationIfIncomplete()
+        [TestCase(zipkinCoreConstants.MESSAGE_SEND, true)]
+        [TestCase(zipkinCoreConstants.MESSAGE_RECV, true)]
+        [TestCase(zipkinCoreConstants.CLIENT_SEND, true)]
+        [TestCase(zipkinCoreConstants.SERVER_RECV, true)]
+        [TestCase(zipkinCoreConstants.SERVER_SEND, false)]
+        [TestCase(zipkinCoreConstants.CLIENT_RECV, false)]
+        public void SpanHasDurationForSelectedAnnotationOnly(string annotationType, bool shouldHaveDuration)
         {
             var offset = TimeSpan.FromMilliseconds(10);
 
-            Assert.False(GetSpanDuration(offset, zipkinCoreConstants.SERVER_SEND).HasValue);
-            Assert.False(GetSpanDuration(offset, zipkinCoreConstants.CLIENT_RECV).HasValue);
+            Assert.AreEqual(GetSpanDuration(offset, annotationType).HasValue, shouldHaveDuration);
         }
 
 
