@@ -40,7 +40,7 @@ namespace zipkin4net.UTest.Transport.Http
                 .Returns(true);
 
             var returnStatusCode = HttpStatusCode.BadRequest;
-            var tracingHandler = new TracingHandler("abc")
+            var tracingHandler = new TracingHandler("abc", null, null, logHttpHost: true)
             {
                 InnerHandler = new TestHandler(returnStatusCode)
             };
@@ -80,6 +80,30 @@ namespace zipkin4net.UTest.Transport.Http
                         m.Annotation is TagAnnotation
                         && ((TagAnnotation)m.Annotation).Key == zipkinCoreConstants.HTTP_STATUS_CODE
                         && ((TagAnnotation)m.Annotation).Value.ToString() == ((int)returnStatusCode).ToString())));
+        }
+
+        [Test]
+        public async Task ShouldLogHttpHost()
+        {
+            // Arrange
+            var returnStatusCode = HttpStatusCode.BadRequest;
+            var tracingHandler = new TracingHandler("abc", null, null, logHttpHost: false)
+            {
+                InnerHandler = new TestHandler(returnStatusCode)
+            };
+            httpClient = new HttpClient(tracingHandler);
+
+            dispatcher
+                .Setup(h => h.Dispatch(It.Is<Record>(m =>
+                    m.Annotation is TagAnnotation
+                    && ((TagAnnotation)m.Annotation).Key == zipkinCoreConstants.HTTP_HOST)))
+                .Throws(new Exception("HTTP_HOST Shouldn't be logged."));
+
+            // Act
+            Trace.Current = Trace.Create();
+            var uri = new Uri("https://abc.com/");
+            var method = HttpMethod.Get;
+            await httpClient.SendAsync(new HttpRequestMessage(HttpMethod.Get, uri));
         }
 
         [Test]
