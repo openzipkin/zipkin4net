@@ -19,7 +19,6 @@ namespace zipkin4net.UTest.Transport.Http
     {
         private HttpClient httpClient;
         private Mock<IRecordDispatcher> dispatcher;
-        private static HttpStatusCode returnStatusCode = HttpStatusCode.OK;
 
         [SetUp]
         public void SetUp()
@@ -30,12 +29,6 @@ namespace zipkin4net.UTest.Transport.Http
             TraceManager.Stop();
             TraceManager.SamplingRate = 1.0f;
             TraceManager.Start(new VoidLogger(), dispatcher.Object);
-
-            var tracingHandler = new TracingHandler("abc")
-            {
-                InnerHandler = new TestHandler()
-            };
-            httpClient = new HttpClient(tracingHandler);
         }
 
         [Test]
@@ -45,6 +38,13 @@ namespace zipkin4net.UTest.Transport.Http
             dispatcher
                 .Setup(h => h.Dispatch(It.IsAny<Record>()))
                 .Returns(true);
+
+            var returnStatusCode = HttpStatusCode.BadRequest;
+            var tracingHandler = new TracingHandler("abc")
+            {
+                InnerHandler = new TestHandler(returnStatusCode)
+            };
+            httpClient = new HttpClient(tracingHandler);
 
             // Act
             Trace.Current = Trace.Create();
@@ -82,12 +82,43 @@ namespace zipkin4net.UTest.Transport.Http
                         && ((TagAnnotation)m.Annotation).Value.ToString() == ((int)returnStatusCode).ToString())));
         }
 
+        [Test]
+        public async Task ShouldNotLogStatusCodeOnHttpCodeSuccess()
+        {
+            // Arrange
+            var tracingHandler = new TracingHandler("abc")
+            {
+                InnerHandler = new TestHandler(HttpStatusCode.OK)
+            };
+            httpClient = new HttpClient(tracingHandler);
+
+
+            dispatcher
+                .Setup(h => h.Dispatch(It.Is<Record>(m =>
+                    m.Annotation is TagAnnotation
+                    && ((TagAnnotation)m.Annotation).Key == zipkinCoreConstants.HTTP_STATUS_CODE)))
+                .Throws(new Exception("HTTP_STATUS_CODE Shouldn't be logged."));
+
+            // Act and assert
+            Trace.Current = Trace.Create();
+            var uri = new Uri("https://abc.com/");
+            var method = HttpMethod.Get;
+            await httpClient.SendAsync(new HttpRequestMessage(HttpMethod.Get, uri));
+        }
+
         private class TestHandler : DelegatingHandler
         {
+            private HttpStatusCode _returnStatusCode;
+
+            public TestHandler(HttpStatusCode returnStatusCode)
+            {
+                _returnStatusCode = returnStatusCode;
+            }
+
             protected override Task<HttpResponseMessage> SendAsync(
                 HttpRequestMessage request, CancellationToken cancellationToken)
             {
-                return Task.FromResult(new HttpResponseMessage(returnStatusCode)
+                return Task.FromResult(new HttpResponseMessage(_returnStatusCode)
                 {
                     Content = new StringContent("OK", Encoding.UTF8, "application/json"),
                     RequestMessage = request

@@ -69,7 +69,10 @@ namespace zipkin4net.Transport.Http
                     clientTrace.AddAnnotation(Annotations.Tag(zipkinCoreConstants.HTTP_HOST, result.RequestMessage.RequestUri.Host));
                     clientTrace.AddAnnotation(Annotations.Tag(zipkinCoreConstants.HTTP_PATH, result.RequestMessage.RequestUri.LocalPath));
                     clientTrace.AddAnnotation(Annotations.Tag(zipkinCoreConstants.HTTP_METHOD, result.RequestMessage.Method.Method));
-                    clientTrace.AddAnnotation(Annotations.Tag(zipkinCoreConstants.HTTP_STATUS_CODE, ((int)result.StatusCode).ToString()));
+                    if (!result.IsSuccessStatusCode)
+                    {
+                        clientTrace.AddAnnotation(Annotations.Tag(zipkinCoreConstants.HTTP_STATUS_CODE, ((int)result.StatusCode).ToString()));
+                    }
                 }
 
                 return result;
