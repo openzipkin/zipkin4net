@@ -20,7 +20,7 @@ namespace zipkin4net.Middleware
             {
                 var request = context.Request;
                 var traceContext = extractor.Extract(request.Headers);
-                
+
                 var trace = traceContext == null ? Trace.Create() : Trace.CreateFromId(traceContext);
                 Trace.Current = trace;
                 if (routeFilter(request.Path))

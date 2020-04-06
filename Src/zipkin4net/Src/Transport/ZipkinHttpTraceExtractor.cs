@@ -31,7 +31,7 @@ namespace zipkin4net.Transport
 
         public static bool TryParseTrace(string encodedTraceId, string encodedSpanId, string encodedParentSpanId, string sampledStr, string flagsStr, out Trace trace)
         {
-            var traceContext = B3Extractor<NameValueCollection, string>.TryParseTrace(encodedTraceId, encodedSpanId, encodedParentSpanId, sampledStr, flagsStr);
+            var traceContext = ExtractorHelper.TryParseTrace(encodedTraceId, encodedSpanId, encodedParentSpanId, sampledStr, flagsStr);
             return TryCreateTraceFromTraceContext(traceContext, out trace);
         }
 

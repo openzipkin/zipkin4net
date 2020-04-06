@@ -1,12 +1,11 @@
-﻿using zipkin4net.Annotation;
-using System;
+﻿using System;
 using System.Threading.Tasks;
 
 namespace zipkin4net
 {
-    public class ServerTrace : IDisposable
+    public class ServerTrace : BaseStandardTrace, IDisposable
     {
-        public Trace Trace
+        public override Trace Trace
         {
             get
             {
@@ -21,19 +20,9 @@ namespace zipkin4net
             Trace.Record(Annotations.Rpc(rpc));
         }
 
-        public void AddAnnotation(IAnnotation annotation)
-        {
-            Trace.Record(annotation);
-        }
-        
         public void Dispose()
         {
             Trace.Record(Annotations.ServerSend());
-        }
-
-        public virtual void Error(Exception ex)
-        {
-            Trace.RecordAnnotation(Annotations.Tag("error", ex.Message));
         }
     }
 
