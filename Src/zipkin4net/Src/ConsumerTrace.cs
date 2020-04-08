@@ -1,10 +1,13 @@
 ﻿using System;
+using zipkin4net.Annotation;
 using zipkin4net.Propagation;
 
 namespace zipkin4net
 {
-    public class ConsumerTrace : BaseStandardTrace, IDisposable
+    public class ConsumerTrace : IDisposable
     {
+        public Trace Trace { get; }
+
         public ConsumerTrace(string serviceName, string rpc, string encodedTraceId, string encodedSpanId,
             string encodedParentSpanId, string sampledStr, string flagsStr)
         {
@@ -21,6 +24,16 @@ namespace zipkin4net
             Trace.Record(Annotations.ConsumerStart());
             Trace.Record(Annotations.ServiceName(serviceName));
             Trace.Record(Annotations.Rpc(rpc));
+        }
+
+        public void AddAnnotation(IAnnotation annotation)
+        {
+            Trace.Record(annotation);
+        }
+
+        public virtual void Error(Exception ex)
+        {
+            Trace.Record(Annotations.Tag("error", ex.Message));
         }
 
         public void Dispose()

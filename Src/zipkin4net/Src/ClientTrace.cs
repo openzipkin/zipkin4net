@@ -1,19 +1,33 @@
-﻿using System;
+﻿using zipkin4net.Annotation;
+using System;
 using System.Threading.Tasks;
 
 namespace zipkin4net
 {
-    public class ClientTrace : BaseStandardTrace, IDisposable
+    public class ClientTrace : IDisposable
     {
+        public Trace Trace { get; }
+
         public ClientTrace(string serviceName, string rpc)
         {
-            if (Trace.Current != null) {
-              Trace = Trace.Current.Child();
+            if (Trace.Current != null)
+            {
+                Trace = Trace.Current.Child();
             }
 
             Trace.Record(Annotations.ClientSend());
             Trace.Record(Annotations.ServiceName(serviceName));
             Trace.Record(Annotations.Rpc(rpc));
+        }
+
+        public void AddAnnotation(IAnnotation annotation)
+        {
+            Trace.Record(annotation);
+        }
+
+        public virtual void Error(Exception ex)
+        {
+            Trace?.RecordAnnotation(Annotations.Tag("error", ex.Message));
         }
 
         public void Dispose()
