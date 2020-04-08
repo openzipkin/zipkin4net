@@ -10,8 +10,7 @@ namespace zipkin4net
 
         public ClientTrace(string serviceName, string rpc)
         {
-            if (Trace.Current != null)
-            {
+            if (Trace.Current != null) {
                 Trace = Trace.Current.Child();
             }
 
