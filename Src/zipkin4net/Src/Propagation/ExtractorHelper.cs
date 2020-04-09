@@ -33,7 +33,7 @@ namespace zipkin4net.Propagation
                     flags = SpanFlags.SamplingKnown;
                     if (sampled.Value)
                     {
-                        flags = flags | SpanFlags.Sampled;
+                        flags |= SpanFlags.Sampled;
                     }
                 }
                 else
