@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\aspnetcore\common\common.csproj" />
+    <ProjectReference Include="..\example.message.common\example.message.common.csproj" />
+  </ItemGroup>
+
+</Project>

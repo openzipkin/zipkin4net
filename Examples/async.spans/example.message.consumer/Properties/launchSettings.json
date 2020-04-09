@@ -1,0 +1,7 @@
+{
+  "profiles": {
+    "example.message.consumer": {
+      "commandName": "Project"
+    }
+  }
+}
