@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using zipkin4net.Annotation;
 using zipkin4net.Propagation;
 
@@ -39,6 +40,27 @@ namespace zipkin4net
         public void Dispose()
         {
             Trace.Record(Annotations.ConsumerStop());
+        }
+    }
+
+    public static class ConsumerTraceExtensions
+    {
+        /// <summary>
+        /// Runs the task asynchronously and adds an error annotation in case of failure
+        /// </summary>
+        /// <param name="consumerTrace"></param>
+        /// <param name="task"></param>
+        public static async Task TracedActionAsync(this ConsumerTrace serverTrace, Task task)
+        {
+            try
+            {
+                await task;
+            }
+            catch (Exception ex)
+            {
+                serverTrace?.Error(ex);
+                throw;
+            }
         }
     }
 }
