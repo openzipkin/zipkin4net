@@ -21,11 +21,8 @@ namespace example.message.consumer
 
             if (message != null)
             {
-                // need to put trae information from producer
-                using var messageProducerTrace = new ConsumerTrace("message.consumer", "process message",
-                    message.TraceId, message.SpanId, message.ParentId, message.Sampled, message.Flags.ToString(CultureInfo.InvariantCulture));
-                await Task.Delay(600); // Test delay for mock processing
 
+                await ProcessMessage(message);
                 Console.WriteLine($"Message '{message.Text}' was processed!");
             }
             else
@@ -36,6 +33,22 @@ namespace example.message.consumer
             // teardown
             ZipkinHelper.StopZipkin();
             Console.ReadLine();
+        }
+
+        static async Task ProcessMessage(Message message)
+        {
+            // need to supply trace information from producer
+            using (var messageProducerTrace = new ConsumerTrace(
+                serviceName: "message.consumer",
+                rpc: "process message",
+                encodedTraceId: message.TraceId,
+                encodedSpanId: message.SpanId,
+                encodedParentSpanId: message.ParentId,
+                sampledStr: message.Sampled,
+                flagsStr: message.Flags.ToString(CultureInfo.InvariantCulture)))
+            {
+                await Task.Delay(600); // Test delay for mock processing
+            }
         }
 
         static async Task<Message> FetchAMessage()

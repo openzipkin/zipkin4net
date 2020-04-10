@@ -21,15 +21,21 @@ namespace example.message.producer
             var text = Guid.NewGuid().ToString();
             // need to create current trace before using ProducerTrace
             Trace.Current = Trace.Create();
-            using (var messageProducerTrace = new ProducerTrace("message.producer", "create message"))
-            {
-                await ProduceMessage(messageProducerTrace.Trace.CurrentSpan, text);
-            }
+            await TracedProduceMessage(text);
             Console.WriteLine($"Message '{text}' sent to message center!");
 
             // teardown
             ZipkinHelper.StopZipkin();
             Console.ReadLine();
+        }
+
+        static async Task TracedProduceMessage(string text)
+        {
+            using (var messageProducerTrace = new ProducerTrace("message.producer", "create message"))
+            {
+                // TracedActionAsync extension method logs error annotation if exception occurs
+                await messageProducerTrace.TracedActionAsync(ProduceMessage(messageProducerTrace.Trace.CurrentSpan, text));
+            }
         }
 
         static async Task ProduceMessage(ITraceContext traceContext, string text)
