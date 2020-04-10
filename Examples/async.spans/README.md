@@ -4,7 +4,7 @@ This document will show how to implement PRODUCER and CONSUMER spans using zipki
 
 ## Implementation Overview
 
-We got 3 applications to produce example PRODUCER and CONSUMER spans.
+We have 3 applications to produce example PRODUCER and CONSUMER spans.
 
 - `example.message.center` - Stores and pops messages. The messages contain trace information.
 - `example.message.producer` - Creates a message with trace information and stores it to `example.message.center`. Logs PRODUCER span to zipkin server.
@@ -12,25 +12,23 @@ We got 3 applications to produce example PRODUCER and CONSUMER spans.
 
 ## Pre-requisites
 
-In order to build the example, you need to install:
-- at least [dotnet 2.2](https://dotnet.microsoft.com/download/dotnet-core/2.2)
-
-To run the examples, you need a live zipkin server.
+- To build the example, you need to install at least [dotnet 2.2](https://dotnet.microsoft.com/download/dotnet-core/2.2)
+- To run the examples, you need a live zipkin server.
 
 ## Running the example
 
 1. Run `example.message.center` app
-  - On a commandline, navigate to `Examples\async.spans\example.message.center`
+  - On a command line, navigate to `Examples\async.spans\example.message.center`
   - Run `dotnet run`
   ![example.message.center](images/run-example.message.center.PNG)
 
 2. Run `example.message.producer` app
-  - On a commandline, navigate to `Examples\async.spans\example.message.producer`
+  - On a command line, navigate to `Examples\async.spans\example.message.producer`
   - Run `dotnet run <base url of live zipkin server>`
   ![example.message.producer](images/run-example.message.producer.PNG)
 
 3. Run `example.message.consumer` app
-  - On a commandline, navigate to `Examples\async.spans\example.message.consumer`
+  - On a command line, navigate to `Examples\async.spans\example.message.consumer`
   - Run `dotnet run <base url of live zipkin server>`
   ![example.message.consumer](images/run-example.message.consumer.PNG)
 
@@ -40,7 +38,7 @@ To run the examples, you need a live zipkin server.
   - Click one of the search result, it should show the PRODUCER and CONSUMER spans
   ![example-output](images/run-example-output.PNG)
 
-## What to take note on how to use PRODUCER and CONSUMER spans
+## What to take note on how to create/use PRODUCER and CONSUMER spans
 
 ### PRODUCER spans
 
@@ -54,7 +52,7 @@ using (var messageProducerTrace = new ProducerTrace("<Application name>", "<RPC 
 }
 ```
 - `TracedActionAsync` is used to run the process that is measured to log error annotation in your zipkin trace if exception is thrown.
-- Make a way that trace information is passed out using your message. So in the example, the trace information is part of the message which will be parsed by the consumer application to start CONSUMER spans.
+- Make a way that trace information is passed to the consumer. So in the example, the trace information is part of the message which will be parsed by the consumer application to create CONSUMER spans.
 
 ### CONSUMER spans
 
@@ -77,5 +75,5 @@ static async Task ProcessMessage(Message message)
     }
 }
 ```
-- In the example PRODUCER application passed in the trace information through the `message` object. Using the trace information, CONSUMER span is created.
+- In the example PRODUCER application passed the trace information through the `message` object. Using the trace information, CONSUMER span is created.
 - `TracedActionAsync` is used to run the process that is measured to log error annotation in your zipkin trace if exception is thrown.
