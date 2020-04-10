@@ -35,6 +35,7 @@ namespace example.message.producer
             {
                 // TracedActionAsync extension method logs error annotation if exception occurs
                 await messageProducerTrace.TracedActionAsync(ProduceMessage(messageProducerTrace.Trace.CurrentSpan, text));
+                messageProducerTrace.AddAnnotation(Annotations.Tag("sampleProducerTag", "success!"));
             }
         }
 

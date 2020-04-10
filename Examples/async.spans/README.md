@@ -49,10 +49,12 @@ We have 3 applications to produce example PRODUCER and CONSUMER spans.
   {
       // TracedActionAsync extension method logs error annotation if exception occurs
       await messageProducerTrace.TracedActionAsync(ProduceMessage(messageProducerTrace.Trace.CurrentSpan, text));
+      messageProducerTrace.AddAnnotation(Annotations.Tag("sampleProducerTag", "success!"));
   }
   ```
 - `TracedActionAsync` is used to run the process that is measured to log error annotation in your zipkin trace if exception is thrown.
 - Make a way that trace information is passed to the consumer. So in the example, the trace information is part of the message which will be parsed by the consumer application to create CONSUMER spans.
+- Also, custom annotations can be added using the ProducerTrace object method `AddAnnotation`.
 
 ### CONSUMER spans
 
@@ -62,7 +64,7 @@ We have 3 applications to produce example PRODUCER and CONSUMER spans.
   static async Task ProcessMessage(Message message)
   {
       // need to supply trace information from producer
-      using (var messageProducerTrace = new ConsumerTrace(
+      using (var messageConsumerTrace = new ConsumerTrace(
           serviceName: "<Application name>",
           rpc:  "<RPC here>",
           encodedTraceId: message.TraceId,
@@ -71,9 +73,11 @@ We have 3 applications to produce example PRODUCER and CONSUMER spans.
           sampledStr: message.Sampled,
           flagsStr: message.Flags.ToString(CultureInfo.InvariantCulture)))
       {
-          await messageProducerTrace.TracedActionAsync(Task.Delay(600)); // Test delay for mock processing
+          await messageConsumerTrace.TracedActionAsync(Task.Delay(600)); // Test delay for mock processing
+          messageConsumerTrace.AddAnnotation(Annotations.Tag("sampleConsumerTag", "success!"));
       }
   }
   ```
 - In the example PRODUCER application passed the trace information through the `message` object. Using the trace information, CONSUMER span is created.
 - `TracedActionAsync` is used to run the process that is measured to log error annotation in your zipkin trace if exception is thrown.
+- Also, custom annotations can be added using the ConsumerTrace object method `AddAnnotation`.

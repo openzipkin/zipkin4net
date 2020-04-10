@@ -38,7 +38,7 @@ namespace example.message.consumer
         static async Task ProcessMessage(Message message)
         {
             // need to supply trace information from producer
-            using (var messageProducerTrace = new ConsumerTrace(
+            using (var messageConsumerTrace = new ConsumerTrace(
                 serviceName: "message.consumer",
                 rpc: "process message",
                 encodedTraceId: message.TraceId,
@@ -47,7 +47,8 @@ namespace example.message.consumer
                 sampledStr: message.Sampled,
                 flagsStr: message.Flags.ToString(CultureInfo.InvariantCulture)))
             {
-                await messageProducerTrace.TracedActionAsync(Task.Delay(600)); // Test delay for mock processing
+                await messageConsumerTrace.TracedActionAsync(Task.Delay(600)); // Test delay for mock processing
+                messageConsumerTrace.AddAnnotation(Annotations.Tag("sampleConsumerTag", "success!"));
             }
         }
 
