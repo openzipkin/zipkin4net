@@ -32,7 +32,7 @@ namespace example.message.consumer
 
             // teardown
             ZipkinHelper.StopZipkin();
-            Console.ReadLine();
+            Console.ReadKey();
         }
 
         static async Task ProcessMessage(Message message)
