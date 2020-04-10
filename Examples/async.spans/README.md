@@ -22,23 +22,23 @@ To run the examples, you need a live zipkin server.
 1. Run `example.message.center` app
   - On a commandline, navigate to `Examples\async.spans\example.message.center`
   - Run `dotnet run`
-  ![example.message.center](images/run-example.message.center.png)
+  ![example.message.center](images/run-example.message.center.PNG)
 
 2. Run `example.message.producer` app
   - On a commandline, navigate to `Examples\async.spans\example.message.producer`
   - Run `dotnet run <base url of live zipkin server>`
-  ![example.message.producer](images/run-example.message.producer.png)
+  ![example.message.producer](images/run-example.message.producer.PNG)
 
 3. Run `example.message.consumer` app
   - On a commandline, navigate to `Examples\async.spans\example.message.consumer`
   - Run `dotnet run <base url of live zipkin server>`
-  ![example.message.consumer](images/run-example.message.consumer.png)
+  ![example.message.consumer](images/run-example.message.consumer.PNG)
 
 4. Check the output
   - Go to zipkin UI
   - Search for `message.producer` or `message.consumer` as serviceName
   - Click one of the search result, it should show the PRODUCER and CONSUMER spans
-  ![example-output](images/run-example-output.png )
+  ![example-output](images/run-example-output.PNG)
 
 ## What to take note on how to use PRODUCER and CONSUMER spans
 
@@ -73,9 +73,9 @@ static async Task ProcessMessage(Message message)
         sampledStr: message.Sampled,
         flagsStr: message.Flags.ToString(CultureInfo.InvariantCulture)))
     {
-        await Task.Delay(600); // Test delay for mock processing
+        await messageProducerTrace.TracedActionAsync(Task.Delay(600)); // Test delay for mock processing
     }
 }
 ```
 - In the example PRODUCER application passed in the trace information through the `message` object. Using the trace information, CONSUMER span is created.
-- `TracedActionAsync` can be used to run the process that will be measured to log error annotation in your zipkin trace if exception is thrown.
+- `TracedActionAsync` is used to run the process that is measured to log error annotation in your zipkin trace if exception is thrown.

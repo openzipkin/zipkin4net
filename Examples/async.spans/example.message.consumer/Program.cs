@@ -47,7 +47,7 @@ namespace example.message.consumer
                 sampledStr: message.Sampled,
                 flagsStr: message.Flags.ToString(CultureInfo.InvariantCulture)))
             {
-                await Task.Delay(600); // Test delay for mock processing
+                await messageProducerTrace.TracedActionAsync(Task.Delay(600)); // Test delay for mock processing
             }
         }
 
