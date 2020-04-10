@@ -3,7 +3,7 @@ sudo: required
 dist: trusty
 mono:
   - latest
-dotnet: 3.1.100
+dotnet: 2.0.0
 os:
   - linux
 script:
