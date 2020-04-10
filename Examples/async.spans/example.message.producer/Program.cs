@@ -1,8 +1,8 @@
 ﻿using example.message.common;
+using Newtonsoft.Json;
 using System;
 using System.Net.Http;
 using System.Text;
-using System.Text.Json;
 using System.Threading.Tasks;
 using zipkin4net;
 using zipkin4net.Propagation;
@@ -26,7 +26,7 @@ namespace example.message.producer
 
             // teardown
             ZipkinHelper.StopZipkin();
-            Console.ReadLine();
+            Console.ReadKey();
         }
 
         static async Task TracedProduceMessage(string text)
@@ -53,10 +53,11 @@ namespace example.message.producer
                 Sampled = traceContext.SerializeSampledKey(),
                 Flags = long.Parse(traceContext.SerializeDebugKey())
             };
+            var stringContent = JsonConvert.SerializeObject(message);
 
             await client.SendAsync(new HttpRequestMessage(HttpMethod.Post, "messages/push")
             {
-                Content = new StringContent(JsonSerializer.Serialize(message), Encoding.UTF8, "application/json")
+                Content = new StringContent(stringContent, Encoding.UTF8, "application/json")
             }); ;
         }
     }

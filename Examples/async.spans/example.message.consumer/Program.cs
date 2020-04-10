@@ -1,8 +1,8 @@
 ﻿using example.message.common;
+using Newtonsoft.Json;
 using System;
 using System.Globalization;
 using System.Net.Http;
-using System.Text.Json;
 using System.Threading.Tasks;
 using zipkin4net;
 
@@ -64,7 +64,7 @@ namespace example.message.consumer
             if (string.IsNullOrEmpty(content))
                 return null;
             else
-                return JsonSerializer.Deserialize<Message>(content);
+                return JsonConvert.DeserializeObject<Message>(content);
         }
     }
 }

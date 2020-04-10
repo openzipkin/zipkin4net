@@ -1,25 +1,26 @@
-﻿using System.Text.Json.Serialization;
+﻿using System.Runtime.Serialization;
 
 namespace example.message.common
 {
+    [DataContract(Name = "message")]
     public class Message
     {
-        [JsonPropertyName("text")]
+        [DataMember(Name = "text")]
         public string Text { get; set; }
 
-        [JsonPropertyName("trace_id")]
+        [DataMember(Name = "trace_id")]
         public string TraceId { get; set; }
 
-        [JsonPropertyName("parent_id")]
+        [DataMember(Name = "parent_id")]
         public string ParentId { get; set; }
 
-        [JsonPropertyName("span_id")]
+        [DataMember(Name = "span_id")]
         public string SpanId { get; set; }
 
-        [JsonPropertyName("sampled")]
+        [DataMember(Name = "sampled")]
         public string Sampled { get; set; }
 
-        [JsonPropertyName("flags")]
+        [DataMember(Name = "flags")]
         public long Flags { get; set; }
     }
 }
