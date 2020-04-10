@@ -7,7 +7,7 @@ using zipkin4net.Annotation;
 namespace zipkin4net.UTest
 {
     [TestFixture]
-    internal class T_ClientTrace
+    internal class T_ProducerTrace
     {
         private Mock<IRecordDispatcher> dispatcher;
         private const string serviceName = "service1";
@@ -26,9 +26,9 @@ namespace zipkin4net.UTest
         public void ShouldNotSetCurrentTrace()
         {
             Trace.Current = null;
-            using (var client = new ClientTrace(serviceName, rpc))
+            using (var producer = new ProducerTrace(serviceName, rpc))
             {
-                Assert.IsNull(client.Trace);
+                Assert.IsNull(producer.Trace);
             }
         }
 
@@ -37,15 +37,15 @@ namespace zipkin4net.UTest
         {
             var trace = Trace.Create();
             Trace.Current = trace;
-            using (var client = new ClientTrace(serviceName, rpc))
+            using (var producer = new ProducerTrace(serviceName, rpc))
             {
-                Assert.AreEqual(trace.CurrentSpan.SpanId, client.Trace.CurrentSpan.ParentSpanId);
-                Assert.AreEqual(trace.CurrentSpan.TraceId, client.Trace.CurrentSpan.TraceId);
+                Assert.AreEqual(trace.CurrentSpan.SpanId, producer.Trace.CurrentSpan.ParentSpanId);
+                Assert.AreEqual(trace.CurrentSpan.TraceId, producer.Trace.CurrentSpan.TraceId);
             }
         }
 
         [Test]
-        public void ShouldLogClientAnnotations()
+        public void ShouldLogProducerAnnotations()
         {
             // Arrange
             dispatcher
@@ -56,13 +56,13 @@ namespace zipkin4net.UTest
             var trace = Trace.Create();
             trace.ForceSampled();
             Trace.Current = trace;
-            using (var client = new ClientTrace(serviceName, rpc))
+            using (var producer = new ProducerTrace(serviceName, rpc))
             {
                 // Assert
                 dispatcher
                     .Verify(h =>
                         h.Dispatch(It.Is<Record>(m =>
-                            m.Annotation is ClientSend)));
+                            m.Annotation is ProducerStart)));
 
                 dispatcher
                     .Verify(h =>
@@ -81,7 +81,7 @@ namespace zipkin4net.UTest
             dispatcher
                 .Verify(h =>
                     h.Dispatch(It.Is<Record>(m =>
-                        m.Annotation is ClientRecv)));
+                        m.Annotation is ProducerStop)));
         }
     }
 }

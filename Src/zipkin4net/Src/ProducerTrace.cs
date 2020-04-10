@@ -18,7 +18,7 @@ namespace zipkin4net
 
         public void Dispose()
         {
-            Trace.Record(Annotations.ConsumerStop());
+            Trace.Record(Annotations.ProducerStop());
         }
     }
 }
