@@ -4,7 +4,7 @@ This document will show how to implement PRODUCER and CONSUMER spans using zipki
 
 # Implementation Overview
 
-We got 3 applications to complate the PRODUCER and CONSUMER spans.
+We got 3 applications to produce example PRODUCER and CONSUMER spans.
 
 - `example.message.center` - Stores and pops messages. The messages contain trace information.
 - `example.message.producer` - Creates a message with trace information and stores it to `example.message.center`. Logs PRODUCER span to zipkin server.
@@ -22,23 +22,23 @@ To run, the examples, you need a live zipkin server.
 1. Run `example.message.center` app
   - On a commandline, navigate to `Examples\async.spans\example.message.center`
   - Run `dotnet run`
-  ![alt text](images/run-example.message.center.png "example.message.center")
+  ![example.message.center](images/run-example.message.center.png)
 
 2. Run `example.message.producer` app
   - On a commandline, navigate to `Examples\async.spans\example.message.producer`
   - Run `dotnet run <base url of live zipkin server>`
-  ![alt text](images/run-example.message.producer.png "example.message.producer")
+  ![example.message.producer](images/run-example.message.producer.png)
 
 3. Run `example.message.consumer` app
   - On a commandline, navigate to `Examples\async.spans\example.message.consumer`
   - Run `dotnet run <base url of live zipkin server>`
-  ![alt text](images/run-example.message.consumer.png "example.message.consumer")
+  ![example.message.consumer](images/run-example.message.consumer.png)
 
 4. Check the output
   - Go to zipkin UI
   - Search for `message.producer` or `message.consumer` as serviceName
   - Click one of the search result, it should show the PRODUCER and CONSUMER spans
-  ![alt text](images/run-example-output.png "example-output")
+  ![example-output](images/run-example-output.png )
 
 # What to take note on how to use PRODUCER and CONSUMER spans
 
