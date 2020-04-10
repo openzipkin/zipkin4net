@@ -47,7 +47,7 @@ To run the examples, you need a live zipkin server.
 - To make a PRODUCER span, you need to use `ProducerTrace` class 
 - Example code from [example.message.producer](example.message.producer/Program.cs)
 ```csharp
- using (var messageProducerTrace = new ProducerTrace("<Application name>", "<RPC here>"))
+using (var messageProducerTrace = new ProducerTrace("<Application name>", "<RPC here>"))
 {
     // TracedActionAsync extension method logs error annotation if exception occurs
     await messageProducerTrace.TracedActionAsync(ProduceMessage(messageProducerTrace.Trace.CurrentSpan, text));
@@ -65,8 +65,8 @@ static async Task ProcessMessage(Message message)
 {
     // need to supply trace information from producer
     using (var messageProducerTrace = new ConsumerTrace(
-        serviceName: "message.consumer",
-        rpc: "process message",
+        serviceName: "<Application name>",
+        rpc:  "<RPC here>",
         encodedTraceId: message.TraceId,
         encodedSpanId: message.SpanId,
         encodedParentSpanId: message.ParentId,
