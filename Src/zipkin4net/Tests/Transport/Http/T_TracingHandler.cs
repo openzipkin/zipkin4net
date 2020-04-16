@@ -83,7 +83,7 @@ namespace zipkin4net.UTest.Transport.Http
         }
 
         [Test]
-        public async Task ShouldLogHttpHost()
+        public async Task ShouldNotLogHttpHost()
         {
             // Arrange
             var returnStatusCode = HttpStatusCode.BadRequest;

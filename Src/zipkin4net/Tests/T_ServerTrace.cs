@@ -7,7 +7,7 @@ using zipkin4net.Annotation;
 namespace zipkin4net.UTest
 {
     [TestFixture]
-    internal class T_ClientTrace
+    internal class T_ServerTrace
     {
         private Mock<IRecordDispatcher> dispatcher;
         private const string serviceName = "service1";
@@ -23,29 +23,7 @@ namespace zipkin4net.UTest
         }
 
         [Test]
-        public void ShouldNotSetCurrentTrace()
-        {
-            Trace.Current = null;
-            using (var client = new ClientTrace(serviceName, rpc))
-            {
-                Assert.IsNull(client.Trace);
-            }
-        }
-
-        [Test]
-        public void ShouldCallChildWhenCurrentTraceNotNull()
-        {
-            var trace = Trace.Create();
-            Trace.Current = trace;
-            using (var client = new ClientTrace(serviceName, rpc))
-            {
-                Assert.AreEqual(trace.CurrentSpan.SpanId, client.Trace.CurrentSpan.ParentSpanId);
-                Assert.AreEqual(trace.CurrentSpan.TraceId, client.Trace.CurrentSpan.TraceId);
-            }
-        }
-
-        [Test]
-        public void ShouldLogClientAnnotations()
+        public void ShouldLogServerAnnotations()
         {
             // Arrange
             dispatcher
@@ -56,13 +34,13 @@ namespace zipkin4net.UTest
             var trace = Trace.Create();
             trace.ForceSampled();
             Trace.Current = trace;
-            using (var client = new ClientTrace(serviceName, rpc))
+            using (var server = new ServerTrace(serviceName, rpc))
             {
                 // Assert
                 dispatcher
                     .Verify(h =>
                         h.Dispatch(It.Is<Record>(m =>
-                            m.Annotation is ClientSend)));
+                            m.Annotation is ServerRecv)));
 
                 dispatcher
                     .Verify(h =>
@@ -81,7 +59,7 @@ namespace zipkin4net.UTest
             dispatcher
                 .Verify(h =>
                     h.Dispatch(It.Is<Record>(m =>
-                        m.Annotation is ClientRecv)));
+                        m.Annotation is ServerSend)));
         }
     }
 }

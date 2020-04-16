@@ -4,7 +4,7 @@ dist: trusty
 mono:
   - latest
 dotnet: 2.0.0
-os:  
+os:
   - linux
 script:
   - ./build.sh

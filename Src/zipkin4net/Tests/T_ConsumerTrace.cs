@@ -3,11 +3,12 @@ using Moq;
 using zipkin4net.Dispatcher;
 using zipkin4net.Logger;
 using zipkin4net.Annotation;
+using zipkin4net.Propagation;
 
 namespace zipkin4net.UTest
 {
     [TestFixture]
-    internal class T_ClientTrace
+    internal class T_ConsumerTrace
     {
         private Mock<IRecordDispatcher> dispatcher;
         private const string serviceName = "service1";
@@ -23,21 +24,28 @@ namespace zipkin4net.UTest
         }
 
         [Test]
-        public void ShouldNotSetCurrentTrace()
+        public void ShouldSetCurrentTraceIfInvalidTraceInformationIsPassed()
         {
-            Trace.Current = null;
-            using (var client = new ClientTrace(serviceName, rpc))
+            TraceManager.SamplingRate = 1.0f;
+            using (var client = new ConsumerTrace(serviceName, rpc, null, null, null, null, null))
             {
-                Assert.IsNull(client.Trace);
+                Assert.IsNotNull(client.Trace);
             }
         }
 
         [Test]
-        public void ShouldCallChildWhenCurrentTraceNotNull()
+        public void ShouldSetChildTraceIfValidTraceInformationIsPassed()
         {
-            var trace = Trace.Create();
-            Trace.Current = trace;
-            using (var client = new ClientTrace(serviceName, rpc))
+            TraceManager.SamplingRate = 1.0f;
+            var rootTrace = Trace.Create();
+            var trace = rootTrace.Child();
+            var context = trace.CurrentSpan;
+            using (var client = new ConsumerTrace(serviceName, rpc,
+                context.SerializeTraceId(),
+                context.SerializeSpanId(),
+                context.SerializeParentSpanId(),
+                context.SerializeSampledKey(),
+                context.SerializeDebugKey()))
             {
                 Assert.AreEqual(trace.CurrentSpan.SpanId, client.Trace.CurrentSpan.ParentSpanId);
                 Assert.AreEqual(trace.CurrentSpan.TraceId, client.Trace.CurrentSpan.TraceId);
@@ -45,7 +53,7 @@ namespace zipkin4net.UTest
         }
 
         [Test]
-        public void ShouldLogClientAnnotations()
+        public void ShouldLogConsumerAnnotations()
         {
             // Arrange
             dispatcher
@@ -53,16 +61,14 @@ namespace zipkin4net.UTest
                 .Returns(true);
 
             // Act
-            var trace = Trace.Create();
-            trace.ForceSampled();
-            Trace.Current = trace;
-            using (var client = new ClientTrace(serviceName, rpc))
+            TraceManager.SamplingRate = 1.0f;
+            using (var server = new ConsumerTrace(serviceName, rpc, null, null, null, null, null))
             {
                 // Assert
                 dispatcher
                     .Verify(h =>
                         h.Dispatch(It.Is<Record>(m =>
-                            m.Annotation is ClientSend)));
+                            m.Annotation is ConsumerStart)));
 
                 dispatcher
                     .Verify(h =>
@@ -81,7 +87,7 @@ namespace zipkin4net.UTest
             dispatcher
                 .Verify(h =>
                     h.Dispatch(It.Is<Record>(m =>
-                        m.Annotation is ClientRecv)));
+                        m.Annotation is ConsumerStop)));
         }
     }
 }
