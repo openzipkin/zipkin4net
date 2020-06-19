@@ -74,7 +74,7 @@ namespace zipkin4net.Transport.Http
                     _injector.Inject(clientTrace.Trace.CurrentSpan, request.Headers);
                 }
 
-                var result = await clientTrace.TracedActionAsync(base.SendAsync(request, cancellationToken));
+                var result = await clientTrace.TracedActionAsync(base.SendAsync(request, cancellationToken)).ConfigureAwait(false);
 
                 if (clientTrace.Trace != null)
                 {
