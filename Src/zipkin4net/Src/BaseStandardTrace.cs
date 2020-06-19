@@ -31,7 +31,7 @@ namespace zipkin4net
         {
             try
             {
-                return await task;
+                return await task.ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -50,7 +50,7 @@ namespace zipkin4net
         {
             try
             {
-                await task;
+                await task.ConfigureAwait(false);
             }
             catch (Exception ex)
             {
