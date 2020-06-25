@@ -12,7 +12,15 @@
     <PackageReleaseNotes>Asp.net core middleware for zipkin4net</PackageReleaseNotes>
     <PackageProjectUrl>https://github.com/openzipkin/zipkin4net</PackageProjectUrl>
     <PackageLicenseUrl>https://github.com/openzipkin/zipkin4net/blob/master/LICENSE</PackageLicenseUrl>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
   </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All" />
+  </ItemGroup>
+
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Hosting" Version="1.1.1" />
