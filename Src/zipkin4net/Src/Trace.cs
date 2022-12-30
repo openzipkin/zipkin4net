@@ -51,10 +51,9 @@ namespace zipkin4net
         }
         private Trace()
         {
-            var traceId = RandomUtils.NextLong();
-            var traceIdHigh = TraceManager.Trace128Bits ? RandomUtils.NextLong() : 0;
             var spanId = RandomUtils.NextLong();
-
+            var traceId = spanId;
+            var traceIdHigh = TraceManager.Trace128Bits ? RandomUtils.NextLong() : 0;
             var isSampled = TraceManager.Sampler.Sample(traceId);
 
             CurrentSpan = new SpanState(traceIdHigh: traceIdHigh, traceId: traceId, parentSpanId: null, spanId: spanId, isSampled: isSampled, isDebug: false);
