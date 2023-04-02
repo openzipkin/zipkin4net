@@ -8,7 +8,7 @@ namespace zipkin4net.Transport
 {
 	public static class ZipkinHttpHelper
 	{
-        public static void InjectionHelper(HttpClient carrier, string key, string value)
+        public static void InjectorHelper(HttpClient carrier, string key, string value)
         {
             carrier.DefaultRequestHeaders.Add(key, value);
         }
