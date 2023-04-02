@@ -32,6 +32,8 @@ namespace zipkin4net.UTests.Transport
             Assert.AreEqual(ZipkinHttpHelper.ExtractorHelper(carrier, key), string.Empty);
         }
 
+		// No test needed for Injector
+
 	}
 }
 
